@@ -26,7 +26,8 @@
     "typescript": "^4.5.3"
   },
   "dependencies": {
-    "@react-dive-ui/machines": "workspace:*"
+    "@react-dive-ui/machines": "workspace:*",
+    "@xstate/react": "4.0.0-beta.8"
   },
   "publishConfig": {
     "access": "public"
