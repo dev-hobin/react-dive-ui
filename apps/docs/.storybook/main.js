@@ -14,11 +14,8 @@ module.exports = {
       resolve: {
         alias: [
           {
-            find: "@acme/core",
-            replacement: path.resolve(
-              __dirname,
-              "../../../packages/acme-core/"
-            ),
+            find: "@react-dive-ui/core",
+            replacement: path.resolve(__dirname, "../../../packages/core/"),
           },
         ],
       },
