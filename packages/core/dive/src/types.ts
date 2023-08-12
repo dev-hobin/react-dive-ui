@@ -25,5 +25,5 @@ export type JsxElements = {
   [TElement in keyof JSX.IntrinsicElements]: DiveForwardRefComponent<TElement>;
 };
 
-type DiveForwardRefComponent<TElement extends ElementType> =
+export type DiveForwardRefComponent<TElement extends ElementType> =
   React.ForwardRefExoticComponent<DivePropsWithRef<TElement>>;

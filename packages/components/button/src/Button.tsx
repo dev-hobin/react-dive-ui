@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { buttonMachine } from "@react-dive-ui/machines";
+import { buttonMachine } from "@react-dive-ui/button-machine";
 import { useActor } from "@xstate/react";
 
 export interface ButtonProps {

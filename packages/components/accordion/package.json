@@ -1,5 +1,5 @@
 {
-  "name": "@react-dive-ui/button",
+  "name": "@react-dive-ui/accordion",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -26,7 +26,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@react-dive-ui/button-machine": "workspace:*",
+    "@react-dive-ui/accordion-machine": "workspace:*",
+    "@react-dive-ui/dive": "workspace:*",
     "@xstate/react": "4.0.0-beta.8"
   },
   "publishConfig": {
