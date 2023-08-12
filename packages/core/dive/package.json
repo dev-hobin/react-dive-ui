@@ -1,5 +1,5 @@
 {
-  "name": "@react-dive-ui/core",
+  "name": "@react-dive-ui/dive",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -10,8 +10,8 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
-    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
@@ -24,10 +24,6 @@
     "react": "^18.2.0",
     "tsup": "^7.2.0",
     "typescript": "^5.1.6"
-  },
-  "dependencies": {
-    "@react-dive-ui/machines": "workspace:*",
-    "@xstate/react": "4.0.0-beta.8"
   },
   "publishConfig": {
     "access": "public"

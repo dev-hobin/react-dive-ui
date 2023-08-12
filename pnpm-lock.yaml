@@ -29,6 +29,9 @@ importers:
       '@react-dive-ui/button':
         specifier: workspace:0.0.0
         version: link:../../packages/components/button
+      '@react-dive-ui/dive':
+        specifier: workspace:0.0.0
+        version: link:../../packages/core/dive
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -81,6 +84,9 @@ importers:
 
   packages/components/button:
     dependencies:
+      '@react-dive-ui/dive':
+        specifier: workspace:*
+        version: link:../../core/dive
       '@react-dive-ui/machines':
         specifier: workspace:*
         version: link:../../machines
@@ -113,18 +119,11 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
-  packages/core:
-    dependencies:
-      '@react-dive-ui/machines':
-        specifier: workspace:*
-        version: link:../machines
-      '@xstate/react':
-        specifier: 4.0.0-beta.8
-        version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)
+  packages/core/dive:
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../../tsconfig
       '@types/react':
         specifier: ^18.2.20
         version: 18.2.20
@@ -136,7 +135,7 @@ importers:
         version: 8.46.0
       eslint-config-dive:
         specifier: workspace:*
-        version: link:../eslint-config-dive
+        version: link:../../eslint-config-dive
       react:
         specifier: ^18.2.0
         version: 18.2.0

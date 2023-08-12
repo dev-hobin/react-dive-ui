@@ -1,6 +1,6 @@
+import { ReactNode } from "react";
 import { buttonMachine } from "@react-dive-ui/machines";
 import { useActor } from "@xstate/react";
-import { ReactNode } from "react";
 
 export interface ButtonProps {
   children: ReactNode;
