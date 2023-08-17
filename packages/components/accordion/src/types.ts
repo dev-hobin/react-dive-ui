@@ -4,16 +4,11 @@ interface CommonAccordionOption {
 }
 
 export interface SingleAccordionOption extends CommonAccordionOption {
+  type: "single";
   defaultValue?: string;
   collapsible?: boolean;
 }
 export interface MultipleAccordionOption extends CommonAccordionOption {
-  defaultValue?: string[];
-}
-
-export interface SingleAccordion extends SingleAccordionOption {
-  type: "single";
-}
-export interface MultipleAccordion extends MultipleAccordionOption {
   type: "multiple";
+  defaultValue?: string[];
 }

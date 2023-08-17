@@ -1,20 +1,20 @@
 import { useCallback } from "react";
 import { useActor } from "@xstate/react";
 import { accordionMachine } from "@react-dive-ui/accordion-machine";
-import { MultipleAccordion, SingleAccordion } from "./types";
+import { SingleAccordionOption, MultipleAccordionOption } from "./types";
 
-export type AccordionOption = MultipleAccordion | SingleAccordion;
+export type AccordionOption = SingleAccordionOption | MultipleAccordionOption;
 export function useAccordion(option: AccordionOption) {
   const [state, send] = useActor(accordionMachine, {
     input:
       option.type === "single"
         ? {
             ...option,
-            values: option.defaultValue ? [option.defaultValue] : [],
+            value: option.defaultValue ? [option.defaultValue] : [],
           }
         : {
             ...option,
-            values: option.defaultValue ?? [],
+            value: option.defaultValue ?? [],
           },
   });
 
