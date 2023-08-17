@@ -29,9 +29,6 @@ importers:
       '@react-dive-ui/accordion':
         specifier: workspace:0.0.0
         version: link:../../packages/components/accordion
-      '@react-dive-ui/button':
-        specifier: workspace:0.0.0
-        version: link:../../packages/components/button
       '@react-dive-ui/dive':
         specifier: workspace:0.0.0
         version: link:../../packages/core/dive
@@ -122,40 +119,6 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
-  packages/components/button:
-    dependencies:
-      '@react-dive-ui/button-machine':
-        specifier: workspace:*
-        version: link:../../machines/button
-      '@xstate/react':
-        specifier: 4.0.0-beta.8
-        version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)
-    devDependencies:
-      '@react-dive-ui/tsconfig':
-        specifier: workspace:*
-        version: link:../../tsconfig
-      '@types/react':
-        specifier: ^18.2.20
-        version: 18.2.20
-      '@types/react-dom':
-        specifier: ^18.2.7
-        version: 18.2.7
-      eslint:
-        specifier: ^8.46.0
-        version: 8.46.0
-      eslint-config-dive:
-        specifier: workspace:*
-        version: link:../../eslint-config-dive
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      tsup:
-        specifier: ^7.2.0
-        version: 7.2.0(typescript@5.1.6)
-      typescript:
-        specifier: ^5.1.6
-        version: 5.1.6
-
   packages/core/dive:
     devDependencies:
       '@react-dive-ui/tsconfig':
@@ -199,28 +162,6 @@ importers:
         version: 7.29.4(eslint@8.46.0)
 
   packages/machines/accordion:
-    dependencies:
-      xstate:
-        specifier: 5.0.0-beta.21
-        version: 5.0.0-beta.21
-    devDependencies:
-      '@react-dive-ui/tsconfig':
-        specifier: workspace:*
-        version: link:../../tsconfig
-      eslint:
-        specifier: ^8.15.0
-        version: 8.46.0
-      eslint-config-dive:
-        specifier: workspace:*
-        version: link:../../eslint-config-dive
-      tsup:
-        specifier: ^5.10.1
-        version: 5.10.1(typescript@4.9.3)
-      typescript:
-        specifier: ^4.5.3
-        version: 4.9.3
-
-  packages/machines/button:
     dependencies:
       xstate:
         specifier: 5.0.0-beta.21
