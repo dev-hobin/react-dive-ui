@@ -5,10 +5,10 @@ import { useAccordionState, useItem } from "./providers";
 type ContentProps = ComponentPropsWithoutRef<typeof dive.div>;
 export const Content = forwardRef<HTMLDivElement, ContentProps>(
   (props, ref) => {
-    const { values } = useAccordionState();
+    const { value } = useAccordionState();
     const item = useItem();
 
-    const isOpen = values.includes(item.value);
+    const isOpen = value.includes(item.value);
 
     if (!isOpen) return null;
     return <dive.div {...props} ref={ref} />;
