@@ -1,27 +1,27 @@
-import {
-  Children,
-  ElementType,
-  cloneElement,
-  forwardRef,
-  isValidElement,
-} from "react";
-import { DiveForwardRef, DivePropsWithoutRef, JsxElements } from "./types";
+import React from "react";
+import { DivePropsWithoutRef, JsxElements } from "./types";
 import { mergeProps } from "./utils/mergeProps";
 import { composeRefs } from "./utils/composeRefs";
 
-function withAsChild<TElement extends ElementType>(Component: TElement) {
-  const DiveComponent = forwardRef(
-    (props: DivePropsWithoutRef<TElement>, ref?: DiveForwardRef<TElement>) => {
+function withAsChild<TElement extends React.ElementType>(
+  Component: TElement,
+  displayName: string
+) {
+  const DiveComponent = React.forwardRef(
+    (
+      props: DivePropsWithoutRef<TElement>,
+      ref: React.ForwardedRef<React.ElementRef<TElement>>
+    ) => {
       const { asChild, children, ...restProps } = props;
 
       if (!asChild) {
         return <Component {...props} ref={ref} />;
       }
 
-      const onlyChild = Children.only(children);
+      const onlyChild = React.Children.only(children);
 
-      return isValidElement(onlyChild)
-        ? cloneElement(children, {
+      return React.isValidElement(onlyChild)
+        ? React.cloneElement(children, {
             ...mergeProps(restProps, children.props),
             ref: ref
               ? composeRefs(ref, (children as any).ref)
@@ -31,23 +31,22 @@ function withAsChild<TElement extends ElementType>(Component: TElement) {
     }
   );
 
-  // @ts-ignore
-  DiveComponent.displayName = Component.displayName || Component.name;
+  DiveComponent.displayName = displayName;
 
   return DiveComponent;
 }
 
-export const jsxFactory = () => {
+const jsxFactory = () => {
   const cache = new Map();
 
   return new Proxy(withAsChild, {
     apply(target, thisArg, argArray) {
-      return withAsChild(argArray[0]);
+      return withAsChild(argArray[0], argArray[1]);
     },
-    get(_, element) {
-      const asElement = element as ElementType;
+    get(target, prop: keyof JSX.IntrinsicElements) {
+      const asElement = prop;
       if (!cache.has(asElement)) {
-        cache.set(asElement, withAsChild(asElement));
+        cache.set(asElement, withAsChild(asElement, `dive.${asElement}`));
       }
       return cache.get(asElement);
     },
