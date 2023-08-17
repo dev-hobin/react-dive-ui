@@ -2,7 +2,9 @@ import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { ItemProvider } from "./providers";
 import { dive } from "@react-dive-ui/dive";
 
-type ItemProps = ComponentPropsWithoutRef<typeof dive.div> & { value: string };
+type ItemProps = ComponentPropsWithoutRef<typeof dive.section> & {
+  value: string;
+};
 export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
   const { value, ...restProps } = props;
   return (
