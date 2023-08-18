@@ -1,16 +1,19 @@
 import { createMachine, assign } from "xstate";
 import { MachineContext, MachineEvents } from "./types";
+import { dom } from "./dom";
 
 export const machine = createMachine(
   {
     id: "Accordion",
     context: ({ input = {} }) => ({
+      id: input.id,
       type: input.type ?? "single",
       itemMap: {},
       orientation: input.orientation ?? "vertical",
       collapsible: input.collapsible ?? true,
       disabled: input.disabled ?? false,
       value: input.value ?? [],
+      focusedItemValue: undefined,
     }),
     initial: "idle",
     states: {
@@ -36,7 +39,25 @@ export const machine = createMachine(
             target: "idle",
             actions: ["closeItem"],
           },
+          "TRIGGER.FOCUS": {
+            target: "idle",
+            actions: ["setFocusedItemValue"],
+          },
+          "TRIGGER.BLUR": {
+            target: "idle",
+            actions: ["unsetFocusedItemValue"],
+          },
         },
+      },
+    },
+    on: {
+      "FOCUS.NEXT": {
+        target: "#Accordion",
+        actions: ["focusNext"],
+      },
+      "FOCUS.PREVIOUS": {
+        target: "#Accordion",
+        actions: ["focusPrevious"],
       },
     },
     types: {
@@ -114,6 +135,49 @@ export const machine = createMachine(
           return { value: currentOpened.filter((v) => v !== value) };
         }
       }),
+      setFocusedItemValue: assign(({ context, event }) => {
+        if (event.type !== "TRIGGER.FOCUS") return context;
+        const { value } = event;
+        return { focusedItemValue: value };
+      }),
+      unsetFocusedItemValue: assign(({ context, event }) => {
+        if (event.type !== "TRIGGER.BLUR") return context;
+        return { focusedItemValue: undefined };
+      }),
+      focusNext: ({ context, event }) => {
+        if (event.type !== "FOCUS.NEXT") return;
+        const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
+        if (!currentFocusedTriggerEl) return;
+
+        const triggerEls = dom.findTriggers(context.id);
+
+        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        if (currentIndex === -1) return;
+
+        const nextTrigger = triggerEls[currentIndex + 1];
+        if (nextTrigger) {
+          nextTrigger.focus();
+        } else {
+          triggerEls[0].focus();
+        }
+      },
+      focusPrevious: ({ context, event }) => {
+        if (event.type !== "FOCUS.PREVIOUS") return;
+        const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
+        if (!currentFocusedTriggerEl) return;
+
+        const triggerEls = dom.findTriggers(context.id);
+
+        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        if (currentIndex === -1) return;
+
+        const previousTrigger = triggerEls[currentIndex - 1];
+        if (previousTrigger) {
+          previousTrigger.focus();
+        } else {
+          triggerEls[triggerEls.length - 1].focus();
+        }
+      },
     },
   }
 );

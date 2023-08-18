@@ -1,6 +1,8 @@
 import { DivePropsWithoutRef } from "@react-dive-ui/dive";
 import { UseAccordionReturn } from "./useAccordion";
 
+const ARROW_KEYS = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
+
 export type AccordionProps = {
   rootProps: DivePropsWithoutRef<"div">;
   getItemProps: (value: string) => DivePropsWithoutRef<"div">;
@@ -15,6 +17,7 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
   const events = accordion.events;
 
   const currentOpenValues = state.value;
+  const currentFocusedValue = state.focusedItemValue;
   const itemMap = state.itemMap;
 
   const orientation = state.orientation;
@@ -26,6 +29,7 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
 
   return {
     rootProps: {
+      "data-dive-id": state.id,
       "data-part": "root",
       "data-orientation": orientation,
     },
@@ -43,8 +47,44 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
         "data-orientation": orientation,
         "data-state": currentOpenValues.includes(value) ? "open" : "close",
         "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
+        "data-focused": currentFocusedValue === value ? "" : undefined,
         onClick: () => {
           events.toggle(value);
+        },
+        onFocus: () => {
+          events.send({ type: "TRIGGER.FOCUS", value });
+        },
+        onBlur: () => {
+          events.send({ type: "TRIGGER.BLUR" });
+        },
+        onKeyDown: (ev) => {
+          if (!ARROW_KEYS.includes(ev.key)) return;
+          switch (ev.key) {
+            case "ArrowUp": {
+              if (orientation === "vertical") {
+                events.send({ type: "FOCUS.PREVIOUS" });
+              }
+              break;
+            }
+            case "ArrowLeft": {
+              if (orientation === "horizontal") {
+                events.send({ type: "FOCUS.PREVIOUS" });
+              }
+              break;
+            }
+            case "ArrowDown": {
+              if (orientation === "vertical") {
+                events.send({ type: "FOCUS.NEXT" });
+              }
+              break;
+            }
+            case "ArrowRight": {
+              if (orientation === "horizontal") {
+                events.send({ type: "FOCUS.NEXT" });
+              }
+              break;
+            }
+          }
         },
       };
     },
