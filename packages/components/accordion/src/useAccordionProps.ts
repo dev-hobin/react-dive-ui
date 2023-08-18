@@ -1,4 +1,6 @@
 import { DivePropsWithoutRef } from "@react-dive-ui/dive";
+import { createIdFactory } from "@react-dive-ui/accordion-machine";
+import { useMemo } from "react";
 import { UseAccordionReturn } from "./useAccordion";
 
 const ARROW_KEYS = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
@@ -12,6 +14,10 @@ export type AccordionProps = {
 };
 export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
   const accordion = logic;
+  const idFactory = useMemo(
+    () => createIdFactory(accordion.state.id),
+    [accordion.state.id]
+  );
 
   const state = accordion.state;
   const events = accordion.events;
@@ -26,10 +32,11 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
 
   const checkIsItemDisabled = (value: string) =>
     isAllDisabled || itemMap[value]?.["isDisabled"];
+  const checkIsItemOpen = (value: string) => currentOpenValues.includes(value);
 
   return {
     rootProps: {
-      "data-dive-id": state.id,
+      id: idFactory.createRootId(),
       "data-part": "root",
       "data-orientation": orientation,
     },
@@ -37,17 +44,13 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
       return {
         "data-part": "item",
         "data-orientation": orientation,
-        "data-state": currentOpenValues.includes(value) ? "open" : "close",
+        "data-state": checkIsItemOpen(value) ? "open" : "close",
         "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
       };
     },
     getTriggerProps: (value) => {
       return {
-        "data-part": "trigger",
-        "data-orientation": orientation,
-        "data-state": currentOpenValues.includes(value) ? "open" : "close",
-        "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
-        "data-focused": currentFocusedValue === value ? "" : undefined,
+        id: idFactory.createTriggerId(value),
         disabled: checkIsItemDisabled(value),
         onClick: () => {
           events.toggle(value);
@@ -87,6 +90,14 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
             }
           }
         },
+        "data-part": "trigger",
+        "data-orientation": orientation,
+        "data-state": checkIsItemOpen(value) ? "open" : "close",
+        "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
+        "data-focused": currentFocusedValue === value ? "" : undefined,
+        "aria-expanded": checkIsItemOpen(value) ? true : false,
+        "aria-controls": idFactory.createContentId(value),
+        "aria-disabled": checkIsItemOpen(value) && !collapsible ? true : false,
       };
     },
     getHeadingProps: (value) => {
@@ -103,6 +114,7 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
         "data-orientation": orientation,
         "data-state": currentOpenValues.includes(value) ? "open" : "close",
         "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
+        "aria-labelledby": idFactory.createTriggerId(value),
       };
     },
   };
