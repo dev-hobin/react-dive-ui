@@ -5,6 +5,8 @@ export const dom = {
     ),
   findTriggers: (id: string) =>
     Array.from<HTMLElement>(
-      document.querySelectorAll(`[data-dive-id="${id}"] [data-part="trigger"]`)
+      document.querySelectorAll(
+        `[data-dive-id="${id}"] [data-part="trigger"]:not([data-disabled])`
+      )
     ),
 };
