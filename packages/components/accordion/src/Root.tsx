@@ -1,11 +1,12 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { AccordionEventsProvider, AccordionStateProvider } from "./providers";
 import {
   AccordionOption,
   UseAccordionReturn,
   useAccordion,
 } from "./useAccordion";
+import { useAccordionProps } from "./useAccordionProps";
+import { AccordionPropsProvider, AccordionStateProvider } from "./providers";
 
 type CommonProps = ComponentPropsWithoutRef<typeof dive.div>;
 type ConditionalProps =
@@ -21,14 +22,15 @@ type ConditionalProps =
 type RootProps = CommonProps & ConditionalProps;
 export const Root = forwardRef<HTMLDivElement, RootProps>((props, ref) => {
   const { logic, option, ...restProps } = props;
-  const { events, state } = logic ?? useAccordion(option);
+  const accordion = logic ?? useAccordion(option);
+  const componentProps = useAccordionProps(accordion);
 
   return (
-    <AccordionEventsProvider value={events}>
-      <AccordionStateProvider value={state}>
-        <dive.div {...restProps} ref={ref} />
-      </AccordionStateProvider>
-    </AccordionEventsProvider>
+    <AccordionStateProvider value={accordion.state}>
+      <AccordionPropsProvider value={componentProps}>
+        <dive.div {...restProps} {...componentProps.rootProps} ref={ref} />
+      </AccordionPropsProvider>
+    </AccordionStateProvider>
   );
 });
 Root.displayName = "Accordion.Root";
