@@ -18,11 +18,17 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
+  | { type: "ROOT.SET.DISABLED"; disabled: boolean }
   | { type: "ITEM.REGISTER"; item: AccordionItem }
   | { type: "ITEM.UNREGISTER"; value: AccordionItem["value"] }
   | { type: "ITEM.TOGGLE"; value: AccordionItem["value"] }
   | { type: "ITEM.OPEN"; value: AccordionItem["value"] }
   | { type: "ITEM.CLOSE"; value: AccordionItem["value"] }
+  | {
+      type: "ITEM.SET.DISABLED";
+      value: AccordionItem["value"];
+      disabled: boolean;
+    }
   | { type: "TRIGGER.FOCUS"; value: AccordionItem["value"] }
   | { type: "TRIGGER.BLUR" }
   | { type: "FOCUS.NEXT" }

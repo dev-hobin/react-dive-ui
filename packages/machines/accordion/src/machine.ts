@@ -19,6 +19,10 @@ export const machine = createMachine(
     states: {
       idle: {
         on: {
+          "ROOT.SET.DISABLED": {
+            target: "idle",
+            actions: ["setRootDisabled"],
+          },
           "ITEM.REGISTER": {
             target: "idle",
             actions: ["registerItem"],
@@ -34,6 +38,10 @@ export const machine = createMachine(
           "ITEM.OPEN": {
             target: "idle",
             actions: ["openItem"],
+          },
+          "ITEM.SET.DISABLED": {
+            target: "idle",
+            actions: ["setItemDisabled"],
           },
           "ITEM.CLOSE": {
             target: "idle",
@@ -53,11 +61,11 @@ export const machine = createMachine(
     on: {
       "FOCUS.NEXT": {
         target: "#Accordion",
-        actions: ["focusNext"],
+        actions: ["focusNextTrigger"],
       },
       "FOCUS.PREVIOUS": {
         target: "#Accordion",
-        actions: ["focusPrevious"],
+        actions: ["focusPreviousTrigger"],
       },
     },
     types: {
@@ -111,9 +119,17 @@ export const machine = createMachine(
       }),
       openItem: assign(({ context, event }) => {
         if (event.type !== "ITEM.OPEN") return context;
-        const { type, value: currentOpened } = context;
+        const {
+          type,
+          value: currentOpened,
+          disabled: isAllDisabled,
+          itemMap,
+        } = context;
         const { value } = event;
 
+        console.log(isAllDisabled, itemMap[value]);
+
+        if (isAllDisabled || itemMap[value].isDisabled) return context;
         if (currentOpened.includes(value)) return context;
         if (type === "single") {
           return { value: [value] };
@@ -123,9 +139,16 @@ export const machine = createMachine(
       }),
       closeItem: assign(({ context, event }) => {
         if (event.type !== "ITEM.CLOSE") return context;
-        const { type, value: currentOpened, collapsible } = context;
+        const {
+          type,
+          collapsible,
+          itemMap,
+          value: currentOpened,
+          disabled: isAllDisabled,
+        } = context;
         const { value } = event;
 
+        if (isAllDisabled || itemMap[value].isDisabled) return context;
         if (!currentOpened.includes(value)) return context;
 
         if (type === "single") {
@@ -134,6 +157,25 @@ export const machine = createMachine(
         } else {
           return { value: currentOpened.filter((v) => v !== value) };
         }
+      }),
+      setRootDisabled: assign(({ context, event }) => {
+        if (event.type !== "ROOT.SET.DISABLED") return context;
+        const { disabled } = event;
+        return {
+          disabled,
+        };
+      }),
+      setItemDisabled: assign(({ context, event }) => {
+        if (event.type !== "ITEM.SET.DISABLED") return context;
+        const { itemMap } = context;
+        const { value, disabled } = event;
+
+        return {
+          itemMap: {
+            ...itemMap,
+            [value]: { ...itemMap[value], isDisabled: disabled },
+          },
+        };
       }),
       setFocusedItemValue: assign(({ context, event }) => {
         if (event.type !== "TRIGGER.FOCUS") return context;
@@ -144,7 +186,7 @@ export const machine = createMachine(
         if (event.type !== "TRIGGER.BLUR") return context;
         return { focusedItemValue: undefined };
       }),
-      focusNext: ({ context, event }) => {
+      focusNextTrigger: ({ context, event }) => {
         if (event.type !== "FOCUS.NEXT") return;
         const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
         if (!currentFocusedTriggerEl) return;
@@ -161,7 +203,7 @@ export const machine = createMachine(
           triggerEls[0].focus();
         }
       },
-      focusPrevious: ({ context, event }) => {
+      focusPreviousTrigger: ({ context, event }) => {
         if (event.type !== "FOCUS.PREVIOUS") return;
         const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
         if (!currentFocusedTriggerEl) return;

@@ -36,9 +36,37 @@ export function useAccordion(option?: AccordionOption) {
     [send]
   );
 
+  const open = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.OPEN", value });
+    },
+    [send]
+  );
+
+  const close = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.CLOSE", value });
+    },
+    [send]
+  );
+
+  const setItemDisabled = useCallback(
+    (value: string, disabled: boolean) => {
+      send({ type: "ITEM.SET.DISABLED", value, disabled });
+    },
+    [send]
+  );
+
+  const setDisabled = useCallback(
+    (disabled: boolean) => {
+      send({ type: "ROOT.SET.DISABLED", disabled });
+    },
+    [send]
+  );
+
   return {
     state: { status: state.value, ...state.context },
-    events: { _send: send, toggle },
+    events: { _send: send, toggle, open, close, setItemDisabled, setDisabled },
   } as const;
 }
 
