@@ -9,7 +9,7 @@ export const Content = forwardRef<HTMLDivElement, ContentProps>(
     const item = useItem();
     const state = useAccordionState();
     const { getContentProps } = useProps();
-    const mergedProps = mergeProps(props, getContentProps(item.value));
+    const mergedProps = mergeProps(getContentProps(item.value), props);
 
     const isOpen = state.value.includes(item.value);
 

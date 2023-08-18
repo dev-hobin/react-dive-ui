@@ -8,7 +8,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
   (props, ref) => {
     const item = useItem();
     const { getHeadingProps } = useProps();
-    const mergedProps = mergeProps(props, getHeadingProps(item.value));
+    const mergedProps = mergeProps(getHeadingProps(item.value), props);
 
     return <dive.h3 {...mergedProps} ref={ref} />;
   }

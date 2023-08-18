@@ -19,8 +19,8 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
 
   const initial = useRef({ value, isDisabled: disabled });
   const mergedProps = mergeProps(
-    restProps,
-    getItemProps(initial.current.value)
+    getItemProps(initial.current.value),
+    restProps
   );
 
   useLayoutEffect(() => {

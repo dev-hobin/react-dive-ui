@@ -12,7 +12,7 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
     const { onClick, onFocus, onBlur, onKeyDown, ...triggerProps } =
       getTriggerProps(item.value);
 
-    const mergedProps = mergeProps(props, triggerProps);
+    const mergedProps = mergeProps(triggerProps, props);
 
     return (
       <dive.button

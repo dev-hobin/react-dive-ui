@@ -2,31 +2,31 @@ interface Props {
   [key: string]: any;
 }
 
-export function mergeProps(parentProps: Props, childProps: Props) {
-  const overrideProps = { ...childProps };
+export function mergeProps(baseProps: Props, overrideProps: Props) {
+  const mergedProps = { ...baseProps };
 
-  for (const propName in childProps) {
-    const parentPropValue = parentProps[propName];
-    const childPropValue = childProps[propName];
+  for (const propName in baseProps) {
+    const overridePropValue = overrideProps[propName];
+    const basePropValue = baseProps[propName];
 
     const isHandler = /^on[A-Z]/.test(propName);
     if (isHandler) {
-      if (parentPropValue && childPropValue) {
-        overrideProps[propName] = (...args: unknown[]) => {
-          childPropValue(...args);
-          parentPropValue(...args);
+      if (overridePropValue && basePropValue) {
+        mergedProps[propName] = (...args: unknown[]) => {
+          basePropValue(...args);
+          overridePropValue(...args);
         };
-      } else if (parentPropValue) {
-        overrideProps[propName] = parentPropValue;
+      } else if (overridePropValue) {
+        mergedProps[propName] = overridePropValue;
       }
     } else if (propName === "style") {
-      overrideProps[propName] = { ...parentPropValue, ...childPropValue };
+      mergedProps[propName] = { ...overridePropValue, ...basePropValue };
     } else if (propName === "className") {
-      overrideProps[propName] = [parentPropValue, childPropValue]
+      mergedProps[propName] = [overridePropValue, basePropValue]
         .filter(Boolean)
         .join(" ");
     }
   }
 
-  return { ...parentProps, ...overrideProps };
+  return { ...overrideProps, ...mergedProps };
 }
