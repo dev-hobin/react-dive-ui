@@ -29,20 +29,6 @@ export function useAccordion(option?: AccordionOption) {
 
   console.log(state.context);
 
-  const registerItem = useCallback(
-    (item: AccordionItem) => {
-      send({ type: "ITEM.REGISTER", item });
-    },
-    [send]
-  );
-
-  const unregisterItem = useCallback(
-    (value: string) => {
-      send({ type: "ITEM.UNREGISTER", value });
-    },
-    [send]
-  );
-
   const toggle = useCallback(
     (value: string) => {
       send({ type: "ITEM.TOGGLE", value });
@@ -52,7 +38,7 @@ export function useAccordion(option?: AccordionOption) {
 
   return {
     state: { status: state.value, ...state.context },
-    events: { send, toggle, registerItem, unregisterItem },
+    events: { _send: send, toggle },
   } as const;
 }
 

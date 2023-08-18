@@ -41,7 +41,7 @@ export const Controlled = () => {
 
   return (
     <Accordion logic={accordion}>
-      <Accordion.Item value="accordion-1">
+      <Accordion.Item value="accordion-1" disabled>
         <Accordion.Heading>
           <Accordion.Trigger>트리거 1</Accordion.Trigger>
         </Accordion.Heading>

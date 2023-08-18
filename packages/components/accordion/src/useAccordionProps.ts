@@ -48,39 +48,40 @@ export function useAccordionProps(logic: UseAccordionReturn): AccordionProps {
         "data-state": currentOpenValues.includes(value) ? "open" : "close",
         "data-disabled": checkIsItemDisabled(value) ? "" : undefined,
         "data-focused": currentFocusedValue === value ? "" : undefined,
+        disabled: checkIsItemDisabled(value),
         onClick: () => {
           events.toggle(value);
         },
         onFocus: () => {
-          events.send({ type: "TRIGGER.FOCUS", value });
+          events._send({ type: "TRIGGER.FOCUS", value });
         },
         onBlur: () => {
-          events.send({ type: "TRIGGER.BLUR" });
+          events._send({ type: "TRIGGER.BLUR" });
         },
         onKeyDown: (ev) => {
           if (!ARROW_KEYS.includes(ev.key)) return;
           switch (ev.key) {
             case "ArrowUp": {
               if (orientation === "vertical") {
-                events.send({ type: "FOCUS.PREVIOUS" });
+                events._send({ type: "FOCUS.PREVIOUS" });
               }
               break;
             }
             case "ArrowLeft": {
               if (orientation === "horizontal") {
-                events.send({ type: "FOCUS.PREVIOUS" });
+                events._send({ type: "FOCUS.PREVIOUS" });
               }
               break;
             }
             case "ArrowDown": {
               if (orientation === "vertical") {
-                events.send({ type: "FOCUS.NEXT" });
+                events._send({ type: "FOCUS.NEXT" });
               }
               break;
             }
             case "ArrowRight": {
               if (orientation === "horizontal") {
-                events.send({ type: "FOCUS.NEXT" });
+                events._send({ type: "FOCUS.NEXT" });
               }
               break;
             }

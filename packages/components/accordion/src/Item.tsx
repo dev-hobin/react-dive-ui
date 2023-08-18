@@ -1,22 +1,36 @@
-import { ComponentPropsWithoutRef, forwardRef, useLayoutEffect } from "react";
+import {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { ItemProvider, useAccordionEvents, useProps } from "./providers";
 import { dive } from "@react-dive-ui/dive";
 
 type ItemProps = ComponentPropsWithoutRef<typeof dive.section> & {
   value: string;
+  disabled?: boolean;
 };
 export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
-  const { value, ...restProps } = props;
-  const { registerItem, unregisterItem } = useAccordionEvents();
+  const { value, disabled, ...restProps } = props;
+  const { _send } = useAccordionEvents();
   const { getItemProps } = useProps();
 
+  const initial = useRef({ value, isDisabled: disabled });
+
   useLayoutEffect(() => {
-    registerItem({ value, isDisabled: false });
+    _send({
+      type: "ITEM.REGISTER",
+      item: {
+        value: initial.current.value,
+        isDisabled: initial.current.isDisabled ?? false,
+      },
+    });
 
     return () => {
-      unregisterItem(value);
+      _send({ type: "ITEM.UNREGISTER", value: initial.current.value });
     };
-  }, [registerItem, unregisterItem]);
+  }, [_send]);
 
   return (
     <ItemProvider value={value}>
@@ -24,4 +38,5 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
     </ItemProvider>
   );
 });
+
 Item.displayName = "Accordion.Item";
