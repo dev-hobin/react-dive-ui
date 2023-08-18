@@ -11,6 +11,7 @@ import {
   AccordionPropsProvider,
   AccordionStateProvider,
 } from "./providers";
+import { mergeProps } from "@react-dive-ui/merge-props";
 
 type CommonProps = ComponentPropsWithoutRef<typeof dive.div>;
 type ConditionalProps =
@@ -29,11 +30,13 @@ export const Root = forwardRef<HTMLDivElement, RootProps>((props, ref) => {
   const accordion = logic ?? useAccordion(option);
   const componentProps = useAccordionProps(accordion);
 
+  const mergedProps = mergeProps(restProps, componentProps.rootProps);
+
   return (
     <AccordionEventsProvider value={accordion.events}>
       <AccordionStateProvider value={accordion.state}>
         <AccordionPropsProvider value={componentProps}>
-          <dive.div {...restProps} {...componentProps.rootProps} ref={ref} />
+          <dive.div {...mergedProps} ref={ref} />
         </AccordionPropsProvider>
       </AccordionStateProvider>
     </AccordionEventsProvider>

@@ -6,6 +6,7 @@ import {
 } from "react";
 import { ItemProvider, useAccordionEvents, useProps } from "./providers";
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
 
 type ItemProps = ComponentPropsWithoutRef<typeof dive.section> & {
   value: string;
@@ -17,6 +18,10 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
   const { getItemProps } = useProps();
 
   const initial = useRef({ value, isDisabled: disabled });
+  const mergedProps = mergeProps(
+    restProps,
+    getItemProps(initial.current.value)
+  );
 
   useLayoutEffect(() => {
     _send({
@@ -34,7 +39,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
 
   return (
     <ItemProvider value={value}>
-      <dive.section {...restProps} {...getItemProps(value)} ref={ref} />
+      <dive.section {...mergedProps} ref={ref} />
     </ItemProvider>
   );
 });
