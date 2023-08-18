@@ -1,7 +1,7 @@
 import React from "react";
 import { DivePropsWithoutRef, JsxElements } from "./types";
-import { mergeProps } from "./utils/mergeProps";
-import { composeRefs } from "./utils/composeRefs";
+import { mergeProps } from "@react-dive-ui/merge-props";
+import { composeRefs } from "@react-dive-ui/compose-refs";
 
 function withAsChild<TElement extends React.ElementType>(
   Component: TElement,

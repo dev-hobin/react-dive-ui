@@ -120,6 +120,13 @@ importers:
         version: 5.1.6
 
   packages/core/dive:
+    dependencies:
+      '@react-dive-ui/compose-refs':
+        specifier: workspace:*
+        version: link:../../utils/composeRefs
+      '@react-dive-ui/merge-props':
+        specifier: workspace:*
+        version: link:../../utils/mergeProps
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
@@ -185,23 +192,50 @@ importers:
 
   packages/tsconfig: {}
 
-  packages/utils:
+  packages/utils/composeRefs:
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
-        version: link:../tsconfig
+        version: link:../../tsconfig
       '@types/react':
         specifier: ^18.0.9
-        version: 18.0.9
+        version: 18.2.20
       '@types/react-dom':
         specifier: ^18.0.4
-        version: 18.0.4
+        version: 18.2.7
       eslint:
         specifier: ^8.15.0
-        version: 8.29.0
+        version: 8.46.0
       eslint-config-dive:
         specifier: workspace:*
-        version: link:../eslint-config-dive
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.1.0
+        version: 18.2.0
+      tsup:
+        specifier: ^5.10.1
+        version: 5.10.1(typescript@4.9.3)
+      typescript:
+        specifier: ^4.5.3
+        version: 4.9.3
+
+  packages/utils/mergeProps:
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.0.9
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.0.4
+        version: 18.2.7
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
       react:
         specifier: ^18.1.0
         version: 18.2.0
@@ -3833,24 +3867,10 @@ packages:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
     dev: true
 
-  /@types/react-dom@18.0.4:
-    resolution: {integrity: sha512-FgTtbqPOCI3dzZPZoC2T/sx3L34qxy99ITWn4eoSA95qPyXDMH0ALoAqUp49ITniiJFsXUVBtalh/KffMpg21Q==}
-    dependencies:
-      '@types/react': 18.2.20
-    dev: true
-
   /@types/react-dom@18.2.7:
     resolution: {integrity: sha512-GRaAEriuT4zp9N4p1i8BDBYmEyfo+xQ3yHjJU4eiK5NDa1RmUZG+unZABUTK4/Ox/M+GaHwb6Ow8rUITrtjszA==}
     dependencies:
       '@types/react': 18.2.20
-    dev: true
-
-  /@types/react@18.0.9:
-    resolution: {integrity: sha512-9bjbg1hJHUm4De19L1cHiW0Jvx3geel6Qczhjd0qY5VKVE2X5+x77YxAepuCwVh4vrgZJdgEJw48zrhRIeF4Nw==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.3
-      csstype: 3.1.2
     dev: true
 
   /@types/react@18.2.20:
