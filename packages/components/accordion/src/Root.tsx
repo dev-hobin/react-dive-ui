@@ -6,7 +6,11 @@ import {
   useAccordion,
 } from "./useAccordion";
 import { useAccordionProps } from "./useAccordionProps";
-import { AccordionPropsProvider, AccordionStateProvider } from "./providers";
+import {
+  AccordionEventsProvider,
+  AccordionPropsProvider,
+  AccordionStateProvider,
+} from "./providers";
 
 type CommonProps = ComponentPropsWithoutRef<typeof dive.div>;
 type ConditionalProps =
@@ -26,11 +30,14 @@ export const Root = forwardRef<HTMLDivElement, RootProps>((props, ref) => {
   const componentProps = useAccordionProps(accordion);
 
   return (
-    <AccordionStateProvider value={accordion.state}>
-      <AccordionPropsProvider value={componentProps}>
-        <dive.div {...restProps} {...componentProps.rootProps} ref={ref} />
-      </AccordionPropsProvider>
-    </AccordionStateProvider>
+    <AccordionEventsProvider value={accordion.events}>
+      <AccordionStateProvider value={accordion.state}>
+        <AccordionPropsProvider value={componentProps}>
+          <dive.div {...restProps} {...componentProps.rootProps} ref={ref} />
+        </AccordionPropsProvider>
+      </AccordionStateProvider>
+    </AccordionEventsProvider>
   );
 });
+
 Root.displayName = "Accordion.Root";

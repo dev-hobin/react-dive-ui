@@ -15,7 +15,7 @@ type Story = StoryObj<typeof Accordion.Root>;
 
 export const Uncontrolled: Story = {
   render: (args) => (
-    <Accordion.Root {...args} type="single" defaultValue="accordion-1">
+    <Accordion.Root option={{ type: "single", defaultValue: "accordion-2" }}>
       <Accordion.Item value="accordion-1">
         <Accordion.Heading>
           <Accordion.Trigger>트리거 1</Accordion.Trigger>

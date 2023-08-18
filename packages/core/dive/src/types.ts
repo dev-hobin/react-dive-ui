@@ -10,7 +10,7 @@ export type DivePropsWithRef<TElement extends React.ElementType> =
     TElement,
     React.ComponentPropsWithRef<TElement> & {
       asChild?: boolean;
-      [key: `data-${string}`]: string;
+      [key: `data-${string}`]: string | boolean | undefined;
     }
   >;
 
@@ -19,6 +19,6 @@ export type DivePropsWithoutRef<TElement extends React.ElementType> =
     TElement,
     React.ComponentPropsWithoutRef<TElement> & {
       asChild?: boolean;
-      [key: `data-${string}`]: string;
+      [key: `data-${string}`]: string | boolean | undefined;
     }
   >;

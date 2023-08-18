@@ -1,6 +1,9 @@
 import { useCallback } from "react";
 import { useActor } from "@xstate/react";
-import { accordionMachine } from "@react-dive-ui/accordion-machine";
+import {
+  type AccordionItem,
+  accordionMachine,
+} from "@react-dive-ui/accordion-machine";
 import { SingleAccordionOption, MultipleAccordionOption } from "./types";
 
 const defaultOption: SingleAccordionOption = {
@@ -24,13 +27,32 @@ export function useAccordion(option?: AccordionOption) {
           },
   });
 
-  const toggle = useCallback((value: string) => {
-    send({ type: "ITEM.TOGGLE", value });
-  }, []);
+  console.log(state.context);
+
+  const registerItem = useCallback(
+    (item: AccordionItem) => {
+      send({ type: "ITEM.REGISTER", item });
+    },
+    [send]
+  );
+
+  const unregisterItem = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.UNREGISTER", value });
+    },
+    [send]
+  );
+
+  const toggle = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.TOGGLE", value });
+    },
+    [send]
+  );
 
   return {
     state: { status: state.value, ...state.context },
-    events: { send, toggle },
+    events: { send, toggle, registerItem, unregisterItem },
   } as const;
 }
 
