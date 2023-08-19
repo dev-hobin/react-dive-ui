@@ -26,7 +26,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@react-dive-ui/accordion-machine": "workspace:*",
+    "@react-dive-ui/tabs-machine": "workspace:*",
     "@react-dive-ui/dive": "workspace:*",
     "@react-dive-ui/merge-props": "workspace:*",
     "@react-dive-ui/compose-event-handlers": "workspace:*",
