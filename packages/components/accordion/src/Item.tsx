@@ -7,6 +7,7 @@ import {
 import { ItemProvider, useAccordionEvents, useProps } from "./providers";
 import { dive } from "@react-dive-ui/dive";
 import { mergeProps } from "@react-dive-ui/merge-props";
+import { useLatestValue } from "@react-dive-ui/use-latest-value";
 
 type ItemProps = ComponentPropsWithoutRef<typeof dive.section> & {
   value: string;
@@ -14,28 +15,28 @@ type ItemProps = ComponentPropsWithoutRef<typeof dive.section> & {
 };
 export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
   const { value, disabled, ...restProps } = props;
+  const initialProps = useLatestValue({ value, disabled });
+
   const { _send } = useAccordionEvents();
   const { getItemProps } = useProps();
 
-  const initial = useRef({ value, isDisabled: disabled });
-  const mergedProps = mergeProps(
-    getItemProps(initial.current.value),
-    restProps
-  );
+  const mergedProps = mergeProps(getItemProps(initialProps.value), restProps);
 
   useLayoutEffect(() => {
+    const { value, disabled } = initialProps;
+
     _send({
       type: "ITEM.REGISTER",
       item: {
-        value: initial.current.value,
-        isDisabled: initial.current.isDisabled ?? false,
+        value,
+        isDisabled: disabled ?? false,
       },
     });
 
     return () => {
-      _send({ type: "ITEM.UNREGISTER", value: initial.current.value });
+      _send({ type: "ITEM.UNREGISTER", value });
     };
-  }, [_send]);
+  }, [initialProps, _send]);
 
   return (
     <ItemProvider value={value}>
