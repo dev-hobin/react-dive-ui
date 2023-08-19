@@ -4,12 +4,12 @@ import { tabsMachine } from "@react-dive-ui/tabs-machine";
 
 export type TabsOption = {
   defaultValue: string;
-  id?: string;
   orientation?: "horizontal" | "vertical";
   activationMode?: "automatic" | "manual";
+  disabledValues?: string[];
 };
 export function useTabs(option: TabsOption) {
-  const id = option.id ?? useId();
+  const id = useId();
   const { defaultValue, ...restOptions } = option;
   const [state, send] = useActor(tabsMachine, {
     input: {
@@ -28,9 +28,16 @@ export function useTabs(option: TabsOption) {
     [send]
   );
 
+  const setTabDisabled = useCallback(
+    (value: string, disabled: boolean) => {
+      send({ type: "TAB.SET.DISABLED", value, disabled });
+    },
+    [send]
+  );
+
   return {
     state: { status: state.value, ...state.context },
-    events: { _send: send, activateTab },
+    events: { _send: send, activateTab, setTabDisabled },
   } as const;
 }
 

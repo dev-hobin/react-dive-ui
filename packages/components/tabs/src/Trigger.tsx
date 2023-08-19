@@ -1,29 +1,43 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useProps } from "./providers";
+import { useEvents, useProps, useTabsState } from "./providers";
 import { mergeProps } from "@react-dive-ui/merge-props";
 import { composeEventHandlers } from "../../../utils/composeEventHandlers/dist";
 
 type TriggerProps = Omit<
   ComponentPropsWithoutRef<typeof dive.button>,
-  "value"
+  "value" | "disabled"
 > & {
   value: string;
+  disabled?: boolean;
 };
 export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
-    const { value, ...restProps } = props;
+    const { value, disabled } = props;
+
+    const events = useEvents();
     const { getTriggerProps } = useProps();
-    const { onClick, ...triggerProps } = getTriggerProps(value);
+    const { onClick, onKeyDown, ...triggerProps } = getTriggerProps(value);
 
-    const mergedProps = mergeProps(triggerProps, restProps);
+    const initial = useRef({ value, disabled });
+    useLayoutEffect(() => {
+      if (initial.current.disabled === undefined) return;
+      const { value, disabled } = initial.current;
+      events.setTabDisabled(value, disabled);
+    }, [initial, events.setTabDisabled]);
 
+    const mergedProps = mergeProps(triggerProps, props);
     return (
       <dive.button
-        type="button"
         {...mergedProps}
         ref={ref}
         onClick={composeEventHandlers(props.onClick, onClick)}
+        onKeyDown={composeEventHandlers(props.onKeyDown, onKeyDown)}
       />
     );
   }
