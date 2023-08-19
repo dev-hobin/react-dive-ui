@@ -5,7 +5,7 @@ const ARROW_KEYS = ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
 
 export type TabsProps = {
   rootProps: DivePropsWithoutRef<"div">;
-  listProps: DivePropsWithoutRef<"ol">;
+  listProps: DivePropsWithoutRef<"div">;
   getTriggerProps: (value: string) => DivePropsWithoutRef<"button">;
   getContentProps: (value: string) => DivePropsWithoutRef<"div">;
 };
