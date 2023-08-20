@@ -21,11 +21,12 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-interactions"),
   ],
   framework: {
-    name: getAbsolutePath("@storybook/react-vite"),
+    name: "@storybook/react-vite",
     options: {},
   },
   docs: {
     autodocs: "tag",
   },
 };
+
 export default config;
