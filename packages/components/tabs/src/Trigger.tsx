@@ -1,11 +1,6 @@
-import {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useLayoutEffect,
-  useRef,
-} from "react";
+import { ComponentPropsWithoutRef, forwardRef, useLayoutEffect } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useEvents, useProps, useTabsState } from "./providers";
+import { useEvents, useProps } from "./providers";
 import { mergeProps } from "@react-dive-ui/merge-props";
 import { composeEventHandlers } from "../../../utils/composeEventHandlers/dist";
 import { useLatestValue } from "@react-dive-ui/use-latest-value";

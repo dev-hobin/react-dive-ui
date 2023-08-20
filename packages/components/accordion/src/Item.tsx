@@ -1,9 +1,4 @@
-import {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useLayoutEffect,
-  useRef,
-} from "react";
+import { ComponentPropsWithoutRef, forwardRef, useLayoutEffect } from "react";
 import { ItemProvider, useAccordionEvents, useProps } from "./providers";
 import { dive } from "@react-dive-ui/dive";
 import { mergeProps } from "@react-dive-ui/merge-props";

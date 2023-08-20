@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, EventHandler, forwardRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
 import { mergeProps } from "@react-dive-ui/merge-props";
 import { composeEventHandlers } from "@react-dive-ui/compose-event-handlers";

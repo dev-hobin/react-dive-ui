@@ -1,9 +1,6 @@
 import { useCallback, useId } from "react";
 import { useActor } from "@xstate/react";
-import {
-  type AccordionItem,
-  accordionMachine,
-} from "@react-dive-ui/accordion-machine";
+import { accordionMachine } from "@react-dive-ui/accordion-machine";
 import { SingleAccordionOption, MultipleAccordionOption } from "./types";
 
 export type AccordionOption = SingleAccordionOption | MultipleAccordionOption;

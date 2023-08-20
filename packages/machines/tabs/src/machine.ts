@@ -148,7 +148,7 @@ export const machine = createMachine(
           }
         } else {
           return {
-            disabledValues: disabledValues.filter((v) => !value),
+            disabledValues: disabledValues.filter((v) => v !== value),
           };
         }
       }),
