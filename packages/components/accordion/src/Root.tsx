@@ -16,7 +16,7 @@ import { mergeProps } from "@react-dive-ui/merge-props";
 type CommonProps = ComponentPropsWithoutRef<typeof dive.div>;
 type ConditionalProps =
   | {
-      logic?: undefined;
+      logic?: never;
       option: AccordionOption;
     }
   | {

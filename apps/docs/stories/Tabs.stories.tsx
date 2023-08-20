@@ -13,7 +13,7 @@ export default meta;
 
 export const Uncontrolled = () => {
   return (
-    <Tabs option={{ defaultValue: "value-1" }}>
+    <Tabs option={{ defaultValue: "value-1", activationMode: "manual" }}>
       <Tabs.List>
         <Tabs.Trigger value="value-1">탭 1</Tabs.Trigger>
         <Tabs.Trigger value="value-2">탭 2</Tabs.Trigger>

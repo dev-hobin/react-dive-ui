@@ -8,6 +8,7 @@ export const machine = createMachine(
     context: ({ input }) => ({
       id: input.id,
       value: input.value,
+      focusedTab: undefined,
       orientation: input?.orientation ?? "horizontal",
       activationMode: input?.activationMode ?? "automatic",
       disabledValues: input?.disabledValues ?? [],
@@ -45,6 +46,14 @@ export const machine = createMachine(
           "TAB.SET.DISABLED": {
             target: "idle",
             actions: ["setTabDisabled"],
+          },
+          "TAB.FOCUS": {
+            target: "idle",
+            actions: ["setFocusedValue"],
+          },
+          "TAB.BLUR": {
+            target: "idle",
+            actions: ["unsetFocusedValue"],
           },
         },
       },
@@ -106,8 +115,11 @@ export const machine = createMachine(
         currentTab?.focus();
       },
       focusNextTab: ({ context }) => {
-        const tabEls = dom.findTriggers(context.id);
-        const currentTabEl = dom.findTrigger(context.id, context.value);
+        const { id, focusedTab } = context;
+        if (!focusedTab) return;
+
+        const tabEls = dom.findTriggers(id);
+        const currentTabEl = dom.findTrigger(id, focusedTab);
         if (!currentTabEl) return;
 
         const currentIndex = tabEls.indexOf(currentTabEl);
@@ -120,8 +132,11 @@ export const machine = createMachine(
         nextTabEl.focus();
       },
       focusPreviousTab: ({ context }) => {
-        const tabEls = dom.findTriggers(context.id);
-        const currentTabEl = dom.findTrigger(context.id, context.value);
+        const { id, focusedTab } = context;
+        if (!focusedTab) return;
+
+        const tabEls = dom.findTriggers(id);
+        const currentTabEl = dom.findTrigger(id, focusedTab);
         if (!currentTabEl) return;
 
         const currentIndex = tabEls.indexOf(currentTabEl);
@@ -151,6 +166,15 @@ export const machine = createMachine(
             disabledValues: disabledValues.filter((v) => v !== value),
           };
         }
+      }),
+      setFocusedValue: assign(({ event }) => {
+        if (event.type !== "TAB.FOCUS") return {};
+        const { value } = event;
+        return { focusedTab: value };
+      }),
+      unsetFocusedValue: assign(({ event }) => {
+        if (event.type !== "TAB.BLUR") return {};
+        return { focusedTab: undefined };
       }),
     },
     guards: {

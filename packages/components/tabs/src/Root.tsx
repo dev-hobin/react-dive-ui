@@ -25,6 +25,7 @@ type ControlledOrUncontrolledProps =
 type RootProps = CommonProps & ControlledOrUncontrolledProps;
 export const Root = forwardRef<HTMLDivElement, RootProps>((props, ref) => {
   const { logic, option, ...restProps } = props;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const tabs = logic ?? useTabs(option);
   const componentProps = useTabsProps(tabs);
 

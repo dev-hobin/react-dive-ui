@@ -17,16 +17,17 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
     const { value, disabled, ...restProps } = props;
     const initialProps = useLatestValue({ value, disabled });
 
-    const events = useEvents();
+    const { setTabDisabled } = useEvents();
     const { getTriggerProps } = useProps();
-    const { onClick, onKeyDown, ...triggerProps } = getTriggerProps(value);
+    const { onClick, onKeyDown, onFocus, onBlur, ...triggerProps } =
+      getTriggerProps(value);
     const mergedProps = mergeProps(triggerProps, restProps);
 
     useLayoutEffect(() => {
       if (initialProps.disabled === undefined) return;
       const { value, disabled } = initialProps;
-      events.setTabDisabled(value, disabled);
-    }, [initialProps, events.setTabDisabled]);
+      setTabDisabled(value, disabled);
+    }, [initialProps, setTabDisabled]);
 
     return (
       <dive.button
@@ -34,6 +35,8 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
         ref={ref}
         onClick={composeEventHandlers(props.onClick, onClick)}
         onKeyDown={composeEventHandlers(props.onKeyDown, onKeyDown)}
+        onFocus={composeEventHandlers(props.onFocus, onFocus)}
+        onBlur={composeEventHandlers(props.onBlur, onBlur)}
       />
     );
   }

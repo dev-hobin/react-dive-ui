@@ -56,6 +56,12 @@ export function useTabsProps(logic: UseTabsReturn): TabsProps {
         onClick: () => {
           events.activateTab(value);
         },
+        onFocus: () => {
+          events._send({ type: "TAB.FOCUS", value });
+        },
+        onBlur: () => {
+          events._send({ type: "TAB.BLUR" });
+        },
         onKeyDown: (ev) => {
           if (!ARROW_KEYS.includes(ev.key)) return;
           switch (ev.key) {
