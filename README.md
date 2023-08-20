@@ -13,7 +13,9 @@
 
 ```bash
 pnpm install
-pnpm dev
+pnpm build
+cd apps/docs
+pnpm preview-storybook
 ```
 
 ## Inspirations
