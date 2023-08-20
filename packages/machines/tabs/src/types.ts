@@ -16,4 +16,5 @@ export type MachineEvents =
   | { type: "TAB.PREVIOUS" }
   | { type: "TAB.FOCUS"; value: string }
   | { type: "TAB.BLUR" }
-  | { type: "TAB.SET.DISABLED"; value: string; disabled: boolean };
+  | { type: "TAB.SET.DISABLED"; value: string; disabled: boolean }
+  | { type: "CONTEXT.UPDATE"; context: Partial<MachineContext> };

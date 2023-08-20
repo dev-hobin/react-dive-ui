@@ -27,6 +27,7 @@ type ConditionalProps =
 type RootProps = CommonProps & ConditionalProps;
 export const Root = forwardRef<HTMLDivElement, RootProps>((props, ref) => {
   const { logic, option, ...restProps } = props;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const accordion = logic ?? useAccordion(option);
   const componentProps = useAccordionProps(accordion);
 

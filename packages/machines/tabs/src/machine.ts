@@ -55,6 +55,10 @@ export const machine = createMachine(
             target: "idle",
             actions: ["unsetFocusedValue"],
           },
+          "CONTEXT.UPDATE": {
+            target: "idle",
+            actions: ["updateContext"],
+          },
         },
       },
     },
@@ -175,6 +179,10 @@ export const machine = createMachine(
       unsetFocusedValue: assign(({ event }) => {
         if (event.type !== "TAB.BLUR") return {};
         return { focusedTab: undefined };
+      }),
+      updateContext: assign(({ event, context }) => {
+        if (event.type !== "CONTEXT.UPDATE") return {};
+        return { ...context, ...event.context };
       }),
     },
     guards: {

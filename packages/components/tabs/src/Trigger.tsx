@@ -3,7 +3,6 @@ import { dive } from "@react-dive-ui/dive";
 import { useEvents, useProps } from "./providers";
 import { mergeProps } from "@react-dive-ui/merge-props";
 import { composeEventHandlers } from "../../../utils/composeEventHandlers/dist";
-import { useLatestValue } from "@react-dive-ui/use-latest-value";
 
 type TriggerProps = Omit<
   ComponentPropsWithoutRef<typeof dive.button>,
@@ -15,7 +14,6 @@ type TriggerProps = Omit<
 export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
     const { value, disabled, ...restProps } = props;
-    const initialProps = useLatestValue({ value, disabled });
 
     const { setTabDisabled } = useEvents();
     const { getTriggerProps } = useProps();
@@ -24,10 +22,9 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
     const mergedProps = mergeProps(triggerProps, restProps);
 
     useLayoutEffect(() => {
-      if (initialProps.disabled === undefined) return;
-      const { value, disabled } = initialProps;
+      if (disabled === undefined) return;
       setTabDisabled(value, disabled);
-    }, [initialProps, setTabDisabled]);
+    }, [disabled, setTabDisabled, value]);
 
     return (
       <dive.button

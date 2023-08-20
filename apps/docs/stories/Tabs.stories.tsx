@@ -27,7 +27,10 @@ export const Uncontrolled = () => {
 };
 
 export const Controlled = () => {
-  const tabs = useTabs({ defaultValue: "value-1" });
+  const tabs = useTabs({
+    defaultValue: "value-1",
+    disabledValues: ["value-2", "value-3"],
+  });
 
   return (
     <Tabs logic={tabs}>

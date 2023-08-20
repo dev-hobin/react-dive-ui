@@ -1,6 +1,7 @@
 import { useCallback, useId } from "react";
 import { useActor } from "@xstate/react";
 import { tabsMachine } from "@react-dive-ui/tabs-machine";
+import { useLatestValue } from "@react-dive-ui/use-latest-value";
 
 export type TabsOption = {
   defaultValue: string;
@@ -19,7 +20,10 @@ export function useTabs(option: TabsOption) {
     },
   });
 
-  console.log(state.context);
+  const latestState = useLatestValue({ status: state.value, ...state.context });
+  const getState = useCallback(() => {
+    return latestState;
+  }, [latestState]);
 
   const activateTab = useCallback(
     (value: string) => {
@@ -37,7 +41,7 @@ export function useTabs(option: TabsOption) {
 
   return {
     state: { status: state.value, ...state.context },
-    events: { _send: send, activateTab, setTabDisabled },
+    events: { _send: send, activateTab, setTabDisabled, getState },
   } as const;
 }
 
