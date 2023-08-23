@@ -435,6 +435,36 @@ importers:
         specifier: ^4.5.3
         version: 4.9.3
 
+  packages/utils/usePreviousValue:
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@react-dive-ui/use-isomorphic-layout-effect':
+        specifier: workspace:*
+        version: link:../useIsomorphicLayoutEffect
+      '@types/react':
+        specifier: ^18.0.9
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.0.4
+        version: 18.2.7
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.1.0
+        version: 18.2.0
+      tsup:
+        specifier: ^5.10.1
+        version: 5.10.1(typescript@4.9.3)
+      typescript:
+        specifier: ^4.5.3
+        version: 4.9.3
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
