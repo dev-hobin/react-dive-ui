@@ -19,6 +19,7 @@ module.exports = {
     },
   },
   rules: {
+    "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/no-explicit-any": "off",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
