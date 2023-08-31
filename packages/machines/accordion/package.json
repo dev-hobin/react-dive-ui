@@ -19,11 +19,11 @@
     "@react-dive-ui/tsconfig": "workspace:*",
     "eslint": "^8.15.0",
     "eslint-config-dive": "workspace:*",
-    "tsup": "^5.10.1",
-    "typescript": "^4.5.3"
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "xstate": "5.0.0-beta.21"
+    "xstate": "5.0.0-beta.25"
   },
   "publishConfig": {
     "access": "public"

@@ -290,8 +290,8 @@ importers:
   packages/machines/accordion:
     dependencies:
       xstate:
-        specifier: 5.0.0-beta.21
-        version: 5.0.0-beta.21
+        specifier: 5.0.0-beta.25
+        version: 5.0.0-beta.25
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
@@ -10270,6 +10270,10 @@ packages:
 
   /xstate@5.0.0-beta.21:
     resolution: {integrity: sha512-UK9HdAzVq1YHhHk9iBjSgzCWEScKyaCv4XFMekTRbTLF1w+epAEUxwuJz66+Un2Owp27V5j67l1T6N5TVfTbpA==}
+    dev: false
+
+  /xstate@5.0.0-beta.25:
+    resolution: {integrity: sha512-GSCGiflk2jPGBpWI1F+9rf6Xwtd2sC5ojBu4IHydd2DwaZD8MsfKFQHhsQSiGoljPu1+S92Fqx9GeZ6tT/iOlw==}
     dev: false
 
   /xtend@4.0.2:
