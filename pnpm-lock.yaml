@@ -266,6 +266,33 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
+  packages/core/properties:
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.2.20
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.2.7
+      eslint:
+        specifier: ^8.46.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.1.6
+        version: 5.2.2
+
   packages/eslint-config-dive:
     dependencies:
       '@typescript-eslint/eslint-plugin':
@@ -289,6 +316,9 @@ importers:
 
   packages/machines/accordion:
     dependencies:
+      '@react-dive-ui/properties':
+        specifier: workspace:*
+        version: link:../../core/properties
       xstate:
         specifier: 5.0.0-beta.25
         version: 5.0.0-beta.25

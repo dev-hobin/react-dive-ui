@@ -1,5 +1,5 @@
 {
-  "name": "@react-dive-ui/accordion-machine",
+  "name": "@react-dive-ui/properties",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -10,21 +10,20 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
     "@react-dive-ui/tsconfig": "workspace:*",
-    "eslint": "^8.15.0",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "eslint": "^8.46.0",
     "eslint-config-dive": "workspace:*",
+    "react": "^18.2.0",
     "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
-  },
-  "dependencies": {
-    "xstate": "5.0.0-beta.25",
-    "@react-dive-ui/properties": "workspace:*"
+    "typescript": "^5.1.6"
   },
   "publishConfig": {
     "access": "public"

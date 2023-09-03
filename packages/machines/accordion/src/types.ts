@@ -1,3 +1,8 @@
+import { ActorRefFrom, StateFrom } from "xstate";
+import { machine } from "./machine";
+
+export type MachineState = StateFrom<typeof machine>;
+export type MachineSend = ActorRefFrom<typeof machine>["send"];
 export type MachineContext = {
   id: string;
   ids?: ElementIds;
