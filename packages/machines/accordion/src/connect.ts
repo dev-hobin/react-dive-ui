@@ -25,6 +25,7 @@ export function connect(state: MachineState, send: MachineSend) {
     getTriggerProps(value: string, disabled?: boolean) {
       return properties.button({
         type: "button",
+        id: dom.getTriggerId(context, value),
         onClick() {
           send({ type: "ITEM.TOGGLE", value });
         },
@@ -35,8 +36,6 @@ export function connect(state: MachineState, send: MachineSend) {
           send({ type: "TRIGGER.BLUR" });
         },
         onKeyDown(ev) {
-          ev.preventDefault();
-
           if (ev.key === "Home") {
             send({ type: "TRIGGER.FOCUS.FIRST" });
           } else if (ev.key === "End") {
