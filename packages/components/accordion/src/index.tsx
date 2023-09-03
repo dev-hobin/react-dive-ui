@@ -1,34 +1,26 @@
-import { accordionMachine, connect } from "@react-dive-ui/accordion-machine";
-import { useActor } from "@xstate/react";
+import { useAccordion } from "./useAccordion";
 
 export const Accordion = () => {
-  const [state, send] = useActor(accordionMachine, {
-    input: {
-      id: "accordion",
-      ids: {
-        root: "test-root-1",
-        item(value: string) {
-          return `test-item-${value}`;
-        },
-      },
-      type: "single",
-      orientation: "horizontal",
-      collapsible: false,
-    },
+  const { state, props } = useAccordion({
+    id: "accordion",
+    type: "single",
   });
-  const { rootProps, getItemProps, getTriggerProps, getPanelProps } = connect(
-    state,
-    send
-  );
+
+  const {
+    rootProps,
+    getItemProps,
+    getHeadingProps,
+    getTriggerProps,
+    getPanelProps,
+  } = props;
 
   console.log("------------------------");
-  console.log("state.value", state.value);
-  console.log("state.context", state.context);
+  console.log("state", state);
 
   return (
     <div {...rootProps}>
       <div {...getItemProps("value-1")}>
-        <h3>
+        <h3 {...getHeadingProps("value-1")}>
           <button {...getTriggerProps("value-1")}>value-1-trigger</button>
         </h3>
         <div {...getPanelProps("value-1")}>value-1-panel</div>

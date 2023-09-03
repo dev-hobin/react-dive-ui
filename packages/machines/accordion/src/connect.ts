@@ -22,6 +22,17 @@ export function connect(state: MachineState, send: MachineSend) {
           : "closed",
       });
     },
+    getHeadingProps(value: string, disabled?: boolean) {
+      return properties.h3({
+        id: dom.getHeadingId(context, value),
+        "data-part": "heading",
+        "data-disabled": disabled ? "" : undefined,
+        "data-orientation": context.orientation,
+        "data-state": context.expandedValues.includes(value)
+          ? "open"
+          : "closed",
+      });
+    },
     getTriggerProps(value: string, disabled?: boolean) {
       return properties.button({
         type: "button",

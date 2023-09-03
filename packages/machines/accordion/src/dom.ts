@@ -5,6 +5,8 @@ export const dom = {
     context.ids?.root ?? `accordion:${context.id}`,
   getItemId: (context: MachineContext, value: string) =>
     context.ids?.item?.(value) ?? `accordion:${context.id}:item:${value}`,
+  getHeadingId: (context: MachineContext, value: string) =>
+    context.ids?.heading?.(value) ?? `accordion:${context.id}:heading:${value}`,
   getTriggerId: (context: MachineContext, value: string) =>
     context.ids?.trigger?.(value) ?? `accordion:${context.id}:trigger:${value}`,
   getPanelId: (context: MachineContext, value: string) =>

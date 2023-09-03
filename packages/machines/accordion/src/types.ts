@@ -13,12 +13,13 @@ export type MachineContext = {
   focusedValue: string | null;
 };
 
-type ElementIds = {
+export type ElementIds = Partial<{
   root: string;
   item(value: string): string;
+  heading(value: string): string;
   trigger(value: string): string;
   panel(value: string): string;
-};
+}>;
 
 export type MachineEvent =
   | { type: "TRIGGER.FOCUS"; value: string }
@@ -30,3 +31,11 @@ export type MachineEvent =
   | { type: "ITEM.TOGGLE"; value: string }
   | { type: "ITEM.EXPAND"; value: string }
   | { type: "ITEM.COLLAPSE"; value: string };
+
+export type ChangeDetails = {
+  value: string[];
+};
+
+export type FocusChangeDetails = {
+  value: string | null;
+};
