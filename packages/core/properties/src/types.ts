@@ -1,6 +1,7 @@
-import { HTMLAttributes } from "react";
+import { CSSProperties, HTMLAttributes } from "react";
 
-type DataAttr = Record<`data-${string}`, any>;
+type DataAttr = { [key: `data-${string}`]: string | number | undefined };
+type CSSVariables = { [key: `--${string}`]: string | number | undefined };
 type ElementsWithoutRef = {
   [K in keyof JSX.IntrinsicElements]: Omit<JSX.IntrinsicElements[K], "ref">;
 };
@@ -10,11 +11,13 @@ type ElementToProperties = ElementsWithoutRef & {
 export type ElementToPropertyFactory = {
   [K in keyof ElementToProperties]: (
     props: K extends keyof JSX.IntrinsicElements
-      ? DataAttr & JSX.IntrinsicElements[K]
+      ? DataAttr &
+          JSX.IntrinsicElements[K] & { style?: CSSProperties & CSSVariables }
       : never
   ) => ElementToProperties[K];
 } & {
   element(
-    props: DataAttr & HTMLAttributes<HTMLElement>
+    props: DataAttr &
+      HTMLAttributes<HTMLElement> & { style?: CSSProperties & CSSVariables }
   ): ElementToProperties["element"];
 };
