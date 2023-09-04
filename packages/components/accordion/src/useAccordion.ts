@@ -6,6 +6,7 @@ import {
   FocusChangeDetails,
 } from "@react-dive-ui/accordion-machine";
 import { useActor } from "@xstate/react";
+import { useCallback } from "react";
 
 type CommonOption = {
   id: string;
@@ -51,10 +52,29 @@ export function useAccordion(option: AccordionOption, listeners?: Listeners) {
     }
   );
 
+  const toggle = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.TOGGLE", value });
+    },
+    [send]
+  );
+  const open = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.EXPAND", value });
+    },
+    [send]
+  );
+  const close = useCallback(
+    (value: string) => {
+      send({ type: "ITEM.COLLAPSE", value });
+    },
+    [send]
+  );
+
   const { value, context } = state;
   return {
     state: { status: value, ...context },
-    apis: {},
+    apis: { toggle, open, close },
     props: connect(state, send),
   };
 }
