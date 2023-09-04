@@ -11,7 +11,6 @@
   "dependencies": {
     "@react-dive-ui/accordion": "workspace:0.0.0",
     "@react-dive-ui/dive": "workspace:0.0.0",
-    "@react-dive-ui/tabs": "workspace:0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
