@@ -1,4 +1,5 @@
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useAccordionStore } from "../providers/accordion";
 import { ItemProvider } from "../providers/item";
@@ -15,9 +16,11 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>((props, ref) => {
 
   const store = useAccordionStore();
   const { getItemProps } = store.props;
+
+  const mergedProps = mergeProps(getItemProps(value, disabled), restProps);
   return (
     <ItemProvider value={value} disabled={disabled}>
-      <dive.div {...getItemProps(value, disabled)} {...restProps} ref={ref} />
+      <dive.div {...mergedProps} ref={ref} />
     </ItemProvider>
   );
 });

@@ -1,4 +1,5 @@
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useAccordionStore } from "../providers/accordion";
 import { useItem } from "../providers/item";
@@ -10,13 +11,12 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
     const item = useItem();
 
     const { getHeadingProps } = store.props;
-    return (
-      <dive.h3
-        {...getHeadingProps(item.value, item.disabled)}
-        {...props}
-        ref={ref}
-      />
+
+    const mergedProps = mergeProps(
+      getHeadingProps(item.value, item.disabled),
+      props
     );
+    return <dive.h3 {...mergedProps} ref={ref} />;
   }
 );
 
