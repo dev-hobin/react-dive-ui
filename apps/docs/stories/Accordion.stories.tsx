@@ -1,5 +1,4 @@
 import type { Meta } from "@storybook/react";
-
 import { Accordion, useAccordion } from "@react-dive-ui/accordion";
 
 const meta = {
