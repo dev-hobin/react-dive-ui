@@ -46,7 +46,7 @@ export function useAccordion(option: AccordionOption, listeners?: Listeners) {
         type: option.type,
         collapsible: option.type === "single" && option.collapsible,
         orientation: option.orientation,
-        expandedValues: getValues(option.defaultValue),
+        expandedValues: toArray(option.defaultValue),
       },
     }
   );
@@ -59,8 +59,10 @@ export function useAccordion(option: AccordionOption, listeners?: Listeners) {
   };
 }
 
-function getValues(v: undefined | string | string[]) {
+function toArray(v: undefined | string | string[]) {
   if (!v) return [];
   if (Array.isArray(v)) return v;
   return [v];
 }
+
+export type AccordionStore = ReturnType<typeof useAccordion>;
