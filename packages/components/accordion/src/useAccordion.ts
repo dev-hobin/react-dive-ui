@@ -9,7 +9,7 @@ import { useActor } from "@xstate/react";
 
 type CommonOption = {
   id: string;
-  ids?: Partial<ElementIds>;
+  ids?: ElementIds;
   orientation?: "vertical" | "horizontal";
 };
 type SingleAccordionOption = CommonOption & {
