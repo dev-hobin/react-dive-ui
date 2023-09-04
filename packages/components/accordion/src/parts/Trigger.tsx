@@ -17,7 +17,7 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
 
     const mergedProps = mergeProps(triggerProps, props);
     return (
-      <button
+      <dive.button
         {...mergedProps}
         onClick={composeEventHandlers(props.onClick, onClick)}
         onFocus={composeEventHandlers(props.onFocus, onFocus)}
