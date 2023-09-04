@@ -1,12 +1,21 @@
-import { HTMLAttributes } from "react";
+import { dive } from "@react-dive-ui/dive";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useAccordionStore } from "../providers/accordion";
 import { useItem } from "../providers/item";
 
-export interface PanelProps extends HTMLAttributes<HTMLDivElement> {}
-export const Panel = (props: PanelProps) => {
+type PanelProps = ComponentPropsWithoutRef<typeof dive.div>;
+export const Panel = forwardRef<HTMLDivElement, PanelProps>((props, ref) => {
   const store = useAccordionStore();
   const item = useItem();
 
   const { getPanelProps } = store.props;
-  return <div {...getPanelProps(item.value, item.disabled)} {...props} />;
-};
+  return (
+    <dive.div
+      {...getPanelProps(item.value, item.disabled)}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+
+Panel.displayName = "Accordion.Panel";
