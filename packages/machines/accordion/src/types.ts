@@ -1,35 +1,41 @@
-export type AccordionType = "single" | "multiple";
-export type AccordionOrientation = "vertical" | "horizontal";
+import { ActorRefFrom, StateFrom } from "xstate";
+import { machine } from "./machine";
 
-export interface AccordionItem {
-  value: string | number;
-  isDisabled: boolean;
-}
-
+export type MachineState = StateFrom<typeof machine>;
+export type MachineSend = ActorRefFrom<typeof machine>["send"];
 export type MachineContext = {
   id: string;
-  type: AccordionType;
-  orientation: AccordionOrientation;
+  ids?: ElementIds;
+  type: "single" | "multiple";
+  expandedValues: string[];
   collapsible: boolean;
-  disabled: boolean;
-  itemMap: Record<AccordionItem["value"], AccordionItem>;
-  value: AccordionItem["value"][];
-  focusedItemValue: AccordionItem["value"] | undefined;
+  orientation: "vertical" | "horizontal";
+  focusedValue: string | null;
 };
 
-export type MachineEvents =
-  | { type: "ROOT.SET.DISABLED"; disabled: boolean }
-  | { type: "ITEM.REGISTER"; item: AccordionItem }
-  | { type: "ITEM.UNREGISTER"; value: AccordionItem["value"] }
-  | { type: "ITEM.TOGGLE"; value: AccordionItem["value"] }
-  | { type: "ITEM.OPEN"; value: AccordionItem["value"] }
-  | { type: "ITEM.CLOSE"; value: AccordionItem["value"] }
-  | {
-      type: "ITEM.SET.DISABLED";
-      value: AccordionItem["value"];
-      disabled: boolean;
-    }
-  | { type: "TRIGGER.FOCUS"; value: AccordionItem["value"] }
+export type ElementIds = Partial<{
+  root: string;
+  item(value: string): string;
+  heading(value: string): string;
+  trigger(value: string): string;
+  panel(value: string): string;
+}>;
+
+export type MachineEvent =
+  | { type: "TRIGGER.FOCUS"; value: string }
   | { type: "TRIGGER.BLUR" }
-  | { type: "FOCUS.NEXT" }
-  | { type: "FOCUS.PREVIOUS" };
+  | { type: "TRIGGER.FOCUS.NEXT" }
+  | { type: "TRIGGER.FOCUS.PREV" }
+  | { type: "TRIGGER.FOCUS.FIRST" }
+  | { type: "TRIGGER.FOCUS.LAST" }
+  | { type: "ITEM.TOGGLE"; value: string }
+  | { type: "ITEM.EXPAND"; value: string }
+  | { type: "ITEM.COLLAPSE"; value: string };
+
+export type ChangeDetails = {
+  value: string[];
+};
+
+export type FocusChangeDetails = {
+  value: string | null;
+};

@@ -1,225 +1,196 @@
-import { createMachine, assign } from "xstate";
-import { MachineContext, MachineEvents } from "./types";
+import { and, assign, createMachine, not, pure, raise } from "xstate";
+import { MachineContext, MachineEvent } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
   {
     id: "Accordion",
-    context: ({ input = {} }) => ({
-      id: input.id,
-      type: input.type ?? "single",
-      itemMap: {},
-      orientation: input.orientation ?? "vertical",
-      collapsible: input.collapsible ?? true,
-      disabled: input.disabled ?? false,
-      value: input.value ?? [],
-      focusedItemValue: undefined,
-    }),
     initial: "idle",
+    context: ({ input }) => ({
+      id: input.id,
+      ids: input?.ids,
+      type: input.type,
+      expandedValues: input?.expandedValues ?? [],
+      collapsible: input?.collapsible ?? true,
+      orientation: input?.orientation ?? "vertical",
+      focusedValue: null,
+    }),
     states: {
       idle: {
         on: {
-          "ROOT.SET.DISABLED": {
-            target: "idle",
-            actions: ["setRootDisabled"],
-          },
-          "ITEM.REGISTER": {
-            target: "idle",
-            actions: ["registerItem"],
-          },
-          "ITEM.UNREGISTER": {
-            target: "idle",
-            actions: ["unregisterItem"],
-          },
-          "ITEM.TOGGLE": {
-            target: "idle",
-            actions: ["toggleItem"],
-          },
-          "ITEM.OPEN": {
-            target: "idle",
-            actions: ["openItem"],
-          },
-          "ITEM.SET.DISABLED": {
-            target: "idle",
-            actions: ["setItemDisabled"],
-          },
-          "ITEM.CLOSE": {
-            target: "idle",
-            actions: ["closeItem"],
-          },
           "TRIGGER.FOCUS": {
-            target: "idle",
-            actions: ["setFocusedItemValue"],
+            target: "focused",
+            actions: ["setFocusedItem", "onFocusChange"],
           },
+        },
+      },
+      focused: {
+        on: {
           "TRIGGER.BLUR": {
             target: "idle",
-            actions: ["unsetFocusedItemValue"],
+            actions: ["unsetFocusedItem", "onFocusChange"],
+          },
+          "TRIGGER.FOCUS.NEXT": [
+            {
+              guard: "isLastTrigger",
+              actions: [raise({ type: "TRIGGER.FOCUS.FIRST" })],
+            },
+            {
+              actions: ["focusNextTrigger"],
+            },
+          ],
+          "TRIGGER.FOCUS.PREV": [
+            {
+              guard: "isFirstTrigger",
+              actions: [raise({ type: "TRIGGER.FOCUS.LAST" })],
+            },
+            {
+              actions: ["focusPrevTrigger"],
+            },
+          ],
+          "TRIGGER.FOCUS.FIRST": {
+            actions: ["focusFirstTrigger"],
+          },
+          "TRIGGER.FOCUS.LAST": {
+            actions: ["focusLastTrigger"],
           },
         },
       },
     },
     on: {
-      "FOCUS.NEXT": {
-        target: "#Accordion",
-        actions: ["focusNextTrigger"],
-      },
-      "FOCUS.PREVIOUS": {
-        target: "#Accordion",
-        actions: ["focusPreviousTrigger"],
-      },
+      "ITEM.TOGGLE": [
+        {
+          guard: "isItemExpanded",
+          actions: pure(({ event }) =>
+            raise({ type: "ITEM.COLLAPSE", value: event.value })
+          ),
+        },
+        {
+          actions: pure(({ event }) =>
+            raise({ type: "ITEM.EXPAND", value: event.value })
+          ),
+        },
+      ],
+      "ITEM.EXPAND": [
+        { guard: "isItemExpanded" },
+        {
+          guard: "isSingleType",
+          actions: ["switchItem", "onChange"],
+        },
+        { actions: ["expandItem", "onChange"] },
+      ],
+      "ITEM.COLLAPSE": [
+        { guard: not("isItemExpanded") },
+        { guard: and(["isSingleType", not("isCollapsible")]) },
+        { actions: ["collapseItem", "onChange"] },
+      ],
     },
     types: {
-      events: {} as MachineEvents,
       context: {} as MachineContext,
+      events: {} as MachineEvent,
     },
   },
   {
+    guards: {
+      isItemExpanded: ({ context, event }) => {
+        if (!("value" in event)) return false;
+        return context.expandedValues.includes(event.value);
+      },
+      isSingleType: ({ context }) => context.type === "single",
+      isCollapsible: ({ context }) => context.collapsible,
+      isLastTrigger: ({ context }) => {
+        if (!context.focusedValue) return false;
+        const currentTriggerEl = dom.getTriggerEl(
+          context,
+          context.focusedValue
+        );
+        if (!currentTriggerEl) return false;
+
+        const triggerEls = dom.getTriggerEls(context);
+        const lastTriggerEl = triggerEls.at(-1);
+
+        return currentTriggerEl === lastTriggerEl;
+      },
+      isFirstTrigger: ({ context }) => {
+        if (!context.focusedValue) return false;
+        const currentTriggerEl = dom.getTriggerEl(
+          context,
+          context.focusedValue
+        );
+        if (!currentTriggerEl) return false;
+
+        const triggerEls = dom.getTriggerEls(context);
+        const firstTriggerEl = triggerEls.at(0);
+
+        return currentTriggerEl === firstTriggerEl;
+      },
+    },
     actions: {
-      registerItem: assign({
-        itemMap: ({ context, event }) => {
-          if (event.type !== "ITEM.REGISTER") return context.itemMap;
-          const item = event.item;
-          context.itemMap[item.value] = item;
-          return { ...context.itemMap };
-        },
+      switchItem: pure(({ event }) => {
+        if (event.type !== "ITEM.EXPAND") return;
+        return assign({ expandedValues: [event.value] });
       }),
-      unregisterItem: assign({
-        itemMap: ({ context, event }) => {
-          if (event.type !== "ITEM.UNREGISTER") return context.itemMap;
-          const itemKey = event.value;
-          delete context.itemMap[itemKey];
-          return { ...context.itemMap };
-        },
+      expandItem: pure(({ context, event }) => {
+        if (event.type !== "ITEM.EXPAND") return;
+        return assign({
+          expandedValues: [...context.expandedValues, event.value],
+        });
       }),
-      toggleItem: assign(({ context, event }) => {
-        if (event.type !== "ITEM.TOGGLE") return context;
-        const { type, collapsible, value: currentOpened } = context;
-        const { value } = event;
+      collapseItem: pure(({ context, event }) => {
+        if (event.type !== "ITEM.COLLAPSE") return;
+        return assign({
+          expandedValues: context.expandedValues.filter(
+            (value) => value !== event.value
+          ),
+        });
+      }),
+      setFocusedItem: pure(({ event }) => {
+        if (event.type !== "TRIGGER.FOCUS") return;
+        return assign({ focusedValue: event.value });
+      }),
+      unsetFocusedItem: assign({ focusedValue: null }),
+      focusNextTrigger: ({ context }) => {
+        if (!context.focusedValue) return;
 
-        if (type === "single") {
-          const currentOpenedValue = currentOpened[0];
-          // 이미 열려있는 아이템
-          if (currentOpenedValue === value) {
-            // collapse 가능하면 아이템 닫기
-            if (collapsible) return { value: [] };
-            // collapse 불가능하면 기존 상태 유지
-            else return { value: currentOpened };
-          } else {
-            // 열려있는 아이템 변경
-            return { value: [value] };
-          }
-        } else {
-          const currentOpenedValues = currentOpened;
-          if (currentOpenedValues.includes(value)) {
-            return { value: currentOpenedValues.filter((v) => v !== value) };
-          } else {
-            return { value: [...currentOpenedValues, value] };
-          }
-        }
-      }),
-      openItem: assign(({ context, event }) => {
-        if (event.type !== "ITEM.OPEN") return context;
-        const {
-          type,
-          value: currentOpened,
-          disabled: isAllDisabled,
-          itemMap,
-        } = context;
-        const { value } = event;
+        const currentTriggerEl = dom.getTriggerEl(
+          context,
+          context.focusedValue
+        );
+        if (!currentTriggerEl) return;
 
-        console.log(isAllDisabled, itemMap[value]);
-
-        if (isAllDisabled || itemMap[value].isDisabled) return context;
-        if (currentOpened.includes(value)) return context;
-        if (type === "single") {
-          return { value: [value] };
-        } else {
-          return { value: [...currentOpened, value] };
-        }
-      }),
-      closeItem: assign(({ context, event }) => {
-        if (event.type !== "ITEM.CLOSE") return context;
-        const {
-          type,
-          collapsible,
-          itemMap,
-          value: currentOpened,
-          disabled: isAllDisabled,
-        } = context;
-        const { value } = event;
-
-        if (isAllDisabled || itemMap[value].isDisabled) return context;
-        if (!currentOpened.includes(value)) return context;
-
-        if (type === "single") {
-          if (collapsible) return { value: [] };
-          return { value: currentOpened };
-        } else {
-          return { value: currentOpened.filter((v) => v !== value) };
-        }
-      }),
-      setRootDisabled: assign(({ context, event }) => {
-        if (event.type !== "ROOT.SET.DISABLED") return context;
-        const { disabled } = event;
-        return {
-          disabled,
-        };
-      }),
-      setItemDisabled: assign(({ context, event }) => {
-        if (event.type !== "ITEM.SET.DISABLED") return context;
-        const { itemMap } = context;
-        const { value, disabled } = event;
-
-        return {
-          itemMap: {
-            ...itemMap,
-            [value]: { ...itemMap[value], isDisabled: disabled },
-          },
-        };
-      }),
-      setFocusedItemValue: assign(({ context, event }) => {
-        if (event.type !== "TRIGGER.FOCUS") return context;
-        const { value } = event;
-        return { focusedItemValue: value };
-      }),
-      unsetFocusedItemValue: assign(({ context, event }) => {
-        if (event.type !== "TRIGGER.BLUR") return context;
-        return { focusedItemValue: undefined };
-      }),
-      focusNextTrigger: ({ context, event }) => {
-        if (event.type !== "FOCUS.NEXT") return;
-        const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
-        if (!currentFocusedTriggerEl) return;
-
-        const triggerEls = dom.findTriggers(context.id);
-
-        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        const triggerEls = dom.getTriggerEls(context);
+        const currentIndex = triggerEls.indexOf(currentTriggerEl);
         if (currentIndex === -1) return;
 
-        const nextTrigger = triggerEls[currentIndex + 1];
-        if (nextTrigger) {
-          nextTrigger.focus();
-        } else {
-          triggerEls[0].focus();
-        }
+        const nextTriggerEl = triggerEls[currentIndex + 1];
+        nextTriggerEl.focus();
       },
-      focusPreviousTrigger: ({ context, event }) => {
-        if (event.type !== "FOCUS.PREVIOUS") return;
-        const currentFocusedTriggerEl = dom.findFocusedTrigger(context.id);
-        if (!currentFocusedTriggerEl) return;
+      focusPrevTrigger: ({ context }) => {
+        if (!context.focusedValue) return;
 
-        const triggerEls = dom.findTriggers(context.id);
+        const currentTriggerEl = dom.getTriggerEl(
+          context,
+          context.focusedValue
+        );
+        if (!currentTriggerEl) return;
 
-        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        const triggerEls = dom.getTriggerEls(context);
+        const currentIndex = triggerEls.indexOf(currentTriggerEl);
         if (currentIndex === -1) return;
 
-        const previousTrigger = triggerEls[currentIndex - 1];
-        if (previousTrigger) {
-          previousTrigger.focus();
-        } else {
-          triggerEls[triggerEls.length - 1].focus();
-        }
+        const prevTriggerEl = triggerEls[currentIndex - 1];
+        prevTriggerEl.focus();
       },
+      focusFirstTrigger: ({ context }) => {
+        dom.getTriggerEls(context)[0]?.focus();
+      },
+      focusLastTrigger: ({ context }) => {
+        dom.getTriggerEls(context).at(-1)?.focus();
+      },
+
+      // template
+      onChange: () => {},
+      onFocusChange: () => {},
     },
   }
 );

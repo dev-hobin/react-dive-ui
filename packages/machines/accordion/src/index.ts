@@ -1,8 +1,3 @@
 export { machine as accordionMachine } from "./machine";
-export { createIdFactory } from "./factory";
-
-export type {
-  AccordionItem,
-  AccordionType,
-  AccordionOrientation,
-} from "./types";
+export { connect } from "./connect";
+export * from "./types";

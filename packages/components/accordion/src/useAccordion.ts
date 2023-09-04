@@ -1,70 +1,68 @@
-import { useCallback, useId } from "react";
+import {
+  accordionMachine,
+  connect,
+  ElementIds,
+  ChangeDetails,
+  FocusChangeDetails,
+} from "@react-dive-ui/accordion-machine";
 import { useActor } from "@xstate/react";
-import { accordionMachine } from "@react-dive-ui/accordion-machine";
-import { SingleAccordionOption, MultipleAccordionOption } from "./types";
+
+type CommonOption = {
+  id: string;
+  ids?: ElementIds;
+  orientation?: "vertical" | "horizontal";
+};
+type SingleAccordionOption = CommonOption & {
+  type: "single";
+  defaultValue?: string;
+  collapsible?: boolean;
+};
+type MultipleAccordionOption = CommonOption & {
+  type: "multiple";
+  defaultValue?: string[];
+};
+type Listeners = {
+  onChange?: (details: ChangeDetails) => void;
+  onFocusChange?: (details: FocusChangeDetails) => void;
+};
 
 export type AccordionOption = SingleAccordionOption | MultipleAccordionOption;
-export function useAccordion(option?: AccordionOption) {
-  const id = useId();
-
-  const [state, send] = useActor(accordionMachine, {
-    input:
-      option === undefined
-        ? { type: "single", id }
-        : option.type === "single"
-        ? {
-            ...option,
-            id,
-            value: option.defaultValue ? [option.defaultValue] : [],
-          }
-        : {
-            ...option,
-            id,
-            value: option.defaultValue ?? [],
-          },
-  });
-
-  console.log(state.context);
-
-  const toggle = useCallback(
-    (value: string) => {
-      send({ type: "ITEM.TOGGLE", value });
-    },
-    [send]
+export function useAccordion(option: AccordionOption, listeners?: Listeners) {
+  const [state, send] = useActor(
+    accordionMachine.provide({
+      actions: {
+        onChange: ({ context }) => {
+          listeners?.onChange?.({ value: context.expandedValues });
+        },
+        onFocusChange: ({ context }) => {
+          listeners?.onFocusChange?.({ value: context.focusedValue });
+        },
+      },
+    }),
+    {
+      input: {
+        id: option.id,
+        ids: option.ids,
+        type: option.type,
+        collapsible: option.type === "single" && option.collapsible,
+        orientation: option.orientation,
+        expandedValues: toArray(option.defaultValue),
+      },
+    }
   );
 
-  const open = useCallback(
-    (value: string) => {
-      send({ type: "ITEM.OPEN", value });
-    },
-    [send]
-  );
-
-  const close = useCallback(
-    (value: string) => {
-      send({ type: "ITEM.CLOSE", value });
-    },
-    [send]
-  );
-
-  const setItemDisabled = useCallback(
-    (value: string, disabled: boolean) => {
-      send({ type: "ITEM.SET.DISABLED", value, disabled });
-    },
-    [send]
-  );
-
-  const setDisabled = useCallback(
-    (disabled: boolean) => {
-      send({ type: "ROOT.SET.DISABLED", disabled });
-    },
-    [send]
-  );
-
+  const { value, context } = state;
   return {
-    state: { status: state.value, ...state.context },
-    events: { _send: send, toggle, open, close, setItemDisabled, setDisabled },
-  } as const;
+    state: { status: value, ...context },
+    apis: {},
+    props: connect(state, send),
+  };
 }
 
-export type UseAccordionReturn = ReturnType<typeof useAccordion>;
+function toArray(v: undefined | string | string[]) {
+  if (!v) return [];
+  if (Array.isArray(v)) return v;
+  return [v];
+}
+
+export type AccordionStore = ReturnType<typeof useAccordion>;

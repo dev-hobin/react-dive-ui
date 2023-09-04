@@ -11,54 +11,31 @@ const meta = {
 
 export default meta;
 
-export const Uncontrolled = () => {
-  return (
-    <Accordion option={{ type: "single", defaultValue: "accordion-2" }}>
-      <Accordion.Item value="accordion-1">
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 1</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 1</Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="accordion-2">
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 2</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 2</Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="accordion-3">
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 3</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 3</Accordion.Content>
-      </Accordion.Item>
-    </Accordion>
-  );
-};
-
-export const Controlled = () => {
-  const accordion = useAccordion({ type: "single" });
+export const AccordionTest = () => {
+  const accordion = useAccordion({ id: "accordion", type: "single" });
 
   return (
-    <Accordion logic={accordion}>
-      <Accordion.Item value="accordion-1" disabled>
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 1</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 1</Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="accordion-2">
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 2</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 2</Accordion.Content>
-      </Accordion.Item>
-      <Accordion.Item value="accordion-3">
-        <Accordion.Heading>
-          <Accordion.Trigger>트리거 3</Accordion.Trigger>
-        </Accordion.Heading>
-        <Accordion.Content>컨텐츠 3</Accordion.Content>
-      </Accordion.Item>
-    </Accordion>
+    <Accordion.Provider store={accordion}>
+      <Accordion.Root>
+        <Accordion.Item value="value-1">
+          <Accordion.Heading>
+            <Accordion.Trigger>value-1 trigger</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>value-1 panel</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="value-2">
+          <Accordion.Heading>
+            <Accordion.Trigger>value-2 trigger</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>value-2 panel</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="value-3">
+          <Accordion.Heading>
+            <Accordion.Trigger>value-3 trigger</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>value-3 panel</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion.Root>
+    </Accordion.Provider>
   );
 };

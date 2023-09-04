@@ -7,29 +7,27 @@ function withAsChild<TElement extends React.ElementType>(
   Component: TElement,
   displayName: string
 ) {
-  const DiveComponent = React.forwardRef(
-    (
-      props: DivePropsWithoutRef<TElement>,
-      ref: React.ForwardedRef<React.ElementRef<TElement>>
-    ) => {
-      const { asChild, children, ...restProps } = props;
+  const DiveComponent = React.forwardRef<
+    React.ElementRef<TElement>,
+    DivePropsWithoutRef<TElement>
+  >((props, ref) => {
+    const { asChild, children, ...restProps } = props;
 
-      if (!asChild) {
-        return <Component {...props} ref={ref} />;
-      }
-
-      const onlyChild = React.Children.only(children);
-
-      return React.isValidElement(onlyChild)
-        ? React.cloneElement(children, {
-            ...mergeProps(restProps, children.props),
-            ref: ref
-              ? composeRefs(ref, (children as any).ref)
-              : (children as any).ref,
-          })
-        : null;
+    if (!asChild) {
+      return <Component {...props} ref={ref} />;
     }
-  );
+
+    const onlyChild = React.Children.only(children);
+
+    return React.isValidElement(onlyChild)
+      ? React.cloneElement(children, {
+          ...mergeProps(restProps, children.props),
+          ref: ref
+            ? composeRefs(ref, (children as any).ref)
+            : (children as any).ref,
+        })
+      : null;
+  });
 
   DiveComponent.displayName = displayName;
 

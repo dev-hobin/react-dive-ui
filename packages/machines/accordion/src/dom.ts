@@ -1,12 +1,28 @@
+import { MachineContext } from "./types";
+
 export const dom = {
-  findFocusedTrigger: (id: string) =>
-    document
-      .getElementById(id)
-      ?.querySelector<HTMLElement>('[data-part="trigger"][data-focused]'),
-  findTriggers: (id: string) =>
-    Array.from<HTMLElement>(
-      document
-        .getElementById(id)
-        ?.querySelectorAll('[data-part="trigger"]:not([data-disabled])') ?? []
-    ),
+  getRootId: (context: MachineContext) =>
+    context.ids?.root ?? `accordion:${context.id}`,
+  getItemId: (context: MachineContext, value: string) =>
+    context.ids?.item?.(value) ?? `accordion:${context.id}:item:${value}`,
+  getHeadingId: (context: MachineContext, value: string) =>
+    context.ids?.heading?.(value) ?? `accordion:${context.id}:heading:${value}`,
+  getTriggerId: (context: MachineContext, value: string) =>
+    context.ids?.trigger?.(value) ?? `accordion:${context.id}:trigger:${value}`,
+  getPanelId: (context: MachineContext, value: string) =>
+    context.ids?.panel?.(value) ?? `accordion:${context.id}:panel:${value}`,
+
+  getRootEl: (context: MachineContext) =>
+    document.getElementById(dom.getRootId(context)),
+  getTriggerEls: (context: MachineContext) => {
+    return Array.from<HTMLElement>(
+      dom
+        .getRootEl(context)
+        ?.querySelectorAll(
+          `[aria-controls][data-part='trigger']:not([disabled])`
+        ) ?? []
+    );
+  },
+  getTriggerEl: (context: MachineContext, value: string) =>
+    document.getElementById(dom.getTriggerId(context, value)),
 };
