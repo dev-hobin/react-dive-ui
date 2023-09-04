@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface DiveForwardRefComponent<TElement extends React.ElementType>
   extends React.ForwardRefExoticComponent<DivePropsWithRef<TElement>> {}
 
@@ -11,6 +13,9 @@ export type DivePropsWithRef<TElement extends React.ElementType> =
     React.ComponentPropsWithRef<TElement> & {
       asChild?: boolean;
       [key: `data-${string}`]: string | boolean | undefined;
+      style?: React.CSSProperties & {
+        [styleVariable: `--${string}`]: string | undefined;
+      };
     }
   >;
 
@@ -20,5 +25,8 @@ export type DivePropsWithoutRef<TElement extends React.ElementType> =
     React.ComponentPropsWithoutRef<TElement> & {
       asChild?: boolean;
       [key: `data-${string}`]: string | boolean | undefined;
+      style?: React.CSSProperties & {
+        [styleVariable: `--${string}`]: string | undefined;
+      };
     }
   >;
