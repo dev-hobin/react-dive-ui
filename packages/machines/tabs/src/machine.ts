@@ -78,6 +78,9 @@ export const machine = createMachine(
       "TRIGGER.ACTIVATE": {
         actions: ["setValue"],
       },
+      "CONTEXT.SET": {
+        actions: ["setContext"],
+      },
     },
     types: {
       events: {} as MachineEvent,
@@ -161,6 +164,10 @@ export const machine = createMachine(
         if (!context.value) return;
         dom.getPanelEl(context, context.value)?.focus();
       },
+      setContext: pure(({ event }) => {
+        if (event.type !== "CONTEXT.SET") return;
+        return assign(event.context);
+      }),
     },
   }
 );
