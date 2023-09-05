@@ -1,0 +1,5 @@
+{
+  "extends": "@react-dive-ui/tsconfig/base.json",
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}
