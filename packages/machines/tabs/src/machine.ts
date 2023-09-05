@@ -76,7 +76,6 @@ export const machine = createMachine(
     },
     on: {
       "TRIGGER.ACTIVATE": {
-        target: "#Tabs",
         actions: ["setValue"],
       },
     },
@@ -119,7 +118,7 @@ export const machine = createMachine(
       }),
       setFocusedValue: pure(({ event }) => {
         if (event.type !== "TRIGGER.FOCUS") return;
-        return assign({ value: event.value });
+        return assign({ focusedValue: event.value });
       }),
       unsetFocusedValue: assign({ focusedValue: null }),
       focusNextTrigger: ({ context }) => {

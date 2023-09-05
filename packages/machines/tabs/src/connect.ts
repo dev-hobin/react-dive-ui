@@ -37,7 +37,7 @@ export function connect(state: MachineState, send: MachineSend) {
           send({ type: "TRIGGER.BLUR" });
         },
         onKeyDown(ev) {
-          if (ev.key === "Tab" && activeValue === value) {
+          if (!ev.shiftKey && ev.key === "Tab" && activeValue === value) {
             ev.preventDefault();
             send({ type: "PANEL.FOCUS.CURRENT" });
             return;
