@@ -29,3 +29,11 @@ export type MachineEvent =
   | { type: "TRIGGER.ACTIVATE"; value: string }
   | { type: "PANEL.FOCUS.CURRENT" }
   | { type: "CONTEXT.SET"; context: Partial<MachineContext> };
+
+export type ChangeDetails = {
+  value: string;
+};
+
+export type FocusChangeDetails = {
+  value: string | null;
+};

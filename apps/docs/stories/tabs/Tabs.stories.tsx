@@ -12,10 +12,22 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const tabs = useTabs({
-    id: "tabs",
-    defaultValue: "tab-1",
-  });
+  const tabs = useTabs(
+    {
+      id: "tabs",
+      defaultValue: "tab-1",
+    },
+    {
+      onChange: (details) => {
+        console.log("change", details);
+      },
+      onFocusChange: (details) => {
+        console.log("focusChange", details);
+      },
+    }
+  );
+
+  console.log("state", tabs.state);
 
   return (
     <Tabs.Provider store={tabs}>

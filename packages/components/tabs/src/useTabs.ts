@@ -1,4 +1,10 @@
-import { tabsMachine, connect, ElementIds } from "@react-dive-ui/tabs-machine";
+import {
+  tabsMachine,
+  connect,
+  ElementIds,
+  ChangeDetails,
+  FocusChangeDetails,
+} from "@react-dive-ui/tabs-machine";
 import { useActor } from "@xstate/react";
 import { useCallback } from "react";
 
@@ -11,16 +17,33 @@ export type TabsOption = {
   activationMode?: ActivationMode;
   defaultValue?: string;
 };
-export function useTabs(option: TabsOption) {
-  const [state, send] = useActor(tabsMachine, {
-    input: {
-      id: option.id,
-      ids: option.ids,
-      orientation: option.orientation,
-      activationMode: option.activationMode,
-      value: option.defaultValue,
-    },
-  });
+export type Listeners = {
+  onChange?: (details: ChangeDetails) => void;
+  onFocusChange?: (details: FocusChangeDetails) => void;
+};
+export function useTabs(option: TabsOption, listeners?: Listeners) {
+  const [state, send] = useActor(
+    tabsMachine.provide({
+      actions: {
+        onChange: ({ context }) => {
+          if (!context.value) return;
+          listeners?.onChange?.({ value: context.value });
+        },
+        onFocusChange: ({ context }) => {
+          listeners?.onFocusChange?.({ value: context.focusedValue });
+        },
+      },
+    }),
+    {
+      input: {
+        id: option.id,
+        ids: option.ids,
+        orientation: option.orientation,
+        activationMode: option.activationMode,
+        value: option.defaultValue,
+      },
+    }
+  );
 
   const activate = useCallback(
     (value: string) => {

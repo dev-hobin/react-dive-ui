@@ -44,25 +44,19 @@ export function connect(state: MachineState, send: MachineSend) {
           }
 
           if (ev.key === "Home") {
-            ev.preventDefault();
             send({ type: "TRIGGER.FOCUS.FIRST" });
           } else if (ev.key === "End") {
-            ev.preventDefault();
             send({ type: "TRIGGER.FOCUS.LAST" });
           } else if (context.orientation === "vertical") {
             if (ev.key === "ArrowUp") {
-              ev.preventDefault();
               send({ type: "TRIGGER.FOCUS.PREV" });
             } else if (ev.key === "ArrowDown") {
-              ev.preventDefault();
               send({ type: "TRIGGER.FOCUS.NEXT" });
             }
           } else {
             if (ev.key === "ArrowRight") {
-              ev.preventDefault();
               send({ type: "TRIGGER.FOCUS.NEXT" });
             } else if (ev.key === "ArrowLeft") {
-              ev.preventDefault();
               send({ type: "TRIGGER.FOCUS.PREV" });
             }
           }

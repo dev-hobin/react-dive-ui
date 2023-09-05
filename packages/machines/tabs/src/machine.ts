@@ -1,4 +1,4 @@
-import { assign, createMachine, pure, raise } from "xstate";
+import { assign, createMachine, not, pure, raise } from "xstate";
 import { MachineContext, MachineEvent } from "./types";
 import { dom } from "./dom";
 
@@ -23,6 +23,7 @@ export const machine = createMachine(
               guard: "isActivationModeAutomatic",
               actions: [
                 "setFocusedValue",
+                "onFocusChange",
                 pure(({ context }) => {
                   if (!context.focusedValue) return;
                   return raise({
@@ -34,7 +35,7 @@ export const machine = createMachine(
             },
             {
               target: "focused",
-              actions: ["setFocusedValue"],
+              actions: ["setFocusedValue", "onFocusChange"],
             },
           ],
         },
@@ -43,7 +44,7 @@ export const machine = createMachine(
         on: {
           "TRIGGER.BLUR": {
             target: "idle",
-            actions: ["unsetFocusedValue"],
+            actions: ["unsetFocusedValue", "onFocusChange"],
           },
           "TRIGGER.FOCUS.NEXT": [
             {
@@ -69,15 +70,18 @@ export const machine = createMachine(
           },
           "PANEL.FOCUS.CURRENT": {
             target: "idle",
-            actions: ["focusCurrentPanel"],
+            actions: ["unsetFocusedValue", "focusCurrentPanel"],
           },
         },
       },
     },
     on: {
-      "TRIGGER.ACTIVATE": {
-        actions: ["setValue"],
-      },
+      "TRIGGER.ACTIVATE": [
+        {
+          guard: not("isActivatedValue"),
+          actions: ["setValue", "onChange"],
+        },
+      ],
       "CONTEXT.SET": {
         actions: ["setContext"],
       },
@@ -89,6 +93,12 @@ export const machine = createMachine(
   },
   {
     guards: {
+      isActivatedValue: ({ context, event }) => {
+        if (!("value" in event)) return false;
+
+        const value = event.value;
+        return context.value === value;
+      },
       isActivationModeAutomatic: ({ context }) =>
         context.activationMode === "automatic",
       isFirstTrigger: ({ context }) => {
@@ -168,6 +178,10 @@ export const machine = createMachine(
         if (event.type !== "CONTEXT.SET") return;
         return assign(event.context);
       }),
+
+      // override
+      onChange: () => {},
+      onFocusChange: () => {},
     },
   }
 );
