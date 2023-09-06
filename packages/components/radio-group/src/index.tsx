@@ -1,2 +1,2 @@
-export * from "./Tabs";
-export * from "./useTabs";
+export * from "./RadioGroup";
+export * from "./useRadioGroup";

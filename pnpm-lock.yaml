@@ -32,6 +32,9 @@ importers:
       '@react-dive-ui/dive':
         specifier: workspace:0.0.0
         version: link:../../packages/core/dive
+      '@react-dive-ui/radio-group':
+        specifier: workspace:0.0.0
+        version: link:../../packages/components/radio-group
       '@react-dive-ui/tabs':
         specifier: workspace:0.0.0
         version: link:../../packages/components/tabs
