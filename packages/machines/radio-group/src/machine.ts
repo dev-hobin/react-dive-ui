@@ -1,4 +1,4 @@
-import { assign, createMachine, pure, raise } from "xstate";
+import { assign, createMachine, not, pure, raise } from "xstate";
 import { MachineContext, MachineEvent } from "./types";
 import { dom } from "./dom";
 
@@ -18,10 +18,17 @@ export const machine = createMachine(
     states: {
       idle: {
         on: {
-          "RADIO.FOCUS": {
-            target: "focused",
-            actions: ["setFocusedValue"],
-          },
+          "RADIO.FOCUS": [
+            {
+              guard: not("isSelectedRadioExist"),
+              target: "focused",
+              actions: ["focusFirstSelectableRadio", "setFocusedValue"],
+            },
+            {
+              target: "focused",
+              actions: ["setFocusedValue"],
+            },
+          ],
         },
       },
       focused: {
@@ -30,11 +37,14 @@ export const machine = createMachine(
             target: "idle",
             actions: ["unsetFocusedValue"],
           },
+          "RADIO.FOCUS": {
+            actions: ["setFocusedValue", "selectCurrentFocused"],
+          },
           "RADIO.SELECT.NEXT": {
-            actions: ["focusNextRadio", "selectCurrentFocused"],
+            actions: ["focusNextRadio"],
           },
           "RADIO.SELECT.PREV": {
-            actions: ["focusPrevRadio", "selectCurrentFocused"],
+            actions: ["focusPrevRadio"],
           },
         },
       },
@@ -53,6 +63,9 @@ export const machine = createMachine(
     },
   },
   {
+    guards: {
+      isSelectedRadioExist: ({ context }) => context.value !== null,
+    },
     actions: {
       setFocusedValue: pure(({ event }) => {
         if (event.type !== "RADIO.FOCUS") return;
@@ -87,6 +100,11 @@ export const machine = createMachine(
 
         radioEls.at(getPrevIndex(currentIndex, radioEls))?.focus();
       },
+      focusFirstSelectableRadio: ({ context }) => {
+        const radioEls = dom.getRadioEls(context);
+        if (radioEls.length === 0) return;
+        radioEls[0]?.focus();
+      },
       selectCurrentFocused: pure(({ context }) => {
         if (!context.focusedValue) return;
         return raise({
@@ -112,5 +130,5 @@ function getNextIndex(currentIndex: number, array: unknown[]) {
 }
 function getPrevIndex(currentIndex: number, array: unknown[]) {
   if (array.length === 0) return 0;
-  return -((currentIndex + 1) % array.length);
+  return (currentIndex - 1) % array.length;
 }

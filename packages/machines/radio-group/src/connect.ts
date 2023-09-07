@@ -5,6 +5,9 @@ import { dom } from "./dom";
 export function connect(state: MachineState, send: MachineSend) {
   const { context } = state;
 
+  const selectedValue = context.value;
+  const focusedValue = context.focusedValue;
+
   return {
     groupProps: properties.element({
       id: dom.getGroupId(context),
@@ -12,15 +15,20 @@ export function connect(state: MachineState, send: MachineSend) {
       "data-part": "group",
       "data-disabled": context.disabled ? "" : undefined,
     }),
-    getRadioProps(value: string, disabled = false) {
+    getRadioProps(value: string, disabled = false, labelled = false) {
       return properties.button({
         type: "button",
         id: dom.getRadioId(context, value),
         role: "radio",
         disabled: disabled || context.disabled,
-        tabIndex: context.value === value || value === null ? 0 : -1,
+        tabIndex:
+          (!selectedValue && !focusedValue) ||
+          selectedValue === value ||
+          focusedValue === value
+            ? 0
+            : -1,
         "aria-checked": context.value === value,
-        "aria-labelledby": dom.getLabelEl(context, value)
+        "aria-labelledby": labelled
           ? dom.getLabelId(context, value)
           : undefined,
         "data-part": "radio",
@@ -33,8 +41,12 @@ export function connect(state: MachineState, send: MachineSend) {
         onFocus() {
           send({ type: "RADIO.FOCUS", value });
         },
-        onBlur() {
-          send({ type: "RADIO.BLUR" });
+        onBlur(ev) {
+          if (
+            !dom.getRadioEls(context).includes(ev.relatedTarget as HTMLElement)
+          ) {
+            send({ type: "RADIO.BLUR" });
+          }
         },
         onKeyDown(ev) {
           if (context.orientation === "vertical") {
