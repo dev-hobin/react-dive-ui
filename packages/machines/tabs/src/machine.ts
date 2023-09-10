@@ -1,5 +1,5 @@
 import { assign, createMachine, not, pure, raise } from "xstate";
-import { MachineContext, MachineEvent } from "./types";
+import { MachineContext, MachineEvent, UserInput } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -7,7 +7,7 @@ export const machine = createMachine(
     id: "Tabs",
     context: ({ input }) => ({
       id: input.id,
-      ids: input?.ids,
+      ids: input?.ids ?? null,
       value: input?.value ?? null,
       focusedValue: null,
       orientation: input?.orientation ?? "horizontal",
@@ -22,7 +22,10 @@ export const machine = createMachine(
               target: "focused",
               guard: "isActivationModeAutomatic",
               actions: [
-                "setFocusedValue",
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
                 "onFocusChange",
                 pure(({ context }) => {
                   if (!context.focusedValue) return;
@@ -35,7 +38,13 @@ export const machine = createMachine(
             },
             {
               target: "focused",
-              actions: ["setFocusedValue", "onFocusChange"],
+              actions: [
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
+                "onFocusChange",
+              ],
             },
           ],
         },
@@ -78,26 +87,55 @@ export const machine = createMachine(
     on: {
       "TRIGGER.ACTIVATE": [
         {
-          guard: not("isActivatedValue"),
-          actions: ["setValue", "onChange"],
+          guard: not({
+            type: "isActivatedValue",
+            params: ({ event }) => ({ value: event.value }),
+          }),
+          actions: [
+            {
+              type: "setValue",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
         },
       ],
       "CONTEXT.SET": {
-        actions: ["setContext"],
+        actions: [
+          {
+            type: "setContext",
+            params: ({ event }) => ({ context: event.context }),
+          },
+        ],
       },
     },
     types: {
       events: {} as MachineEvent,
       context: {} as MachineContext,
+      input: {} as UserInput,
+      guards: {} as
+        | { type: "isActivatedValue"; params: { value: string } }
+        | { type: "isActivationModeAutomatic" }
+        | { type: "isFirstTrigger" }
+        | { type: "isLastTrigger" },
+      actions: {} as
+        | { type: "setValue"; params: { value: string } }
+        | { type: "setFocusedValue"; params: { value: string } }
+        | { type: "unsetFocusedValue" }
+        | { type: "focusNextTrigger" }
+        | { type: "focusPrevTrigger" }
+        | { type: "focusFirstTrigger" }
+        | { type: "focusLastTrigger" }
+        | { type: "focusCurrentPanel" }
+        | { type: "setContext"; params: { context: Partial<MachineContext> } }
+        | { type: "onChange" }
+        | { type: "onFocusChange" },
     },
   },
   {
     guards: {
-      isActivatedValue: ({ context, event }) => {
-        if (!("value" in event)) return false;
-
-        const value = event.value;
-        return context.value === value;
+      isActivatedValue: ({ context, guard }) => {
+        return context.value === guard.params.value;
       },
       isActivationModeAutomatic: ({ context }) =>
         context.activationMode === "automatic",
@@ -125,14 +163,10 @@ export const machine = createMachine(
       },
     },
     actions: {
-      setValue: pure(({ event }) => {
-        if (event.type !== "TRIGGER.ACTIVATE") return;
-        return assign({ value: event.value });
-      }),
-      setFocusedValue: pure(({ event }) => {
-        if (event.type !== "TRIGGER.FOCUS") return;
-        return assign({ focusedValue: event.value });
-      }),
+      setValue: assign(({ action }) => ({ value: action.params.value })),
+      setFocusedValue: assign(({ action }) => ({
+        focusedValue: action.params.value,
+      })),
       unsetFocusedValue: assign({ focusedValue: null }),
       focusNextTrigger: ({ context }) => {
         if (!context.focusedValue) return;
@@ -174,10 +208,7 @@ export const machine = createMachine(
         if (!context.value) return;
         dom.getPanelEl(context, context.value)?.focus();
       },
-      setContext: pure(({ event }) => {
-        if (event.type !== "CONTEXT.SET") return;
-        return assign(event.context);
-      }),
+      setContext: assign(({ action }) => action.params.context),
 
       // override
       onChange: () => {},
