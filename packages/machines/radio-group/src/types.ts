@@ -2,16 +2,23 @@ import { ActorRefFrom, StateFrom } from "xstate";
 import { machine } from "./machine";
 
 export type MachineState = StateFrom<typeof machine>;
+
 export type MachineSend = ActorRefFrom<typeof machine>["send"];
+
 export type MachineContext = {
   id: string;
   ids: ElementIds | null;
-  value: string;
+  value: string | null;
   focusedValue: string | null;
   disabled: boolean;
   orientation: "vertical" | "horizontal";
   form: FormOption | null;
 };
+
+export type UserInput = Required<Pick<MachineContext, "id">> &
+  Partial<
+    Pick<MachineContext, "ids" | "value" | "disabled" | "orientation" | "form">
+  >;
 
 export type ElementIds = Partial<{
   group: string;
