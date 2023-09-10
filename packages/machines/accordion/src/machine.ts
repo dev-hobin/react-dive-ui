@@ -1,5 +1,11 @@
 import { and, assign, createMachine, not, pure, raise } from "xstate";
-import { MachineContext, MachineEvent } from "./types";
+import {
+  MachineAction,
+  MachineContext,
+  MachineEvent,
+  MachineGuard,
+  UserInput,
+} from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -8,8 +14,8 @@ export const machine = createMachine(
     initial: "idle",
     context: ({ input }) => ({
       id: input.id,
-      ids: input?.ids,
       type: input.type,
+      ids: input?.ids ?? null,
       expandedValues: input?.expandedValues ?? [],
       collapsible: input?.collapsible ?? true,
       orientation: input?.orientation ?? "vertical",
@@ -20,7 +26,13 @@ export const machine = createMachine(
         on: {
           "TRIGGER.FOCUS": {
             target: "focused",
-            actions: ["setFocusedItem", "onFocusChange"],
+            actions: [
+              {
+                type: "setFocusedItem",
+                params: ({ event }) => ({ value: event.value }),
+              },
+              "onFocusChange",
+            ],
           },
         },
       },
@@ -60,7 +72,10 @@ export const machine = createMachine(
     on: {
       "ITEM.TOGGLE": [
         {
-          guard: "isItemExpanded",
+          guard: {
+            type: "isItemExpanded",
+            params: ({ event }) => ({ value: event.value }),
+          },
           actions: pure(({ event }) =>
             raise({ type: "ITEM.COLLAPSE", value: event.value })
           ),
@@ -72,29 +87,64 @@ export const machine = createMachine(
         },
       ],
       "ITEM.EXPAND": [
-        { guard: "isItemExpanded" },
+        {
+          guard: {
+            type: "isItemExpanded",
+            params: ({ event }) => ({ value: event.value }),
+          },
+        },
         {
           guard: "isSingleType",
-          actions: ["switchItem", "onChange"],
+          actions: [
+            {
+              type: "switchItem",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
         },
-        { actions: ["expandItem", "onChange"] },
+        {
+          actions: [
+            {
+              type: "expandItem",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
+        },
       ],
       "ITEM.COLLAPSE": [
-        { guard: not("isItemExpanded") },
+        {
+          guard: not({
+            type: "isItemExpanded",
+            params: ({ event }) => ({ value: event.value }),
+          }),
+        },
         { guard: and(["isSingleType", not("isCollapsible")]) },
-        { actions: ["collapseItem", "onChange"] },
+        {
+          actions: [
+            {
+              type: "collapseItem",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
+        },
       ],
     },
     types: {
       context: {} as MachineContext,
       events: {} as MachineEvent,
+      input: {} as UserInput,
+      guards: {} as MachineGuard,
+      actions: {} as MachineAction,
     },
   },
   {
     guards: {
-      isItemExpanded: ({ context, event }) => {
-        if (!("value" in event)) return false;
-        return context.expandedValues.includes(event.value);
+      isItemExpanded: ({ context, guard }) => {
+        const { value } = guard.params;
+        return context.expandedValues.includes(value);
       },
       isSingleType: ({ context }) => context.type === "single",
       isCollapsible: ({ context }) => context.collapsible,
@@ -126,28 +176,20 @@ export const machine = createMachine(
       },
     },
     actions: {
-      switchItem: pure(({ event }) => {
-        if (event.type !== "ITEM.EXPAND") return;
-        return assign({ expandedValues: [event.value] });
-      }),
-      expandItem: pure(({ context, event }) => {
-        if (event.type !== "ITEM.EXPAND") return;
-        return assign({
-          expandedValues: [...context.expandedValues, event.value],
-        });
-      }),
-      collapseItem: pure(({ context, event }) => {
-        if (event.type !== "ITEM.COLLAPSE") return;
-        return assign({
-          expandedValues: context.expandedValues.filter(
-            (value) => value !== event.value
-          ),
-        });
-      }),
-      setFocusedItem: pure(({ event }) => {
-        if (event.type !== "TRIGGER.FOCUS") return;
-        return assign({ focusedValue: event.value });
-      }),
+      switchItem: assign(({ action }) => ({
+        expandedValues: [action.params.value],
+      })),
+      expandItem: assign(({ context, action }) => ({
+        expandedValues: [...context.expandedValues, action.params.value],
+      })),
+      collapseItem: assign(({ context, action }) => ({
+        expandedValues: context.expandedValues.filter(
+          (value) => value !== action.params.value
+        ),
+      })),
+      setFocusedItem: assign(({ action }) => ({
+        focusedValue: action.params.value,
+      })),
       unsetFocusedItem: assign({ focusedValue: null }),
       focusNextTrigger: ({ context }) => {
         if (!context.focusedValue) return;

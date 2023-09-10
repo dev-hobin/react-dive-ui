@@ -1,5 +1,5 @@
 import { assign, createMachine, not, pure, raise } from "xstate";
-import { MachineContext, MachineEvent } from "./types";
+import { MachineContext, MachineEvent, UserInput } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -7,7 +7,7 @@ export const machine = createMachine(
     id: "RadioGroup",
     initial: "idle",
     context: ({ input }) => ({
-      id: input?.id,
+      id: input.id,
       ids: input?.ids ?? null,
       value: input?.value ?? null,
       focusedValue: null,
@@ -22,11 +22,22 @@ export const machine = createMachine(
             {
               guard: not("isSelectedRadioExist"),
               target: "focused",
-              actions: ["focusFirstSelectableRadio", "setFocusedValue"],
+              actions: [
+                "focusFirstSelectableRadio",
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
+              ],
             },
             {
               target: "focused",
-              actions: ["setFocusedValue"],
+              actions: [
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
+              ],
             },
           ],
         },
@@ -38,7 +49,13 @@ export const machine = createMachine(
             actions: ["unsetFocusedValue"],
           },
           "RADIO.FOCUS": {
-            actions: ["setFocusedValue", "selectCurrentFocused"],
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: ({ event }) => ({ value: event.value }),
+              },
+              "selectCurrentFocused",
+            ],
           },
           "RADIO.SELECT.NEXT": {
             actions: ["focusNextRadio"],
@@ -51,15 +68,33 @@ export const machine = createMachine(
     },
     on: {
       "RADIO.SELECT": {
-        actions: ["setValue"],
+        actions: [
+          { type: "setValue", params: ({ event }) => ({ value: event.value }) },
+        ],
       },
       "CONTEXT.SET": {
-        actions: ["setContext"],
+        actions: [
+          {
+            type: "setContext",
+            params: ({ event }) => ({ context: event.context }),
+          },
+        ],
       },
     },
     types: {
       context: {} as MachineContext,
       events: {} as MachineEvent,
+      input: {} as UserInput,
+      guards: {} as { type: "isSelectedRadioExist" },
+      actions: {} as
+        | { type: "setFocusedValue"; params: { value: string } }
+        | { type: "setValue"; params: { value: string } }
+        | { type: "unsetFocusedValue" }
+        | { type: "focusNextRadio" }
+        | { type: "focusPrevRadio" }
+        | { type: "focusFirstSelectableRadio" }
+        | { type: "selectCurrentFocused" }
+        | { type: "setContext"; params: { context: Partial<MachineContext> } },
     },
   },
   {
@@ -67,10 +102,9 @@ export const machine = createMachine(
       isSelectedRadioExist: ({ context }) => context.value !== null,
     },
     actions: {
-      setFocusedValue: pure(({ event }) => {
-        if (event.type !== "RADIO.FOCUS") return;
-        return assign({ focusedValue: event.value });
-      }),
+      setFocusedValue: assign(({ action }) => ({
+        focusedValue: action.params.value,
+      })),
       unsetFocusedValue: assign({ focusedValue: null }),
       focusNextRadio: ({ context }) => {
         if (!context.focusedValue) return;
@@ -112,14 +146,8 @@ export const machine = createMachine(
           value: context.focusedValue,
         });
       }),
-      setValue: pure(({ event }) => {
-        if (event.type !== "RADIO.SELECT") return;
-        return assign({ value: event.value });
-      }),
-      setContext: pure(({ event }) => {
-        if (event.type !== "CONTEXT.SET") return;
-        return assign(event.context);
-      }),
+      setValue: assign(({ action }) => ({ value: action.params.value })),
+      setContext: assign(({ action }) => action.params.context),
     },
   }
 );
