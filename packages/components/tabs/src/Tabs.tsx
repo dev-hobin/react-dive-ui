@@ -1,7 +1,7 @@
 import { Root, List, Trigger, Panel } from "./parts";
-import { TabsStoreProvider } from "./tabs-provider";
+import { ServiceProvider } from "./service-provider";
 
 export const Tabs = Object.assign(
   {},
-  { Provider: TabsStoreProvider, Root, List, Trigger, Panel }
+  { Provider: ServiceProvider, Root, List, Trigger, Panel }
 );

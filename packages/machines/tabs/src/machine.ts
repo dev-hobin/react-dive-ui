@@ -1,5 +1,5 @@
-import { assign, createMachine, not, pure, raise } from "xstate";
-import { MachineContext, MachineEvent, UserInput } from "./types";
+import { assign, createMachine, pure, raise } from "xstate";
+import { Actions, Context, Events, Guards, Input } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -7,9 +7,9 @@ export const machine = createMachine(
     id: "Tabs",
     context: ({ input }) => ({
       id: input.id,
-      ids: input?.ids ?? null,
-      value: input?.value ?? null,
+      value: input.value,
       focusedValue: null,
+      itemMap: input?.itemMap ?? new Map(),
       orientation: input?.orientation ?? "horizontal",
       activationMode: input?.activationMode ?? "automatic",
     }),
@@ -17,23 +17,18 @@ export const machine = createMachine(
     states: {
       idle: {
         on: {
-          "TRIGGER.FOCUS": [
+          "TRIGGER.FOCUSED": [
             {
               target: "focused",
-              guard: "isActivationModeAutomatic",
+              guard: "isAutomaticMode",
               actions: [
                 {
                   type: "setFocusedValue",
                   params: ({ event }) => ({ value: event.value }),
                 },
-                "onFocusChange",
-                pure(({ context }) => {
-                  if (!context.focusedValue) return;
-                  return raise({
-                    type: "TRIGGER.ACTIVATE",
-                    value: context.focusedValue,
-                  });
-                }),
+                pure(({ event }) =>
+                  raise({ type: "ITEM.ACTIVATE", value: event.value })
+                ),
               ],
             },
             {
@@ -43,7 +38,6 @@ export const machine = createMachine(
                   type: "setFocusedValue",
                   params: ({ event }) => ({ value: event.value }),
                 },
-                "onFocusChange",
               ],
             },
           ],
@@ -51,168 +45,113 @@ export const machine = createMachine(
       },
       focused: {
         on: {
-          "TRIGGER.BLUR": {
+          "TRIGGER.BLURRED": {
             target: "idle",
-            actions: ["unsetFocusedValue", "onFocusChange"],
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: { value: null },
+              },
+            ],
           },
-          "TRIGGER.FOCUS.NEXT": [
-            {
-              guard: "isLastTrigger",
-              actions: [raise({ type: "TRIGGER.FOCUS.FIRST" })],
-            },
-            { actions: ["focusNextTrigger"] },
-          ],
-          "TRIGGER.FOCUS.PREV": [
-            {
-              guard: "isFirstTrigger",
-              actions: [raise({ type: "TRIGGER.FOCUS.LAST" })],
-            },
-            {
-              actions: ["focusPrevTrigger"],
-            },
-          ],
-          "TRIGGER.FOCUS.FIRST": {
-            actions: ["focusFirstTrigger"],
-          },
-          "TRIGGER.FOCUS.LAST": {
-            actions: ["focusLastTrigger"],
-          },
-          "PANEL.FOCUS.CURRENT": {
-            target: "idle",
-            actions: ["unsetFocusedValue", "focusCurrentPanel"],
-          },
+          "TRIGGER.FOCUS.NEXT": [{ actions: ["focusNextTrigger"] }],
+          "TRIGGER.FOCUS.PREV": [{ actions: ["focusPrevTrigger"] }],
         },
       },
     },
     on: {
-      "TRIGGER.ACTIVATE": [
+      "ITEM.ACTIVATE": [
         {
-          guard: not({
-            type: "isActivatedValue",
+          guard: {
+            type: "isItemDisabled",
             params: ({ event }) => ({ value: event.value }),
-          }),
+          },
+        },
+        {
           actions: [
             {
               type: "setValue",
               params: ({ event }) => ({ value: event.value }),
             },
-            "onChange",
           ],
         },
       ],
-      "CONTEXT.SET": {
+      "SET.ITEM.DISABLED": {
         actions: [
           {
-            type: "setContext",
-            params: ({ event }) => ({ context: event.context }),
+            type: "setItemDisabled",
+            params: ({ event }) => ({
+              value: event.value,
+              disabled: event.disabled,
+            }),
           },
         ],
       },
     },
     types: {
-      events: {} as MachineEvent,
-      context: {} as MachineContext,
-      input: {} as UserInput,
-      guards: {} as
-        | { type: "isActivatedValue"; params: { value: string } }
-        | { type: "isActivationModeAutomatic" }
-        | { type: "isFirstTrigger" }
-        | { type: "isLastTrigger" },
-      actions: {} as
-        | { type: "setValue"; params: { value: string } }
-        | { type: "setFocusedValue"; params: { value: string } }
-        | { type: "unsetFocusedValue" }
-        | { type: "focusNextTrigger" }
-        | { type: "focusPrevTrigger" }
-        | { type: "focusFirstTrigger" }
-        | { type: "focusLastTrigger" }
-        | { type: "focusCurrentPanel" }
-        | { type: "setContext"; params: { context: Partial<MachineContext> } }
-        | { type: "onChange" }
-        | { type: "onFocusChange" },
+      context: {} as Context,
+      input: {} as Input,
+      events: {} as Events,
+      actions: {} as Actions,
+      guards: {} as Guards,
     },
   },
   {
     guards: {
-      isActivatedValue: ({ context, guard }) => {
-        return context.value === guard.params.value;
+      isItemDisabled: ({ context, guard }) => {
+        const item = context.itemMap.get(guard.params.value);
+        return item?.disabled ?? true;
       },
-      isActivationModeAutomatic: ({ context }) =>
-        context.activationMode === "automatic",
-      isFirstTrigger: ({ context }) => {
-        if (!context.focusedValue) return false;
-
-        const currentFocusedTabEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentFocusedTabEl) return false;
-
-        return currentFocusedTabEl === dom.getFirstTriggerEl(context);
-      },
-      isLastTrigger: ({ context }) => {
-        if (!context.focusedValue) return false;
-
-        const currentFocusedTabEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentFocusedTabEl) return false;
-
-        return currentFocusedTabEl === dom.getLastTriggerEl(context);
+      isAutomaticMode: ({ context }) => {
+        return context.activationMode === "automatic";
       },
     },
     actions: {
-      setValue: assign(({ action }) => ({ value: action.params.value })),
       setFocusedValue: assign(({ action }) => ({
         focusedValue: action.params.value,
       })),
-      unsetFocusedValue: assign({ focusedValue: null }),
+      setValue: assign(({ action }) => ({ value: action.params.value })),
       focusNextTrigger: ({ context }) => {
-        if (!context.focusedValue) return;
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
 
         const triggerEls = dom.getTriggerEls(context);
-        const currentFocusedTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentFocusedTriggerEl) return;
+        if (triggerEls.length === 0) return;
 
-        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
         if (currentIndex === -1) return;
 
-        triggerEls[currentIndex + 1].focus();
+        triggerEls[(currentIndex + 1) % triggerEls.length].focus();
       },
       focusPrevTrigger: ({ context }) => {
-        if (!context.focusedValue) return;
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
 
         const triggerEls = dom.getTriggerEls(context);
-        const currentFocusedTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentFocusedTriggerEl) return;
+        if (triggerEls.length === 0) return;
 
-        const currentIndex = triggerEls.indexOf(currentFocusedTriggerEl);
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
         if (currentIndex === -1) return;
 
-        triggerEls[currentIndex - 1].focus();
+        triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
-      focusFirstTrigger: ({ context }) => {
-        dom.getFirstTriggerEl(context)?.focus();
-      },
-      focusLastTrigger: ({ context }) => {
-        dom.getLastTriggerEl(context)?.focus();
-      },
-      focusCurrentPanel: ({ context }) => {
-        if (!context.value) return;
-        dom.getPanelEl(context, context.value)?.focus();
-      },
-      setContext: assign(({ action }) => action.params.context),
+      setItemDisabled: assign(({ context, action }) => {
+        const { value, disabled } = action.params;
+        const item = context.itemMap.get(value);
+        if (!item) return {};
 
-      // override
+        context.itemMap.set(value, { ...item, disabled });
+        return {
+          itemMap: new Map(context.itemMap),
+        };
+      }),
+
+      // template
       onChange: () => {},
-      onFocusChange: () => {},
     },
   }
 );

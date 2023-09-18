@@ -12,44 +12,33 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const tabs = useTabs(
-    {
-      id: "tabs",
-      defaultValue: "tab-1",
-    },
-    {
-      onChange: (details) => {
-        console.log("change", details);
-      },
-      onFocusChange: (details) => {
-        console.log("focusChange", details);
-      },
-    }
-  );
-
-  console.log("state", tabs.state);
+  const { service } = useTabs({
+    items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
+    defaultValue: "value-1",
+    activationMode: "manual",
+  });
 
   return (
-    <Tabs.Provider store={tabs}>
+    <Tabs.Provider service={service}>
       <Tabs.Root className={root}>
         <Tabs.List className={list}>
-          <Tabs.Trigger value="tab-1" className={trigger}>
+          <Tabs.Trigger className={trigger} value="value-1">
             Tab - 1
           </Tabs.Trigger>
-          <Tabs.Trigger value="tab-2" className={trigger}>
+          <Tabs.Trigger className={trigger} value="value-2">
             Tab - 2
           </Tabs.Trigger>
-          <Tabs.Trigger value="tab-3" className={trigger}>
+          <Tabs.Trigger className={trigger} value="value-3">
             Tab - 3
           </Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Panel value="tab-1" className={panel}>
+        <Tabs.Panel className={panel} value="value-1">
           Panel 1
         </Tabs.Panel>
-        <Tabs.Panel value="tab-2" className={panel}>
+        <Tabs.Panel className={panel} value="value-2">
           Panel 2
         </Tabs.Panel>
-        <Tabs.Panel value="tab-3" className={panel}>
+        <Tabs.Panel className={panel} value="value-3">
           Panel 3
         </Tabs.Panel>
       </Tabs.Root>

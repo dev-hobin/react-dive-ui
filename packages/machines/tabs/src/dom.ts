@@ -1,34 +1,23 @@
-import { MachineContext } from "./types";
+import { Context, Item } from "./types";
 
 export const dom = {
-  getRootId: (context: MachineContext) =>
-    context.ids?.root ?? `tabs:${context.id}`,
-  getListId: (context: MachineContext) =>
-    context.ids?.list ?? `tabs:${context.id}:list`,
-  getTriggerId: (context: MachineContext, value: string) =>
-    context.ids?.trigger?.(value) ?? `tabs:${context.id}:trigger:${value}`,
-  getPanelId: (context: MachineContext, value: string) =>
-    context.ids?.panel?.(value) ?? `tabs:${context.id}:panel:${value}`,
+  getRootId: (context: Context) => `tabs::root::${context.id}`,
+  getListId: (context: Context) => `tabs::list::${context.id}`,
+  getTriggerId: (context: Context, value: Item["value"]) =>
+    `tabs::trigger::${context.id}::${value}`,
+  getPanelId: (context: Context, value: Item["value"]) =>
+    `tabs::panel::${context.id}::${value}`,
 
-  getRootEl: (context: MachineContext) =>
-    document.getElementById(dom.getRootId(context)),
-  getTriggerEls: (context: MachineContext) => {
-    return Array.from<HTMLElement>(
-      dom
-        .getRootEl(context)
-        ?.querySelectorAll(
-          `[aria-controls][data-part='trigger']:not([disabled])`
-        ) ?? []
-    );
+  getTriggerEls: (context: Context) => {
+    const triggerValues = Array.from(context.itemMap.keys());
+
+    const selector = triggerValues
+      .map(
+        (value) =>
+          `#${CSS.escape(dom.getTriggerId(context, value))}:not([disabled])`
+      )
+      .join(", ");
+
+    return Array.from<HTMLElement>(document.querySelectorAll(selector));
   },
-  getTriggerEl: (context: MachineContext, value: string) =>
-    document.getElementById(dom.getTriggerId(context, value)),
-  getFirstTriggerEl: (context: MachineContext) => {
-    return dom.getTriggerEls(context)[0];
-  },
-  getLastTriggerEl: (context: MachineContext) => {
-    return dom.getTriggerEls(context).at(-1);
-  },
-  getPanelEl: (context: MachineContext, value: string) =>
-    document.getElementById(dom.getPanelId(context, value)),
 };

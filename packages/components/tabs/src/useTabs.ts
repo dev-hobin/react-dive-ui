@@ -1,75 +1,74 @@
 import {
-  tabsMachine,
-  connect,
-  ElementIds,
-  ChangeDetails,
-  FocusChangeDetails,
+  machine,
+  Item,
+  Orientation,
+  ActivationMode,
 } from "@react-dive-ui/tabs-machine";
 import { useActor } from "@xstate/react";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 
-type Orientation = "vertical" | "horizontal";
-type ActivationMode = "manual" | "automatic";
-export type TabsOption = {
-  id: string;
-  ids?: ElementIds;
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+type TabsOption = {
+  id?: string;
+  items: Optional<Item, "disabled">[];
+  defaultValue: Item["value"];
   orientation?: Orientation;
   activationMode?: ActivationMode;
-  defaultValue?: string;
+  onChange?: (details: { value: Item["value"] }) => void;
 };
-export type Listeners = {
-  onChange?: (details: ChangeDetails) => void;
-  onFocusChange?: (details: FocusChangeDetails) => void;
-};
-export function useTabs(option: TabsOption, listeners?: Listeners) {
-  const [state, send] = useActor(
-    tabsMachine.provide({
+export function useTabs(options: TabsOption) {
+  const internalId = useId();
+  const [state, send, actorRef] = useActor(
+    machine.provide({
       actions: {
         onChange: ({ context }) => {
-          if (!context.value) return;
-          listeners?.onChange?.({ value: context.value });
-        },
-        onFocusChange: ({ context }) => {
-          listeners?.onFocusChange?.({ value: context.focusedValue });
+          options?.onChange?.({ value: context.value });
         },
       },
     }),
     {
       input: {
-        id: option.id,
-        ids: option.ids,
-        orientation: option.orientation,
-        activationMode: option.activationMode,
-        value: option.defaultValue,
+        id: options.id ?? internalId,
+        itemMap: new Map(
+          options.items?.map((item) => {
+            if (item.disabled === undefined) {
+              item.disabled = false;
+            }
+            return [item.value, item];
+          })
+        ),
+        value: options.defaultValue,
+        orientation: options.orientation,
+        activationMode: options.activationMode,
       },
     }
   );
 
   const activate = useCallback(
-    (value: string) => {
-      send({ type: "TRIGGER.ACTIVATE", value });
+    (value: Item["value"]) => {
+      send({ type: "ITEM.ACTIVATE", value });
     },
     [send]
   );
-  const setActivationMode = useCallback(
-    (mode: ActivationMode) => {
-      send({ type: "CONTEXT.SET", context: { activationMode: mode } });
-    },
-    [send]
-  );
-  const setOrientation = useCallback(
-    (orientation: Orientation) => {
-      send({ type: "CONTEXT.SET", context: { orientation } });
+
+  const setItemDisabled = useCallback(
+    (value: Item["value"], disabled: boolean) => {
+      send({ type: "SET.ITEM.DISABLED", value, disabled });
     },
     [send]
   );
 
   const { value, context } = state;
+  const items = Array.from(context.itemMap.values());
+
+  console.log("tabs value", state.value);
+  console.log("tabs context", state.context);
+  console.log("-----");
+
   return {
-    state: { status: value, ...context },
-    apis: { activate, setActivationMode, setOrientation },
-    props: connect(state, send),
+    state: { status: value, items },
+    apis: { activate, setItemDisabled },
+    service: actorRef,
   };
 }
-
-export type TabsStore = ReturnType<typeof useTabs>;

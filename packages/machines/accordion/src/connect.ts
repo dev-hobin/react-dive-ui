@@ -21,6 +21,7 @@ export function connect(service: ActorRefFrom<typeof machine>) {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
+        disabled: !!context.itemMap.get(value)?.disabled,
         onFocus: () => {
           send({ type: "TRIGGER.FOCUSED", value });
         },

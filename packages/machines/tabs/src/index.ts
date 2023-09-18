@@ -1,3 +1,3 @@
-export { machine as tabsMachine } from "./machine";
+export { machine } from "./machine";
 export { connect } from "./connect";
-export * from "./types";
+export type { Item, Service, Orientation, ActivationMode } from "./types";

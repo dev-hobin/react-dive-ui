@@ -1,15 +1,14 @@
-import { dive } from "@react-dive-ui/dive";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { useTabsStore } from "../tabs-provider";
-import { mergeProps } from "@react-dive-ui/merge-props";
+import { connect } from "@react-dive-ui/tabs-machine";
+import { dive } from "@react-dive-ui/dive";
+import { useService } from "../service-provider";
 
 type ListProps = ComponentPropsWithoutRef<typeof dive.div>;
 export const List = forwardRef<HTMLDivElement, ListProps>((props, ref) => {
-  const store = useTabsStore();
-  const { listProps } = store.props;
+  const service = useService();
 
-  const mergedProps = mergeProps(listProps, props);
-  return <dive.div {...mergedProps} ref={ref} />;
+  const { listProps } = connect(service);
+  return <dive.div {...listProps} {...props} ref={ref} />;
 });
 
 List.displayName = "Tabs.List";
