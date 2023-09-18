@@ -3,6 +3,8 @@ export type Item = {
   disabled: boolean;
 };
 
+export type Orientation = "vertical" | "horizontal";
+
 export type Context = {
   id: string;
   type: "single" | "multiple";
@@ -10,7 +12,7 @@ export type Context = {
   expandedValues: Item["value"][];
   itemMap: Map<Item["value"], Item>;
   collapsible: boolean;
-  orientation: "vertical" | "horizontal";
+  orientation: Orientation;
 };
 
 export type Input = Pick<Context, "id" | "type"> &

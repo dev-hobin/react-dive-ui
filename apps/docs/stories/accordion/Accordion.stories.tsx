@@ -12,58 +12,32 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state, service } = useAccordion();
-
-  console.log(state);
+  const { state, service } = useAccordion({
+    type: "single",
+    items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
+    initialExpanded: "value-1",
+  });
 
   return (
     <Accordion.Provider service={service}>
       <Accordion.Root className={root}>
-        <Accordion.ItemProvider value="value-1">
-          <div className={item}>
-            <Accordion.Heading className={heading}>
-              <Accordion.Trigger className={trigger} value="value-1">
-                아이템 1
-              </Accordion.Trigger>
-            </Accordion.Heading>
-            <Accordion.Panel className={panel}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-              molestiae optio quas corrupti eum. Recusandae explicabo numquam
-              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-              repellat, ad nemo possimus.
-            </Accordion.Panel>
-          </div>
-        </Accordion.ItemProvider>
-        <Accordion.ItemProvider value="value-2">
-          <div className={item}>
-            <Accordion.Heading className={heading}>
-              <Accordion.Trigger className={trigger}>
-                아이템 2
-              </Accordion.Trigger>
-            </Accordion.Heading>
-            <Accordion.Panel className={panel}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-              molestiae optio quas corrupti eum. Recusandae explicabo numquam
-              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-              repellat, ad nemo possimus.
-            </Accordion.Panel>
-          </div>
-        </Accordion.ItemProvider>
-        <Accordion.ItemProvider value="value-3">
-          <div className={item}>
-            <Accordion.Heading className={heading}>
-              <Accordion.Trigger className={trigger}>
-                아이템 3
-              </Accordion.Trigger>
-            </Accordion.Heading>
-            <Accordion.Panel className={panel}>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-              molestiae optio quas corrupti eum. Recusandae explicabo numquam
-              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-              repellat, ad nemo possimus.
-            </Accordion.Panel>
-          </div>
-        </Accordion.ItemProvider>
+        {state.items.map((itemInfo) => (
+          <Accordion.ItemProvider key={itemInfo.value} value={itemInfo.value}>
+            <div className={item}>
+              <Accordion.Heading className={heading}>
+                <Accordion.Trigger className={trigger}>
+                  {itemInfo.value}
+                </Accordion.Trigger>
+              </Accordion.Heading>
+              <Accordion.Panel className={panel}>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+                molestiae optio quas corrupti eum. Recusandae explicabo numquam
+                fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+                repellat, ad nemo possimus.
+              </Accordion.Panel>
+            </div>
+          </Accordion.ItemProvider>
+        ))}
       </Accordion.Root>
     </Accordion.Provider>
   );
