@@ -52,6 +52,13 @@ export function useTabs(options: TabsOption) {
     [send]
   );
 
+  const setItemDisabled = useCallback(
+    (value: Item["value"], disabled: boolean) => {
+      send({ type: "SET.ITEM.DISABLED", value, disabled });
+    },
+    [send]
+  );
+
   const { value, context } = state;
   const items = Array.from(context.itemMap.values());
 
@@ -61,7 +68,7 @@ export function useTabs(options: TabsOption) {
 
   return {
     state: { status: value, items },
-    apis: { activate },
+    apis: { activate, setItemDisabled },
     service: actorRef,
   };
 }

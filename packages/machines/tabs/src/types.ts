@@ -24,7 +24,8 @@ export type Events =
   | { type: "TRIGGER.BLURRED" }
   | { type: "TRIGGER.FOCUS.NEXT" }
   | { type: "TRIGGER.FOCUS.PREV" }
-  | { type: "ITEM.ACTIVATE"; value: Item["value"] };
+  | { type: "ITEM.ACTIVATE"; value: Item["value"] }
+  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean };
 
 export type Actions =
   | {
@@ -34,7 +35,11 @@ export type Actions =
   | { type: "focusNextTrigger" }
   | { type: "focusPrevTrigger" }
   | { type: "setValue"; params: { value: Item["value"] } }
-  | { type: "onChange" };
+  | { type: "onChange" }
+  | {
+      type: "setItemDisabled";
+      params: { value: Item["value"]; disabled: boolean };
+    };
 
 export type Guards =
   | {
