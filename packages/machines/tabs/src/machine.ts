@@ -1,5 +1,6 @@
-import { createMachine, pure, raise } from "xstate";
+import { assign, createMachine, pure, raise } from "xstate";
 import { Actions, Context, Events, Guards, Input } from "./types";
+import { dom } from "./dom";
 
 export const machine = createMachine(
   {
@@ -111,6 +112,40 @@ export const machine = createMachine(
       },
       isAutomaticMode: ({ context }) => {
         return context.activationMode === "automatic";
+      },
+    },
+    actions: {
+      setFocusedValue: assign(({ action }) => ({
+        focusedValue: action.params.value,
+      })),
+      setValue: assign(({ action }) => ({ value: action.params.value })),
+      focusNextTrigger: ({ context }) => {
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
+
+        const triggerEls = dom.getTriggerEls(context);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
+        if (currentIndex === -1) return;
+
+        triggerEls[(currentIndex + 1) % triggerEls.length].focus();
+      },
+      focusPrevTrigger: ({ context }) => {
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
+
+        const triggerEls = dom.getTriggerEls(context);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
+        if (currentIndex === -1) return;
+
+        triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
     },
   }
