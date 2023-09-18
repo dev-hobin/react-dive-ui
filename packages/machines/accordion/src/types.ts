@@ -1,72 +1,57 @@
-import { ActorRefFrom, StateFrom } from "xstate";
+import { ActorRefFrom } from "xstate";
 import { machine } from "./machine";
 
-export type MachineState = StateFrom<typeof machine>;
-
-export type MachineSend = ActorRefFrom<typeof machine>["send"];
-
-export type MachineContext = {
-  id: string;
-  ids: ElementIds | null;
-  type: "single" | "multiple";
-  expandedValues: string[];
-  collapsible: boolean;
-  orientation: "vertical" | "horizontal";
-  focusedValue: string | null;
+export type Item = {
+  value: string;
+  disabled: boolean;
 };
 
-export type MachineGuard =
-  | { type: "isItemExpanded"; params: { value: string } }
-  | { type: "isSingleType" }
-  | { type: "isCollapsible" }
-  | { type: "isLastTrigger" }
-  | { type: "isFirstTrigger" };
+export type Orientation = "vertical" | "horizontal";
 
-export type MachineAction =
-  | { type: "switchItem"; params: { value: string } }
-  | { type: "expandItem"; params: { value: string } }
-  | { type: "collapseItem"; params: { value: string } }
-  | { type: "setFocusedItem"; params: { value: string } }
-  | { type: "unsetFocusedItem" }
-  | { type: "focusNextTrigger" }
-  | { type: "focusPrevTrigger" }
-  | { type: "focusFirstTrigger" }
-  | { type: "focusLastTrigger" }
-  // template
-  | { type: "onChange" }
-  | { type: "onFocusChange" };
+export type Context = {
+  id: string;
+  type: "single" | "multiple";
+  focusedValue: Item["value"] | null;
+  expandedValues: Item["value"][];
+  itemMap: Map<Item["value"], Item>;
+  collapsible: boolean;
+  orientation: Orientation;
+};
 
-export type UserInput = Required<Pick<MachineContext, "id" | "type">> &
+export type Input = Pick<Context, "id" | "type"> &
   Partial<
-    Pick<
-      MachineContext,
-      "ids" | "expandedValues" | "collapsible" | "orientation"
-    >
+    Pick<Context, "expandedValues" | "itemMap" | "collapsible" | "orientation">
   >;
 
-export type ElementIds = Partial<{
-  root: string;
-  item(value: string): string;
-  heading(value: string): string;
-  trigger(value: string): string;
-  panel(value: string): string;
-}>;
-
-export type MachineEvent =
-  | { type: "TRIGGER.FOCUS"; value: string }
-  | { type: "TRIGGER.BLUR" }
+export type Events =
+  | { type: "ITEM.EXPAND"; value: Item["value"] }
+  | { type: "ITEM.COLLAPSE"; value: Item["value"] }
+  | { type: "ITEM.TOGGLE"; value: Item["value"] }
+  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean }
+  | { type: "TRIGGER.FOCUSED"; value: Item["value"] }
+  | { type: "TRIGGER.BLURRED" }
   | { type: "TRIGGER.FOCUS.NEXT" }
-  | { type: "TRIGGER.FOCUS.PREV" }
-  | { type: "TRIGGER.FOCUS.FIRST" }
-  | { type: "TRIGGER.FOCUS.LAST" }
-  | { type: "ITEM.TOGGLE"; value: string }
-  | { type: "ITEM.EXPAND"; value: string }
-  | { type: "ITEM.COLLAPSE"; value: string };
+  | { type: "TRIGGER.FOCUS.PREV" };
 
-export type ChangeDetails = {
-  value: string[];
-};
+export type Actions =
+  | { type: "addToExpandedValues"; params: { value: Item["value"] } }
+  | { type: "removeFromExpandedValues"; params: { value: Item["value"] } }
+  | { type: "toggleValueInExpandedValues"; params: { value: Item["value"] } }
+  | { type: "resetExpandedValuesWith"; params: { value: Item["value"] } }
+  | {
+      type: "setItemDisabled";
+      params: { value: Item["value"]; disabled: boolean };
+    }
+  | { type: "setFocusedValue"; params: { value: Item["value"] | null } }
+  | { type: "focusNextTrigger" }
+  | { type: "focusPrevTrigger" }
+  | { type: "onChange" };
 
-export type FocusChangeDetails = {
-  value: string | null;
-};
+export type Guards =
+  | { type: "isItemDisabled"; params: { value: Item["value"] } }
+  | { type: "isExpandedItem"; params: { value: Item["value"] } }
+  | { type: "isSingleType" }
+  | { type: "hasExpandedItem" }
+  | { type: "isCollapsible" };
+
+export type Service = ActorRefFrom<typeof machine>;

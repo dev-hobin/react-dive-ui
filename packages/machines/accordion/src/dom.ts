@@ -1,28 +1,24 @@
-import { MachineContext } from "./types";
+import { Context, Item } from "./types";
 
 export const dom = {
-  getRootId: (context: MachineContext) =>
-    context.ids?.root ?? `accordion:${context.id}`,
-  getItemId: (context: MachineContext, value: string) =>
-    context.ids?.item?.(value) ?? `accordion:${context.id}:item:${value}`,
-  getHeadingId: (context: MachineContext, value: string) =>
-    context.ids?.heading?.(value) ?? `accordion:${context.id}:heading:${value}`,
-  getTriggerId: (context: MachineContext, value: string) =>
-    context.ids?.trigger?.(value) ?? `accordion:${context.id}:trigger:${value}`,
-  getPanelId: (context: MachineContext, value: string) =>
-    context.ids?.panel?.(value) ?? `accordion:${context.id}:panel:${value}`,
+  getRootId: (context: Context) => `accordion::root::${context.id}`,
+  getTriggerId: (context: Context, value: Item["value"]) =>
+    `accordion::trigger::${context.id}::${value}`,
+  getHeadingId: (context: Context, value: Item["value"]) =>
+    `accordion::heading::${context.id}::${value}`,
+  getPanelId: (context: Context, value: Item["value"]) =>
+    `accordion::panel::${context.id}::${value}`,
 
-  getRootEl: (context: MachineContext) =>
-    document.getElementById(dom.getRootId(context)),
-  getTriggerEls: (context: MachineContext) => {
-    return Array.from<HTMLElement>(
-      dom
-        .getRootEl(context)
-        ?.querySelectorAll(
-          `[aria-controls][data-part='trigger']:not([disabled])`
-        ) ?? []
-    );
+  getTriggerEls: (context: Context) => {
+    const triggerValues = Array.from(context.itemMap.keys());
+
+    const selector = triggerValues
+      .map(
+        (value) =>
+          `#${CSS.escape(dom.getTriggerId(context, value))}:not([disabled])`
+      )
+      .join(", ");
+
+    return Array.from<HTMLElement>(document.querySelectorAll(selector));
   },
-  getTriggerEl: (context: MachineContext, value: string) =>
-    document.getElementById(dom.getTriggerId(context, value)),
 };

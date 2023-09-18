@@ -13,9 +13,11 @@ export type DivePropsWithRef<TElement extends React.ElementType> =
     React.ComponentPropsWithRef<TElement> & {
       asChild?: boolean;
       [key: `data-${string}`]: string | boolean | undefined;
-      style?: React.CSSProperties & {
-        [styleVariable: `--${string}`]: string | undefined;
-      };
+      style?:
+        | React.CSSProperties
+        | {
+            [styleVariable: `--${string}`]: string | undefined;
+          };
     }
   >;
 

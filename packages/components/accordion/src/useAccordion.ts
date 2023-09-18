@@ -1,88 +1,103 @@
-import {
-  accordionMachine,
-  connect,
-  ElementIds,
-  ChangeDetails,
-  FocusChangeDetails,
-} from "@react-dive-ui/accordion-machine";
 import { useActor } from "@xstate/react";
-import { useCallback } from "react";
+import { machine, Item, Orientation } from "@react-dive-ui/accordion-machine";
+import { useCallback, useId } from "react";
 
-type CommonOption = {
-  id: string;
-  ids?: ElementIds;
-  orientation?: "vertical" | "horizontal";
-};
-type SingleAccordionOption = CommonOption & {
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+type SingleAccordionOptions = {
   type: "single";
-  defaultValue?: string;
+  id?: string;
+  items?: Optional<Item, "disabled">[];
+  initialExpanded?: Item["value"];
+  orientation?: Orientation;
   collapsible?: boolean;
+  onChange?: (details: Item["value"] | null) => void;
 };
-type MultipleAccordionOption = CommonOption & {
+type MultipleAccordionOptions = {
   type: "multiple";
-  defaultValue?: string[];
-};
-type Listeners = {
-  onChange?: (details: ChangeDetails) => void;
-  onFocusChange?: (details: FocusChangeDetails) => void;
+  id?: string;
+  items?: Optional<Item, "disabled">[];
+  initialExpanded?: Item["value"][];
+  orientation?: Orientation;
+  onChange?: (details: Item["value"][]) => void;
 };
 
-export type AccordionOption = SingleAccordionOption | MultipleAccordionOption;
-export function useAccordion(option: AccordionOption, listeners?: Listeners) {
-  const [state, send] = useActor(
-    accordionMachine.provide({
+type AccordionOptions = SingleAccordionOptions | MultipleAccordionOptions;
+export function useAccordion(options: AccordionOptions) {
+  const internalId = useId();
+  const [state, send, actorRef] = useActor(
+    machine.provide({
       actions: {
         onChange: ({ context }) => {
-          listeners?.onChange?.({ value: context.expandedValues });
-        },
-        onFocusChange: ({ context }) => {
-          listeners?.onFocusChange?.({ value: context.focusedValue });
+          if (options.type === "single") {
+            options.onChange?.(context.expandedValues[0] ?? null);
+          } else {
+            options.onChange?.(context.expandedValues);
+          }
         },
       },
     }),
     {
       input: {
-        id: option.id,
-        ids: option.ids,
-        type: option.type,
-        collapsible: option.type === "single" && option.collapsible,
-        orientation: option.orientation,
-        expandedValues: toArray(option.defaultValue),
+        id: options.id ?? internalId,
+        type: options.type,
+        collapsible: options.type === "multiple" || options.collapsible,
+        orientation: options.orientation ?? "vertical",
+        expandedValues: !options.initialExpanded
+          ? []
+          : Array.isArray(options.initialExpanded)
+          ? options.initialExpanded
+          : [options.initialExpanded],
+        itemMap: new Map(
+          options.items?.map((item) => {
+            if (item.disabled === undefined) {
+              item.disabled = false;
+            }
+            return [item.value, item];
+          })
+        ),
       },
     }
   );
+  console.log("accordion value", state.value);
+  console.log("accordion context", state.context);
+  console.log("-----");
 
   const toggle = useCallback(
-    (value: string) => {
+    (value: Item["value"]) => {
       send({ type: "ITEM.TOGGLE", value });
     },
     [send]
   );
+
   const open = useCallback(
-    (value: string) => {
+    (value: Item["value"]) => {
       send({ type: "ITEM.EXPAND", value });
     },
     [send]
   );
+
   const close = useCallback(
-    (value: string) => {
+    (value: Item["value"]) => {
       send({ type: "ITEM.COLLAPSE", value });
     },
     [send]
   );
 
+  const setItemDisabled = useCallback(
+    (value: Item["value"], disabled: boolean) => {
+      send({ type: "SET.ITEM.DISABLED", value, disabled });
+    },
+    [send]
+  );
+
   const { value, context } = state;
+
+  const items = Array.from(context.itemMap.values());
+
   return {
-    state: { status: value, ...context },
-    apis: { toggle, open, close },
-    props: connect(state, send),
+    state: { status: value, items: items },
+    apis: { toggle, open, close, setItemDisabled },
+    service: actorRef,
   };
 }
-
-function toArray(v: undefined | string | string[]) {
-  if (!v) return [];
-  if (Array.isArray(v)) return v;
-  return [v];
-}
-
-export type AccordionStore = ReturnType<typeof useAccordion>;

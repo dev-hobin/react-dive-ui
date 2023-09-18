@@ -1,3 +1,3 @@
-export { machine as accordionMachine } from "./machine";
+export { machine } from "./machine";
 export { connect } from "./connect";
-export * from "./types";
+export type { Item, Orientation, Service } from "./types";

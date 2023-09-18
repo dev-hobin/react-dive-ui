@@ -1,21 +1,25 @@
-import { dive } from "@react-dive-ui/dive";
-import { mergeProps } from "@react-dive-ui/merge-props";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { useAccordionStore } from "../providers/accordion";
-import { useItem } from "../providers/item";
+import { dive } from "@react-dive-ui/dive";
+import { useItemValue } from "../item-value-provider";
+import { connect } from "@react-dive-ui/accordion-machine";
+import { useService } from "../service-provider";
 
-type PanelProps = ComponentPropsWithoutRef<typeof dive.div>;
+type PanelProps = ComponentPropsWithoutRef<typeof dive.div> & {
+  value?: string;
+};
 export const Panel = forwardRef<HTMLDivElement, PanelProps>((props, ref) => {
-  const store = useAccordionStore();
-  const item = useItem();
+  const { value, ...restProps } = props;
 
-  const { getPanelProps } = store.props;
+  const service = useService();
+  const itemValue = useItemValue() ?? value;
 
-  const mergedProps = mergeProps(
-    getPanelProps(item.value, item.disabled),
-    props
-  );
-  return <dive.div {...mergedProps} ref={ref} />;
+  if (!itemValue) {
+    throw new Error("Accordion.Panel 컴포넌트는 value 속성을 필요로 합니다.");
+  }
+
+  const { getPanelProps } = connect(service);
+  const panelProps = getPanelProps(itemValue);
+  return <dive.div {...panelProps} {...restProps} ref={ref} />;
 });
 
 Panel.displayName = "Accordion.Panel";

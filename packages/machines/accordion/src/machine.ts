@@ -1,11 +1,5 @@
-import { and, assign, createMachine, not, pure, raise } from "xstate";
-import {
-  MachineAction,
-  MachineContext,
-  MachineEvent,
-  MachineGuard,
-  UserInput,
-} from "./types";
+import { createMachine, and, assign, not, pure, raise } from "xstate";
+import { Input, Context, Events, Actions, Guards } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -15,65 +9,98 @@ export const machine = createMachine(
     context: ({ input }) => ({
       id: input.id,
       type: input.type,
-      ids: input?.ids ?? null,
-      expandedValues: input?.expandedValues ?? [],
-      collapsible: input?.collapsible ?? true,
-      orientation: input?.orientation ?? "vertical",
       focusedValue: null,
+      expandedValues: input.expandedValues ?? [],
+      itemMap: input.itemMap ?? new Map(),
+      collapsible: input.collapsible ?? false,
+      orientation: input.orientation ?? "vertical",
     }),
     states: {
       idle: {
         on: {
-          "TRIGGER.FOCUS": {
+          "TRIGGER.FOCUSED": {
             target: "focused",
             actions: [
               {
-                type: "setFocusedItem",
+                type: "setFocusedValue",
                 params: ({ event }) => ({ value: event.value }),
               },
-              "onFocusChange",
             ],
           },
         },
       },
       focused: {
         on: {
-          "TRIGGER.BLUR": {
+          "TRIGGER.BLURRED": {
             target: "idle",
-            actions: ["unsetFocusedItem", "onFocusChange"],
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: { value: null },
+              },
+            ],
           },
-          "TRIGGER.FOCUS.NEXT": [
-            {
-              guard: "isLastTrigger",
-              actions: [raise({ type: "TRIGGER.FOCUS.FIRST" })],
-            },
-            {
-              actions: ["focusNextTrigger"],
-            },
-          ],
-          "TRIGGER.FOCUS.PREV": [
-            {
-              guard: "isFirstTrigger",
-              actions: [raise({ type: "TRIGGER.FOCUS.LAST" })],
-            },
-            {
-              actions: ["focusPrevTrigger"],
-            },
-          ],
-          "TRIGGER.FOCUS.FIRST": {
-            actions: ["focusFirstTrigger"],
+          "TRIGGER.FOCUS.NEXT": {
+            actions: ["focusNextTrigger"],
           },
-          "TRIGGER.FOCUS.LAST": {
-            actions: ["focusLastTrigger"],
+          "TRIGGER.FOCUS.PREV": {
+            actions: ["focusPrevTrigger"],
           },
         },
       },
     },
     on: {
+      "ITEM.EXPAND": [
+        {
+          guard: {
+            type: "isItemDisabled",
+            params: ({ event }) => ({ value: event.value }),
+          },
+        },
+        {
+          guard: and(["isSingleType", "hasExpandedItem"]),
+          actions: [
+            {
+              type: "resetExpandedValuesWith",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
+        },
+        {
+          actions: [
+            {
+              type: "addToExpandedValues",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
+        },
+      ],
+      "ITEM.COLLAPSE": [
+        {
+          guard: {
+            type: "isItemDisabled",
+            params: ({ event }) => ({ value: event.value }),
+          },
+        },
+        {
+          guard: and(["isSingleType", "hasExpandedItem", not("isCollapsible")]),
+        },
+        {
+          actions: [
+            {
+              type: "removeFromExpandedValues",
+              params: ({ event }) => ({ value: event.value }),
+            },
+            "onChange",
+          ],
+        },
+      ],
       "ITEM.TOGGLE": [
         {
           guard: {
-            type: "isItemExpanded",
+            type: "isExpandedItem",
             params: ({ event }) => ({ value: event.value }),
           },
           actions: pure(({ event }) =>
@@ -86,153 +113,112 @@ export const machine = createMachine(
           ),
         },
       ],
-      "ITEM.EXPAND": [
-        {
-          guard: {
-            type: "isItemExpanded",
-            params: ({ event }) => ({ value: event.value }),
+      "SET.ITEM.DISABLED": {
+        actions: [
+          {
+            type: "setItemDisabled",
+            params: ({ event }) => ({
+              value: event.value,
+              disabled: event.disabled,
+            }),
           },
-        },
-        {
-          guard: "isSingleType",
-          actions: [
-            {
-              type: "switchItem",
-              params: ({ event }) => ({ value: event.value }),
-            },
-            "onChange",
-          ],
-        },
-        {
-          actions: [
-            {
-              type: "expandItem",
-              params: ({ event }) => ({ value: event.value }),
-            },
-            "onChange",
-          ],
-        },
-      ],
-      "ITEM.COLLAPSE": [
-        {
-          guard: not({
-            type: "isItemExpanded",
-            params: ({ event }) => ({ value: event.value }),
-          }),
-        },
-        { guard: and(["isSingleType", not("isCollapsible")]) },
-        {
-          actions: [
-            {
-              type: "collapseItem",
-              params: ({ event }) => ({ value: event.value }),
-            },
-            "onChange",
-          ],
-        },
-      ],
+        ],
+      },
     },
     types: {
-      context: {} as MachineContext,
-      events: {} as MachineEvent,
-      input: {} as UserInput,
-      guards: {} as MachineGuard,
-      actions: {} as MachineAction,
+      context: {} as Context,
+      input: {} as Input,
+      events: {} as Events,
+      actions: {} as Actions,
+      guards: {} as Guards,
     },
   },
   {
     guards: {
-      isItemExpanded: ({ context, guard }) => {
-        const { value } = guard.params;
-        return context.expandedValues.includes(value);
+      isItemDisabled: ({ context, guard }) => {
+        const item = context.itemMap.get(guard.params.value);
+        return item?.disabled ?? true;
       },
-      isSingleType: ({ context }) => context.type === "single",
-      isCollapsible: ({ context }) => context.collapsible,
-      isLastTrigger: ({ context }) => {
-        if (!context.focusedValue) return false;
-        const currentTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentTriggerEl) return false;
-
-        const triggerEls = dom.getTriggerEls(context);
-        const lastTriggerEl = triggerEls.at(-1);
-
-        return currentTriggerEl === lastTriggerEl;
+      isCollapsible: ({ context }) => {
+        return context.collapsible;
       },
-      isFirstTrigger: ({ context }) => {
-        if (!context.focusedValue) return false;
-        const currentTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentTriggerEl) return false;
-
-        const triggerEls = dom.getTriggerEls(context);
-        const firstTriggerEl = triggerEls.at(0);
-
-        return currentTriggerEl === firstTriggerEl;
+      isExpandedItem: ({ context, guard }) => {
+        return context.expandedValues.includes(guard.params.value);
+      },
+      hasExpandedItem: ({ context }) => {
+        return context.expandedValues.length > 0;
+      },
+      isSingleType: ({ context }) => {
+        return context.type === "single";
       },
     },
     actions: {
-      switchItem: assign(({ action }) => ({
-        expandedValues: [action.params.value],
-      })),
-      expandItem: assign(({ context, action }) => ({
+      addToExpandedValues: assign(({ context, action }) => ({
         expandedValues: [...context.expandedValues, action.params.value],
       })),
-      collapseItem: assign(({ context, action }) => ({
+      removeFromExpandedValues: assign(({ context, action }) => ({
         expandedValues: context.expandedValues.filter(
-          (value) => value !== action.params.value
+          (v) => v !== action.params.value
         ),
       })),
-      setFocusedItem: assign(({ action }) => ({
+      toggleValueInExpandedValues: assign(({ context, action }) => {
+        const value = action.params.value;
+        const expandedValues = context.expandedValues;
+        if (expandedValues.includes(value)) {
+          return { expandedValues: expandedValues.filter((v) => v !== value) };
+        } else {
+          return { expandedValues: [...expandedValues, value] };
+        }
+      }),
+      resetExpandedValuesWith: assign(({ action }) => {
+        return {
+          expandedValues: [action.params.value],
+        };
+      }),
+      setItemDisabled: assign(({ context, action }) => {
+        const { value, disabled } = action.params;
+        const item = context.itemMap.get(value);
+        if (!item) return {};
+
+        context.itemMap.set(value, { ...item, disabled });
+        return {
+          itemMap: new Map(context.itemMap),
+        };
+      }),
+      setFocusedValue: assign(({ action }) => ({
         focusedValue: action.params.value,
       })),
-      unsetFocusedItem: assign({ focusedValue: null }),
       focusNextTrigger: ({ context }) => {
-        if (!context.focusedValue) return;
-
-        const currentTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentTriggerEl) return;
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
 
         const triggerEls = dom.getTriggerEls(context);
-        const currentIndex = triggerEls.indexOf(currentTriggerEl);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
         if (currentIndex === -1) return;
 
-        const nextTriggerEl = triggerEls[currentIndex + 1];
-        nextTriggerEl.focus();
+        triggerEls[(currentIndex + 1) % triggerEls.length].focus();
       },
       focusPrevTrigger: ({ context }) => {
-        if (!context.focusedValue) return;
-
-        const currentTriggerEl = dom.getTriggerEl(
-          context,
-          context.focusedValue
-        );
-        if (!currentTriggerEl) return;
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
 
         const triggerEls = dom.getTriggerEls(context);
-        const currentIndex = triggerEls.indexOf(currentTriggerEl);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
         if (currentIndex === -1) return;
 
-        const prevTriggerEl = triggerEls[currentIndex - 1];
-        prevTriggerEl.focus();
-      },
-      focusFirstTrigger: ({ context }) => {
-        dom.getTriggerEls(context)[0]?.focus();
-      },
-      focusLastTrigger: ({ context }) => {
-        dom.getTriggerEls(context).at(-1)?.focus();
+        triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
 
       // template
       onChange: () => {},
-      onFocusChange: () => {},
     },
   }
 );

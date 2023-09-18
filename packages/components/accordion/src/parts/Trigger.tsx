@@ -1,29 +1,36 @@
+import { forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { mergeProps } from "@react-dive-ui/merge-props";
-import { composeEventHandlers } from "@react-dive-ui/compose-event-handlers";
-import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { useAccordionStore } from "../providers/accordion";
-import { useItem } from "../providers/item";
+import { useService } from "../service-provider";
+import { useItemValue } from "../item-value-provider";
 
-type TriggerProps = ComponentPropsWithoutRef<typeof dive.button>;
+import type { ComponentPropsWithoutRef } from "react";
+import { connect, type Item } from "@react-dive-ui/accordion-machine";
+
+type TriggerProps = Omit<
+  ComponentPropsWithoutRef<typeof dive.button>,
+  "value"
+> & { value?: Item["value"] };
 export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
-    const store = useAccordionStore();
-    const item = useItem();
+    const { value, ...restProps } = props;
 
-    const { getTriggerProps } = store.props;
-    const { onClick, onFocus, onKeyDown, onBlur, ...triggerProps } =
-      getTriggerProps(item.value, item.disabled);
+    const service = useService();
+    const itemValue = useItemValue() ?? value;
 
-    const mergedProps = mergeProps(triggerProps, props);
+    if (!itemValue) {
+      throw new Error(
+        "Accordion.Trigger 컴포넌트는 value 속성을 필요로 합니다."
+      );
+    }
+
+    const { getTriggerProps } = connect(service);
+    const triggerProps = getTriggerProps(itemValue);
     return (
       <dive.button
-        {...mergedProps}
-        onClick={composeEventHandlers(props.onClick, onClick)}
-        onFocus={composeEventHandlers(props.onFocus, onFocus)}
-        onBlur={composeEventHandlers(props.onBlur, onBlur)}
-        onKeyDown={composeEventHandlers(props.onKeyDown, onKeyDown)}
+        {...triggerProps}
+        {...restProps}
         ref={ref}
+        onClick={() => service.send({ type: "ITEM.TOGGLE", value: itemValue })}
       />
     );
   }

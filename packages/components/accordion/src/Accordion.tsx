@@ -1,7 +1,15 @@
-import { AccordionStoreProvider } from "./providers/accordion";
-import { Root, Item, Heading, Trigger, Panel } from "./parts";
+import { ItemValueProvider } from "./item-value-provider";
+import { Root, Heading, Trigger, Panel } from "./parts";
+import { ServiceProvider } from "./service-provider";
 
 export const Accordion = Object.assign(
   {},
-  { Provider: AccordionStoreProvider, Root, Item, Heading, Trigger, Panel }
+  {
+    Provider: ServiceProvider,
+    ItemProvider: ItemValueProvider,
+    Root,
+    Heading,
+    Trigger,
+    Panel,
+  }
 );

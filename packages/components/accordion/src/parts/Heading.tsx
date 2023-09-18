@@ -1,22 +1,28 @@
-import { dive } from "@react-dive-ui/dive";
-import { mergeProps } from "@react-dive-ui/merge-props";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { useAccordionStore } from "../providers/accordion";
-import { useItem } from "../providers/item";
+import { dive } from "@react-dive-ui/dive";
+import { useItemValue } from "../item-value-provider";
+import { connect } from "@react-dive-ui/accordion-machine";
+import { useService } from "../service-provider";
 
-type HeadingProps = ComponentPropsWithoutRef<typeof dive.h3>;
+type HeadingProps = ComponentPropsWithoutRef<typeof dive.h3> & {
+  value?: string;
+};
 export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
   (props, ref) => {
-    const store = useAccordionStore();
-    const item = useItem();
+    const { value, ...restProps } = props;
 
-    const { getHeadingProps } = store.props;
+    const service = useService();
+    const itemValue = useItemValue() ?? value;
 
-    const mergedProps = mergeProps(
-      getHeadingProps(item.value, item.disabled),
-      props
-    );
-    return <dive.h3 {...mergedProps} ref={ref} />;
+    if (!itemValue) {
+      throw new Error(
+        "Accordion.Heading 컴포넌트는 value 속성을 필요로 합니다."
+      );
+    }
+
+    const { getHeadingProps } = connect(service);
+    const headingProps = getHeadingProps(itemValue);
+    return <dive.h3 {...headingProps} {...restProps} ref={ref} />;
   }
 );
 
