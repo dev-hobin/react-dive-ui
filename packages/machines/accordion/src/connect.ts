@@ -15,6 +15,7 @@ export function connect(service: ActorRefFrom<typeof machine>) {
   return {
     rootProps: properties.element({
       id: dom.getRootId(context),
+      "data-orientation": context.orientation,
     }),
     getTriggerProps: (value: Item["value"]) => {
       return properties.button({
@@ -45,16 +46,31 @@ export function connect(service: ActorRefFrom<typeof machine>) {
             }
           }
         },
+        "data-state": context.expandedValues.includes(value)
+          ? "open"
+          : "closed",
+        "data-orientation": context.orientation,
+        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
       });
     },
     getHeadingProps: (value: Item["value"]) => {
       return properties.h3({
         id: dom.getHeadingId(context, value),
+        "data-state": context.expandedValues.includes(value)
+          ? "open"
+          : "closed",
+        "data-orientation": context.orientation,
+        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
       });
     },
     getPanelProps: (value: Item["value"]) => {
       return properties.element({
         id: dom.getPanelId(context, value),
+        "data-state": context.expandedValues.includes(value)
+          ? "open"
+          : "closed",
+        "data-orientation": context.orientation,
+        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
       });
     },
   };
