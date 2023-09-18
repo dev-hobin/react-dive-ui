@@ -6,7 +6,9 @@ import { dom } from "./dom";
 import type { Item } from "./types";
 
 export function connect(service: ActorRefFrom<typeof machine>) {
-  const context = service.getSnapshot().context;
+  const snapshot = service.getSnapshot();
+  const context = snapshot.context;
+  const send = service.send;
 
   return {
     rootProps: properties.element({
@@ -16,6 +18,12 @@ export function connect(service: ActorRefFrom<typeof machine>) {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
+        onFocus: () => {
+          send({ type: "TRIGGER.FOCUSED", value });
+        },
+        onBlur: () => {
+          send({ type: "TRIGGER.BLURRED" });
+        },
       });
     },
     getHeadingProps: (value: Item["value"]) => {

@@ -27,7 +27,9 @@ export type Events =
   | { type: "ITEM.EXPAND"; value: Item["value"] }
   | { type: "ITEM.COLLAPSE"; value: Item["value"] }
   | { type: "ITEM.TOGGLE"; value: Item["value"] }
-  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean };
+  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean }
+  | { type: "TRIGGER.FOCUSED"; value: Item["value"] }
+  | { type: "TRIGGER.BLURRED" };
 
 export type Actions =
   | { type: "addToExpandedValues"; params: { value: Item["value"] } }
@@ -37,7 +39,8 @@ export type Actions =
   | {
       type: "setItemDisabled";
       params: { value: Item["value"]; disabled: boolean };
-    };
+    }
+  | { type: "setFocusedValue"; params: { value: Item["value"] | null } };
 
 export type Guards =
   | { type: "isItemDisabled"; params: { value: Item["value"] } }

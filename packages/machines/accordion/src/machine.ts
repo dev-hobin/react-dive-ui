@@ -15,8 +15,32 @@ export const machine = createMachine(
       orientation: input.orientation ?? "vertical",
     }),
     states: {
-      idle: {},
-      focused: {},
+      idle: {
+        on: {
+          "TRIGGER.FOCUSED": {
+            target: "focused",
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: ({ event }) => ({ value: event.value }),
+              },
+            ],
+          },
+        },
+      },
+      focused: {
+        on: {
+          "TRIGGER.BLURRED": {
+            target: "idle",
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: { value: null },
+              },
+            ],
+          },
+        },
+      },
     },
     on: {
       "ITEM.EXPAND": [
@@ -151,6 +175,9 @@ export const machine = createMachine(
           itemMap: new Map(context.itemMap),
         };
       }),
+      setFocusedValue: assign(({ action }) => ({
+        focusedValue: action.params.value,
+      })),
     },
   }
 );
