@@ -12,7 +12,7 @@ export type ActivationMode = "manual" | "automatic";
 
 export type Context = {
   id: string;
-  value: Item["value"] | null;
+  value: Item["value"];
   focusedValue: Item["value"] | null;
   itemMap: Map<Item["value"], Item>;
   activationMode: ActivationMode;
@@ -33,7 +33,8 @@ export type Actions =
     }
   | { type: "focusNextTrigger" }
   | { type: "focusPrevTrigger" }
-  | { type: "setValue"; params: { value: Item["value"] } };
+  | { type: "setValue"; params: { value: Item["value"] } }
+  | { type: "onChange" };
 
 export type Guards =
   | {
@@ -42,7 +43,7 @@ export type Guards =
     }
   | { type: "isAutomaticMode" };
 
-export type Input = Pick<Context, "id"> &
+export type Input = Pick<Context, "id" | "value"> &
   Partial<
     Pick<Context, "value" | "itemMap" | "activationMode" | "orientation">
   >;

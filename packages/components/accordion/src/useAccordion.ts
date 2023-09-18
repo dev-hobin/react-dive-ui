@@ -30,9 +30,9 @@ export function useAccordion(options: AccordionOptions) {
       actions: {
         onChange: ({ context }) => {
           if (options.type === "single") {
-            options.onChange?.(context.expandedValues[0] ?? null);
+            options?.onChange?.(context.expandedValues[0] ?? null);
           } else {
-            options.onChange?.(context.expandedValues);
+            options?.onChange?.(context.expandedValues);
           }
         },
       },

@@ -15,25 +15,35 @@ type TabsOption = {
   defaultValue: Item["value"];
   orientation?: Orientation;
   activationMode?: ActivationMode;
+  onChange?: (details: { value: Item["value"] }) => void;
 };
 export function useTabs(options: TabsOption) {
   const internalId = useId();
-  const [state, send, actorRef] = useActor(machine, {
-    input: {
-      id: options.id ?? internalId,
-      itemMap: new Map(
-        options.items?.map((item) => {
-          if (item.disabled === undefined) {
-            item.disabled = false;
-          }
-          return [item.value, item];
-        })
-      ),
-      value: options.defaultValue,
-      orientation: options.orientation,
-      activationMode: options.activationMode,
-    },
-  });
+  const [state, send, actorRef] = useActor(
+    machine.provide({
+      actions: {
+        onChange: ({ context }) => {
+          options?.onChange?.({ value: context.value });
+        },
+      },
+    }),
+    {
+      input: {
+        id: options.id ?? internalId,
+        itemMap: new Map(
+          options.items?.map((item) => {
+            if (item.disabled === undefined) {
+              item.disabled = false;
+            }
+            return [item.value, item];
+          })
+        ),
+        value: options.defaultValue,
+        orientation: options.orientation,
+        activationMode: options.activationMode,
+      },
+    }
+  );
 
   const activate = useCallback(
     (value: Item["value"]) => {

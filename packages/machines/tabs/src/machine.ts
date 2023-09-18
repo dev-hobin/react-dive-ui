@@ -7,8 +7,8 @@ export const machine = createMachine(
     id: "Tabs",
     context: ({ input }) => ({
       id: input.id,
+      value: input.value,
       focusedValue: null,
-      value: input?.value ?? null,
       itemMap: input?.itemMap ?? new Map(),
       orientation: input?.orientation ?? "horizontal",
       activationMode: input?.activationMode ?? "automatic",
@@ -128,6 +128,9 @@ export const machine = createMachine(
 
         triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
+
+      // template
+      onChange: () => {},
     },
   }
 );
