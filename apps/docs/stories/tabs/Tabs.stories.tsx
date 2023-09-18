@@ -12,47 +12,18 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const tabs = useTabs(
-    {
-      id: "tabs",
-      defaultValue: "tab-1",
-    },
-    {
-      onChange: (details) => {
-        console.log("change", details);
-      },
-      onFocusChange: (details) => {
-        console.log("focusChange", details);
-      },
-    }
-  );
-
-  console.log("state", tabs.state);
+  const tabs = useTabs();
 
   return (
-    <Tabs.Provider store={tabs}>
-      <Tabs.Root className={root}>
-        <Tabs.List className={list}>
-          <Tabs.Trigger value="tab-1" className={trigger}>
-            Tab - 1
-          </Tabs.Trigger>
-          <Tabs.Trigger value="tab-2" className={trigger}>
-            Tab - 2
-          </Tabs.Trigger>
-          <Tabs.Trigger value="tab-3" className={trigger}>
-            Tab - 3
-          </Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Panel value="tab-1" className={panel}>
-          Panel 1
-        </Tabs.Panel>
-        <Tabs.Panel value="tab-2" className={panel}>
-          Panel 2
-        </Tabs.Panel>
-        <Tabs.Panel value="tab-3" className={panel}>
-          Panel 3
-        </Tabs.Panel>
-      </Tabs.Root>
-    </Tabs.Provider>
+    <Tabs.Root className={root}>
+      <Tabs.List className={list}>
+        <Tabs.Trigger className={trigger}>Tab - 1</Tabs.Trigger>
+        <Tabs.Trigger className={trigger}>Tab - 2</Tabs.Trigger>
+        <Tabs.Trigger className={trigger}>Tab - 3</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Panel className={panel}>Panel 1</Tabs.Panel>
+      <Tabs.Panel className={panel}>Panel 2</Tabs.Panel>
+      <Tabs.Panel className={panel}>Panel 3</Tabs.Panel>
+    </Tabs.Root>
   );
 };
