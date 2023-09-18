@@ -12,44 +12,58 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const accordion = useAccordion({ id: "accordion", type: "single" });
+  const { state, service } = useAccordion();
+
+  console.log(state);
 
   return (
-    <Accordion.Provider store={accordion}>
+    <Accordion.Provider service={service}>
       <Accordion.Root className={root}>
-        <Accordion.Item value="value-1" className={item}>
-          <Accordion.Heading className={heading}>
-            <Accordion.Trigger className={trigger}>아이템 1</Accordion.Trigger>
-          </Accordion.Heading>
-          <Accordion.Panel className={panel}>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-            molestiae optio quas corrupti eum. Recusandae explicabo numquam
-            fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-            repellat, ad nemo possimus.
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="value-2" className={item}>
-          <Accordion.Heading className={heading}>
-            <Accordion.Trigger className={trigger}>아이템 2</Accordion.Trigger>
-          </Accordion.Heading>
-          <Accordion.Panel className={panel}>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-            molestiae optio quas corrupti eum. Recusandae explicabo numquam
-            fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-            repellat, ad nemo possimus.
-          </Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value="value-3" className={item}>
-          <Accordion.Heading className={heading}>
-            <Accordion.Trigger className={trigger}>아이템 3</Accordion.Trigger>
-          </Accordion.Heading>
-          <Accordion.Panel className={panel}>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-            molestiae optio quas corrupti eum. Recusandae explicabo numquam
-            fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-            repellat, ad nemo possimus.
-          </Accordion.Panel>
-        </Accordion.Item>
+        <Accordion.ItemProvider value="value-1">
+          <div className={item}>
+            <Accordion.Heading className={heading}>
+              <Accordion.Trigger className={trigger} value="value-1">
+                아이템 1
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panel}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-2">
+          <div className={item}>
+            <Accordion.Heading className={heading}>
+              <Accordion.Trigger className={trigger}>
+                아이템 2
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panel}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-3">
+          <div className={item}>
+            <Accordion.Heading className={heading}>
+              <Accordion.Trigger className={trigger}>
+                아이템 3
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panel}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
       </Accordion.Root>
     </Accordion.Provider>
   );

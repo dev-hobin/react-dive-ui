@@ -10,6 +10,11 @@ export function useAccordion() {
       collapsible: true,
       orientation: "vertical",
       expandedValues: [],
+      itemMap: new Map([
+        ["value-1", { value: "value-1", disabled: false }],
+        ["value-2", { value: "value-2", disabled: false }],
+        ["value-3", { value: "value-3", disabled: false }],
+      ]),
     },
   });
 
