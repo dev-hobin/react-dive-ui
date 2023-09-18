@@ -2,12 +2,11 @@ import { Context, Item } from "./types";
 
 export const dom = {
   getRootId: (context: Context) => `tabs::root::${context.id}`,
+  getListId: (context: Context) => `tabs::list::${context.id}`,
   getTriggerId: (context: Context, value: Item["value"]) =>
     `tabs::trigger::${context.id}::${value}`,
   getPanelId: (context: Context, value: Item["value"]) =>
     `tabs::panel::${context.id}::${value}`,
-  getListId: (context: Context, value: Item["value"]) =>
-    `tabs::list::${context.id}::${value}`,
 
   getTriggerEls: (context: Context) => {
     const triggerValues = Array.from(context.itemMap.keys());
