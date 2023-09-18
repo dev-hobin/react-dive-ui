@@ -1,5 +1,5 @@
 import { ReactNode, createContext } from "react";
-import { Service } from "../types";
+import type { Service } from "@react-dive-ui/accordion-machine";
 
 export const ServiceContext = createContext<Service | undefined>(undefined);
 

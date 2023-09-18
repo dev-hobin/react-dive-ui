@@ -1,3 +1,6 @@
+import { ActorRefFrom } from "xstate";
+import { machine } from "./machine";
+
 export type Item = {
   value: string;
   disabled: boolean;
@@ -37,3 +40,5 @@ export type Guards =
   | { type: "isSingleType" }
   | { type: "hasExpandedItem" }
   | { type: "isCollapsible" };
+
+export type Service = ActorRefFrom<typeof machine>;
