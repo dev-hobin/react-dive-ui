@@ -79,6 +79,17 @@ export const machine = createMachine(
           ),
         },
       ],
+      "SET.ITEM.DISABLED": {
+        actions: [
+          {
+            type: "setItemDisabled",
+            params: ({ event }) => ({
+              value: event.value,
+              disabled: event.disabled,
+            }),
+          },
+        ],
+      },
     },
     types: {
       context: {} as Context,
@@ -128,6 +139,16 @@ export const machine = createMachine(
       resetExpandedValuesWith: assign(({ action }) => {
         return {
           expandedValues: [action.params.value],
+        };
+      }),
+      setItemDisabled: assign(({ context, action }) => {
+        const { value, disabled } = action.params;
+        const item = context.itemMap.get(value);
+        if (!item) return {};
+
+        context.itemMap.set(value, { ...item, disabled });
+        return {
+          itemMap: new Map(context.itemMap),
         };
       }),
     },

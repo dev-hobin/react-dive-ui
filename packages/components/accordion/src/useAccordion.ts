@@ -51,15 +51,24 @@ export function useAccordion(options: AccordionOptions) {
     },
     [send]
   );
+
   const open = useCallback(
     (value: Item["value"]) => {
       send({ type: "ITEM.EXPAND", value });
     },
     [send]
   );
+
   const close = useCallback(
     (value: Item["value"]) => {
       send({ type: "ITEM.COLLAPSE", value });
+    },
+    [send]
+  );
+
+  const setItemDisabled = useCallback(
+    (value: Item["value"], disabled: boolean) => {
+      send({ type: "SET.ITEM.DISABLED", value, disabled });
     },
     [send]
   );
@@ -70,7 +79,7 @@ export function useAccordion(options: AccordionOptions) {
 
   return {
     state: { status: value, items: items },
-    apis: { toggle, open, close },
+    apis: { toggle, open, close, setItemDisabled },
     service: actorRef,
   };
 }

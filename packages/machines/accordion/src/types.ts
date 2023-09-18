@@ -26,13 +26,18 @@ export type Input = Pick<Context, "id" | "type"> &
 export type Events =
   | { type: "ITEM.EXPAND"; value: Item["value"] }
   | { type: "ITEM.COLLAPSE"; value: Item["value"] }
-  | { type: "ITEM.TOGGLE"; value: Item["value"] };
+  | { type: "ITEM.TOGGLE"; value: Item["value"] }
+  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean };
 
 export type Actions =
   | { type: "addToExpandedValues"; params: { value: Item["value"] } }
   | { type: "removeFromExpandedValues"; params: { value: Item["value"] } }
   | { type: "toggleValueInExpandedValues"; params: { value: Item["value"] } }
-  | { type: "resetExpandedValuesWith"; params: { value: Item["value"] } };
+  | { type: "resetExpandedValuesWith"; params: { value: Item["value"] } }
+  | {
+      type: "setItemDisabled";
+      params: { value: Item["value"]; disabled: boolean };
+    };
 
 export type Guards =
   | { type: "isItemDisabled"; params: { value: Item["value"] } }
