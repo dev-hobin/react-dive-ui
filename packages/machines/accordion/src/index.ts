@@ -1,3 +1,3 @@
 export { machine } from "./machine";
-export type { Item, Orientation } from "./types";
+export { connect } from "./connect";
 export type { Item, Orientation, Service } from "./types";
