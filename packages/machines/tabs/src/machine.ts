@@ -1,11 +1,13 @@
 import { createMachine } from "xstate";
+import { Context, Input } from "./types";
 
 export const machine = createMachine({
   id: "Tabs",
-  context: ({ input }: any) => ({
+  context: ({ input }) => ({
     id: input.id,
-    value: input?.value ?? null,
     focusedValue: null,
+    value: input?.value ?? null,
+    itemMap: input?.itemMap ?? new Map(),
     orientation: input?.orientation ?? "horizontal",
     activationMode: input?.activationMode ?? "automatic",
   }),
@@ -15,5 +17,8 @@ export const machine = createMachine({
     focused: {},
   },
   on: {},
-  types: {},
+  types: {
+    context: {} as Context,
+    input: {} as Input,
+  },
 });
