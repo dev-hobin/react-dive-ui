@@ -30,7 +30,6 @@
     "@react-dive-ui/dive": "workspace:*",
     "@react-dive-ui/merge-props": "workspace:*",
     "@react-dive-ui/compose-event-handlers": "workspace:*",
-    "@react-dive-ui/use-latest-value": "workspace:*",
     "xstate": "5.0.0-beta.27",
     "@xstate/react": "4.0.0-beta.8"
   },
