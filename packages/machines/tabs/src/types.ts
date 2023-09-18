@@ -1,3 +1,6 @@
+import { ActorRefFrom } from "xstate";
+import { machine } from "./machine";
+
 export type Item = {
   value: string;
   disabled: boolean;
@@ -43,3 +46,5 @@ export type Input = Pick<Context, "id"> &
   Partial<
     Pick<Context, "value" | "itemMap" | "activationMode" | "orientation">
   >;
+
+export type Service = ActorRefFrom<typeof machine>;
