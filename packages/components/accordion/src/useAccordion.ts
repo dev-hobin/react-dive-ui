@@ -11,6 +11,7 @@ type SingleAccordionOptions = {
   initialExpanded?: Item["value"];
   orientation?: Orientation;
   collapsible?: boolean;
+  onChange?: (details: Item["value"] | null) => void;
 };
 type MultipleAccordionOptions = {
   type: "multiple";
@@ -18,32 +19,49 @@ type MultipleAccordionOptions = {
   items?: Optional<Item, "disabled">[];
   initialExpanded?: Item["value"][];
   orientation?: Orientation;
+  onChange?: (details: Item["value"][]) => void;
 };
 
 type AccordionOptions = SingleAccordionOptions | MultipleAccordionOptions;
 export function useAccordion(options: AccordionOptions) {
   const internalId = useId();
-  const [state, send, actorRef] = useActor(machine, {
-    input: {
-      id: options.id ?? internalId,
-      type: options.type,
-      collapsible: options.type === "multiple" || options.collapsible,
-      orientation: options.orientation ?? "vertical",
-      expandedValues: !options.initialExpanded
-        ? []
-        : Array.isArray(options.initialExpanded)
-        ? options.initialExpanded
-        : [options.initialExpanded],
-      itemMap: new Map(
-        options.items?.map((item) => {
-          if (item.disabled === undefined) {
-            item.disabled = false;
+  const [state, send, actorRef] = useActor(
+    machine.provide({
+      actions: {
+        onChange: ({ context }) => {
+          if (options.type === "single") {
+            options.onChange?.(context.expandedValues[0] ?? null);
+          } else {
+            options.onChange?.(context.expandedValues);
           }
-          return [item.value, item];
-        })
-      ),
-    },
-  });
+        },
+      },
+    }),
+    {
+      input: {
+        id: options.id ?? internalId,
+        type: options.type,
+        collapsible: options.type === "multiple" || options.collapsible,
+        orientation: options.orientation ?? "vertical",
+        expandedValues: !options.initialExpanded
+          ? []
+          : Array.isArray(options.initialExpanded)
+          ? options.initialExpanded
+          : [options.initialExpanded],
+        itemMap: new Map(
+          options.items?.map((item) => {
+            if (item.disabled === undefined) {
+              item.disabled = false;
+            }
+            return [item.value, item];
+          })
+        ),
+      },
+    }
+  );
+  console.log("accordion value", state.value);
+  console.log("accordion context", state.context);
+  console.log("-----");
 
   const toggle = useCallback(
     (value: Item["value"]) => {

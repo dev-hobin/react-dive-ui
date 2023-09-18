@@ -64,6 +64,7 @@ export const machine = createMachine(
               type: "resetExpandedValuesWith",
               params: ({ event }) => ({ value: event.value }),
             },
+            "onChange",
           ],
         },
         {
@@ -72,6 +73,7 @@ export const machine = createMachine(
               type: "addToExpandedValues",
               params: ({ event }) => ({ value: event.value }),
             },
+            "onChange",
           ],
         },
       ],
@@ -91,6 +93,7 @@ export const machine = createMachine(
               type: "removeFromExpandedValues",
               params: ({ event }) => ({ value: event.value }),
             },
+            "onChange",
           ],
         },
       ],
@@ -213,6 +216,9 @@ export const machine = createMachine(
 
         triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
+
+      // template
+      onChange: () => {},
     },
   }
 );

@@ -44,7 +44,8 @@ export type Actions =
     }
   | { type: "setFocusedValue"; params: { value: Item["value"] | null } }
   | { type: "focusNextTrigger" }
-  | { type: "focusPrevTrigger" };
+  | { type: "focusPrevTrigger" }
+  | { type: "onChange" };
 
 export type Guards =
   | { type: "isItemDisabled"; params: { value: Item["value"] } }

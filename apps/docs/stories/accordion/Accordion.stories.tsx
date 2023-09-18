@@ -16,6 +16,7 @@ export const Default = () => {
     type: "single",
     items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
     initialExpanded: "value-1",
+    onChange: (details) => console.log(details),
   });
 
   return (
