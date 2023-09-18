@@ -1,14 +1,14 @@
 import { vars } from "../../styles/theme.css";
 import { style } from "@vanilla-extract/css";
 
-export const root = style({
+export const rootStyle = style({
   borderRadius: "0.25rem",
   width: "20rem",
   backgroundColor: vars.colors.gray[100],
   boxShadow: `0 2px 10px ${vars.colors.alphas.black[50]}`,
 });
 
-export const item = style({
+export const itemStyle = style({
   overflow: "hidden",
   marginTop: "1px",
 
@@ -30,12 +30,12 @@ export const item = style({
   },
 });
 
-export const heading = style({
+export const headingStyle = style({
   all: "unset",
   display: "flex",
 });
 
-export const trigger = style({
+export const triggerStyle = style({
   all: "unset",
 
   backgroundColor: vars.colors.white,
@@ -51,7 +51,7 @@ export const trigger = style({
   color: vars.colors.purple[800],
 });
 
-export const panel = style({
+export const panelStyle = style({
   overflow: "hidden",
   fontSize: vars.fontSizes.md,
   color: vars.colors.alphas.black[800],

@@ -1,6 +1,12 @@
 import type { Meta } from "@storybook/react";
 import { Accordion, useAccordion } from "@react-dive-ui/accordion";
-import { root, item, heading, trigger, panel } from "./style.css";
+import {
+  rootStyle,
+  itemStyle,
+  headingStyle,
+  triggerStyle,
+  panelStyle,
+} from "./style.css";
 
 const meta = {
   title: "Component/Accordion",
@@ -12,7 +18,7 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state, service } = useAccordion({
+  const { service } = useAccordion({
     type: "single",
     items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
     initialExpanded: "value-1",
@@ -21,24 +27,52 @@ export const Default = () => {
 
   return (
     <Accordion.Provider service={service}>
-      <Accordion.Root className={root}>
-        {state.items.map((itemInfo) => (
-          <Accordion.ItemProvider key={itemInfo.value} value={itemInfo.value}>
-            <div className={item}>
-              <Accordion.Heading className={heading}>
-                <Accordion.Trigger className={trigger}>
-                  {itemInfo.value}
-                </Accordion.Trigger>
-              </Accordion.Heading>
-              <Accordion.Panel className={panel}>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
-                molestiae optio quas corrupti eum. Recusandae explicabo numquam
-                fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
-                repellat, ad nemo possimus.
-              </Accordion.Panel>
-            </div>
-          </Accordion.ItemProvider>
-        ))}
+      <Accordion.Root className={rootStyle}>
+        <Accordion.ItemProvider value="value-1">
+          <div className={itemStyle}>
+            <Accordion.Heading className={headingStyle}>
+              <Accordion.Trigger className={triggerStyle}>
+                아이템 1
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panelStyle}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-2">
+          <div className={itemStyle}>
+            <Accordion.Heading className={headingStyle}>
+              <Accordion.Trigger className={triggerStyle}>
+                아이템 2
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panelStyle}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-3">
+          <div className={itemStyle}>
+            <Accordion.Heading className={headingStyle}>
+              <Accordion.Trigger className={triggerStyle}>
+                아이템 3
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel className={panelStyle}>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veniam
+              molestiae optio quas corrupti eum. Recusandae explicabo numquam
+              fugiat, eveniet aliquid inventore magni soluta velit ut, dolorem
+              repellat, ad nemo possimus.
+            </Accordion.Panel>
+          </div>
+        </Accordion.ItemProvider>
       </Accordion.Root>
     </Accordion.Provider>
   );
