@@ -19,12 +19,16 @@ export function connect(service: ActorRefFrom<typeof machine>) {
     }),
     listProps: properties.element({
       id: dom.getListId(context),
+      role: "tablist",
+      "aria-orientation": context.orientation,
       "data-orientation": context.orientation,
     }),
     getTriggerProps: (value: Item["value"]) => {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
+        role: "tab",
+        tabIndex: context.value === value ? 0 : -1,
         onFocus: () => {
           send({ type: "TRIGGER.FOCUSED", value });
         },
@@ -50,7 +54,12 @@ export function connect(service: ActorRefFrom<typeof machine>) {
             }
           }
         },
-        "data-state": context.value === value ? "open" : "closed",
+        onClick: () => {
+          send({ type: "ITEM.ACTIVATE", value });
+        },
+        "aria-controls": dom.getPanelId(context, value),
+        "aria-selected": context.value === value,
+        "data-state": context.value === value ? "active" : "inactive",
         "data-orientation": context.orientation,
         "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
       });
@@ -58,9 +67,11 @@ export function connect(service: ActorRefFrom<typeof machine>) {
     getPanelProps: (value: Item["value"]) => {
       return properties.element({
         id: dom.getPanelId(context, value),
-        "data-state": context.value === value ? "open" : "closed",
+        role: "tabpanel",
+        tabIndex: context.value === value ? 0 : -1,
+        "aria-labelledby": dom.getTriggerId(context, value),
+        "data-state": context.value === value ? "active" : "inactive",
         "data-orientation": context.orientation,
-        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
       });
     },
   };

@@ -15,6 +15,7 @@ export const Default = () => {
   const { service } = useTabs({
     items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
     defaultValue: "value-1",
+    activationMode: "manual",
   });
 
   return (
