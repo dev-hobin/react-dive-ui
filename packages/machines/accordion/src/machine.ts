@@ -20,6 +20,16 @@ type Input = Pick<Context, "id" | "type"> &
     Pick<Context, "expandedValues" | "itemMap" | "collapsible" | "orientation">
   >;
 
+type Events =
+  | { type: "ITEM.EXPAND"; value: Item["value"] }
+  | { type: "ITEM.COLLAPSE"; value: Item["value"] }
+  | { type: "ITEM.TOGGLE"; value: Item["value"] };
+
+type Actions =
+  | { type: "addToExpandedValues"; params: { value: Item["value"] } }
+  | { type: "removeFromExpandedValues"; params: { value: Item["value"] } }
+  | { type: "toggleValueInExpandedValues"; params: { value: Item["value"] } };
+
 export const machine = createMachine({
   id: "Accordion",
   initial: "idle",
@@ -35,10 +45,13 @@ export const machine = createMachine({
   states: {
     idle: {},
     focused: {},
+    on: {},
   },
   on: {},
   types: {
     context: {} as Context,
     input: {} as Input,
+    events: {} as Events,
+    actions: {} as Actions,
   },
 });
