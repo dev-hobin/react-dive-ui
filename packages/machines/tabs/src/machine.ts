@@ -17,15 +17,30 @@ export const machine = createMachine(
     states: {
       idle: {
         on: {
-          "TRIGGER.FOCUSED": {
-            target: "focused",
-            actions: [
-              {
-                type: "setFocusedValue",
-                params: ({ event }) => ({ value: event.value }),
-              },
-            ],
-          },
+          "TRIGGER.FOCUSED": [
+            {
+              target: "focused",
+              guard: "isAutomaticMode",
+              actions: [
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
+                pure(({ event }) =>
+                  raise({ type: "ITEM.ACTIVATE", value: event.value })
+                ),
+              ],
+            },
+            {
+              target: "focused",
+              actions: [
+                {
+                  type: "setFocusedValue",
+                  params: ({ event }) => ({ value: event.value }),
+                },
+              ],
+            },
+          ],
         },
       },
       focused: {
@@ -39,42 +54,8 @@ export const machine = createMachine(
               },
             ],
           },
-          "TRIGGER.FOCUS.NEXT": [
-            {
-              guard: "isAutomaticMode",
-              actions: [
-                "focusNextTrigger",
-                pure(({ context }) => {
-                  if (!context.focusedValue) return;
-                  return raise({
-                    type: "ITEM.ACTIVATE",
-                    value: context.focusedValue,
-                  });
-                }),
-              ],
-            },
-            {
-              actions: ["focusNextTrigger"],
-            },
-          ],
-          "TRIGGER.FOCUS.PREV": [
-            {
-              guard: "isAutomaticMode",
-              actions: [
-                "focusPrevTrigger",
-                pure(({ context }) => {
-                  if (!context.focusedValue) return;
-                  return raise({
-                    type: "ITEM.ACTIVATE",
-                    value: context.focusedValue,
-                  });
-                }),
-              ],
-            },
-            {
-              actions: ["focusPrevTrigger"],
-            },
-          ],
+          "TRIGGER.FOCUS.NEXT": [{ actions: ["focusNextTrigger"] }],
+          "TRIGGER.FOCUS.PREV": [{ actions: ["focusPrevTrigger"] }],
         },
       },
     },
