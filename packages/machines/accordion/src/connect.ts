@@ -5,6 +5,8 @@ import { dom } from "./dom";
 
 import type { Item } from "./types";
 
+const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
+
 export function connect(service: ActorRefFrom<typeof machine>) {
   const snapshot = service.getSnapshot();
   const context = snapshot.context;
@@ -23,6 +25,25 @@ export function connect(service: ActorRefFrom<typeof machine>) {
         },
         onBlur: () => {
           send({ type: "TRIGGER.BLURRED" });
+        },
+        onKeyDown: (ev) => {
+          if (ARROW_KEYS.includes(ev.key)) {
+            ev.preventDefault();
+          }
+
+          if (context.orientation === "horizontal") {
+            if (ev.key === "ArrowRight") {
+              send({ type: "TRIGGER.FOCUS.NEXT" });
+            } else if (ev.key === "ArrowLeft") {
+              send({ type: "TRIGGER.FOCUS.PREV" });
+            }
+          } else if (context.orientation === "vertical") {
+            if (ev.key === "ArrowDown") {
+              send({ type: "TRIGGER.FOCUS.NEXT" });
+            } else if (ev.key === "ArrowUp") {
+              send({ type: "TRIGGER.FOCUS.PREV" });
+            }
+          }
         },
       });
     },

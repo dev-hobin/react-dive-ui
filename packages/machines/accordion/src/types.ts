@@ -29,7 +29,9 @@ export type Events =
   | { type: "ITEM.TOGGLE"; value: Item["value"] }
   | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean }
   | { type: "TRIGGER.FOCUSED"; value: Item["value"] }
-  | { type: "TRIGGER.BLURRED" };
+  | { type: "TRIGGER.BLURRED" }
+  | { type: "TRIGGER.FOCUS.NEXT" }
+  | { type: "TRIGGER.FOCUS.PREV" };
 
 export type Actions =
   | { type: "addToExpandedValues"; params: { value: Item["value"] } }
@@ -40,7 +42,9 @@ export type Actions =
       type: "setItemDisabled";
       params: { value: Item["value"]; disabled: boolean };
     }
-  | { type: "setFocusedValue"; params: { value: Item["value"] | null } };
+  | { type: "setFocusedValue"; params: { value: Item["value"] | null } }
+  | { type: "focusNextTrigger" }
+  | { type: "focusPrevTrigger" };
 
 export type Guards =
   | { type: "isItemDisabled"; params: { value: Item["value"] } }

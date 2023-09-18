@@ -1,5 +1,6 @@
 import { createMachine, and, assign, not, pure, raise } from "xstate";
 import { Input, Context, Events, Actions, Guards } from "./types";
+import { dom } from "./dom";
 
 export const machine = createMachine(
   {
@@ -38,6 +39,12 @@ export const machine = createMachine(
                 params: { value: null },
               },
             ],
+          },
+          "TRIGGER.FOCUS.NEXT": {
+            actions: ["focusNextTrigger"],
+          },
+          "TRIGGER.FOCUS.PREV": {
+            actions: ["focusPrevTrigger"],
           },
         },
       },
@@ -178,6 +185,34 @@ export const machine = createMachine(
       setFocusedValue: assign(({ action }) => ({
         focusedValue: action.params.value,
       })),
+      focusNextTrigger: ({ context }) => {
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
+
+        const triggerEls = dom.getTriggerEls(context);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
+        if (currentIndex === -1) return;
+
+        triggerEls[(currentIndex + 1) % triggerEls.length].focus();
+      },
+      focusPrevTrigger: ({ context }) => {
+        const focusedValue = context.focusedValue;
+        if (!focusedValue) return;
+
+        const triggerEls = dom.getTriggerEls(context);
+        if (triggerEls.length === 0) return;
+
+        const currentIndex = triggerEls.findIndex(
+          (el) => el.id === dom.getTriggerId(context, focusedValue)
+        );
+        if (currentIndex === -1) return;
+
+        triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
+      },
     },
   }
 );
