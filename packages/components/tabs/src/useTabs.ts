@@ -11,7 +11,7 @@ type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 type TabsOption = {
   id?: string;
-  items?: Optional<Item, "disabled">[];
+  items: Optional<Item, "disabled">[];
   defaultValue?: Item["value"];
   orientation?: Orientation;
   activationMode?: ActivationMode;
