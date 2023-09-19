@@ -21,6 +21,8 @@ export function connect(service: Service) {
       onClick: () => {
         send({ type: "CHECK" });
       },
+      "data-state": context.checkedState,
+      "data-disabled": context.disabled ? "" : undefined,
     }),
     labelProps: properties.label({
       id: dom.getLabelId(context),
@@ -30,6 +32,8 @@ export function connect(service: Service) {
           ev.preventDefault();
         }
       },
+      "data-state": context.checkedState,
+      "data-disabled": context.disabled ? "" : undefined,
     }),
     hiddenInputProps: properties.input({
       type: "checkbox",
@@ -42,6 +46,8 @@ export function connect(service: Service) {
       onChange: (ev) => {
         send({ type: "SET.CHECKED", checked: ev.target.checked });
       },
+      "data-state": context.checkedState,
+      "data-disabled": context.disabled ? "" : undefined,
     }),
   };
 }
