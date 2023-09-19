@@ -30,6 +30,7 @@ export const machine = createMachine(
                 },
                 "syncInputWithIndeterminate",
                 "dispatchCheckedEvent",
+                "onChange",
               ],
             },
             {
@@ -37,6 +38,7 @@ export const machine = createMachine(
                 "toggleCheckedState",
                 "syncInputWithIndeterminate",
                 "dispatchCheckedEvent",
+                "onChange",
               ],
             },
           ],
@@ -67,6 +69,7 @@ export const machine = createMachine(
               },
               "syncInputWithIndeterminate",
               "dispatchCheckedEvent",
+              "onChange",
             ],
           },
         },
@@ -116,6 +119,9 @@ export const machine = createMachine(
         descriptor.set?.call(inputEl, checked);
         inputEl.dispatchEvent(new globalThis.Event("click", { bubbles: true }));
       },
+
+      // template
+      onChange: () => {},
     },
     guards: {
       isDisabled: ({ context }) => context.disabled,
