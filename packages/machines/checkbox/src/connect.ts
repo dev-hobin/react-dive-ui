@@ -37,6 +37,7 @@ export function connect(service: Service) {
     }),
     hiddenInputProps: properties.input({
       type: "checkbox",
+      tabIndex: -1,
       id: dom.getHiddenInputId(context),
       value: "on",
       "aria-labelledby": dom.getLabelId(context),
@@ -48,6 +49,14 @@ export function connect(service: Service) {
       },
       "data-state": context.checkedState,
       "data-disabled": context.disabled ? "" : undefined,
+      "aria-hidden": true,
+      style: {
+        pointerEvents: "none",
+        opacity: 0,
+        margin: 0,
+        width: 1,
+        height: 1,
+      },
     }),
   };
 }
