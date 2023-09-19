@@ -29,6 +29,9 @@ importers:
       '@react-dive-ui/accordion':
         specifier: workspace:0.0.0
         version: link:../../packages/components/accordion
+      '@react-dive-ui/checkbox':
+        specifier: workspace:0.0.0
+        version: link:../../packages/components/checkbox
       '@react-dive-ui/dive':
         specifier: workspace:0.0.0
         version: link:../../packages/core/dive
@@ -47,6 +50,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-icons:
+        specifier: ^4.11.0
+        version: 4.11.0(react@18.2.0)
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:0.0.0
@@ -108,9 +114,52 @@ importers:
       '@react-dive-ui/merge-props':
         specifier: workspace:*
         version: link:../../utils/mergeProps
-      '@react-dive-ui/use-latest-value':
+      '@xstate/react':
+        specifier: 4.0.0-beta.8
+        version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)(xstate@5.0.0-beta.27)
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
         specifier: workspace:*
-        version: link:../../utils/useLatestValue
+        version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.2.20
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.2.7
+      eslint:
+        specifier: ^8.46.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.1.6
+        version: 5.2.2
+
+  packages/components/checkbox:
+    dependencies:
+      '@react-dive-ui/checkbox-machine':
+        specifier: workspace:*
+        version: link:../../machines/checkbox
+      '@react-dive-ui/compose-event-handlers':
+        specifier: workspace:*
+        version: link:../../utils/composeEventHandlers
+      '@react-dive-ui/dive':
+        specifier: workspace:*
+        version: link:../../core/dive
+      '@react-dive-ui/merge-props':
+        specifier: workspace:*
+        version: link:../../utils/mergeProps
       '@xstate/react':
         specifier: 4.0.0-beta.8
         version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)(xstate@5.0.0-beta.27)
@@ -342,6 +391,31 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
 
+  packages/machines/checkbox:
+    dependencies:
+      '@react-dive-ui/properties':
+        specifier: workspace:*
+        version: link:../../core/properties
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
   packages/machines/radio-group:
     dependencies:
       '@react-dive-ui/properties':
@@ -453,90 +527,6 @@ importers:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
         version: link:../../tsconfig
-      '@types/react':
-        specifier: ^18.0.9
-        version: 18.2.20
-      '@types/react-dom':
-        specifier: ^18.0.4
-        version: 18.2.7
-      eslint:
-        specifier: ^8.15.0
-        version: 8.46.0
-      eslint-config-dive:
-        specifier: workspace:*
-        version: link:../../eslint-config-dive
-      react:
-        specifier: ^18.1.0
-        version: 18.2.0
-      tsup:
-        specifier: ^5.10.1
-        version: 5.10.1(typescript@4.5.3)
-      typescript:
-        specifier: ^4.5.3
-        version: 4.5.3
-
-  packages/utils/useIsomorphicLayoutEffect:
-    devDependencies:
-      '@react-dive-ui/tsconfig':
-        specifier: workspace:*
-        version: link:../../tsconfig
-      '@types/react':
-        specifier: ^18.0.9
-        version: 18.2.20
-      '@types/react-dom':
-        specifier: ^18.0.4
-        version: 18.2.7
-      eslint:
-        specifier: ^8.15.0
-        version: 8.46.0
-      eslint-config-dive:
-        specifier: workspace:*
-        version: link:../../eslint-config-dive
-      react:
-        specifier: ^18.1.0
-        version: 18.2.0
-      tsup:
-        specifier: ^5.10.1
-        version: 5.10.1(typescript@4.5.3)
-      typescript:
-        specifier: ^4.5.3
-        version: 4.5.3
-
-  packages/utils/useLatestValue:
-    devDependencies:
-      '@react-dive-ui/tsconfig':
-        specifier: workspace:*
-        version: link:../../tsconfig
-      '@types/react':
-        specifier: ^18.0.9
-        version: 18.2.20
-      '@types/react-dom':
-        specifier: ^18.0.4
-        version: 18.2.7
-      eslint:
-        specifier: ^8.15.0
-        version: 8.46.0
-      eslint-config-dive:
-        specifier: workspace:*
-        version: link:../../eslint-config-dive
-      react:
-        specifier: ^18.1.0
-        version: 18.2.0
-      tsup:
-        specifier: ^5.10.1
-        version: 5.10.1(typescript@4.5.3)
-      typescript:
-        specifier: ^4.5.3
-        version: 4.5.3
-
-  packages/utils/usePreviousValue:
-    devDependencies:
-      '@react-dive-ui/tsconfig':
-        specifier: workspace:*
-        version: link:../../tsconfig
-      '@react-dive-ui/use-isomorphic-layout-effect':
-        specifier: workspace:*
-        version: link:../useIsomorphicLayoutEffect
       '@types/react':
         specifier: ^18.0.9
         version: 18.2.20
@@ -8811,6 +8801,14 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
       react-is: 18.1.0
     dev: true
+
+  /react-icons@4.11.0(react@18.2.0):
+    resolution: {integrity: sha512-V+4khzYcE5EBk/BvcuYRq6V/osf11ODUM2J8hg2FDSswRrGvqiYUYPRy4OdrWaQOBj4NcpJfmHZLNaD+VH0TyA==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /react-inspector@6.0.2(react@18.2.0):
     resolution: {integrity: sha512-x+b7LxhmHXjHoU/VrFAzw5iutsILRoYyDq97EDYdFpPLcvqtEzk4ZSZSQjnFPbr5T57tLXnHcqFYoN1pI6u8uQ==}

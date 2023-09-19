@@ -9,13 +9,15 @@
     "clean": "rm -rf .turbo && rm -rf node_modules"
   },
   "dependencies": {
-    "@react-dive-ui/dive": "workspace:0.0.0",
     "@react-dive-ui/accordion": "workspace:0.0.0",
-    "@react-dive-ui/tabs": "workspace:0.0.0",
+    "@react-dive-ui/checkbox": "workspace:0.0.0",
+    "@react-dive-ui/dive": "workspace:0.0.0",
     "@react-dive-ui/radio-group": "workspace:0.0.0",
+    "@react-dive-ui/tabs": "workspace:0.0.0",
     "@vanilla-extract/css": "^1.13.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.11.0"
   },
   "devDependencies": {
     "@react-dive-ui/tsconfig": "workspace:0.0.0",
