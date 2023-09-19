@@ -3,15 +3,21 @@ import { machine } from "./machine";
 
 export type CheckedState = "checked" | "unchecked" | "indeterminate";
 
+export type FormOptions = {
+  name: string;
+  required?: boolean;
+};
+
 export type Context = {
   id: string;
   checkedState: CheckedState;
   disabled: boolean;
   value: string;
+  form: FormOptions | null;
 };
 
 export type Input = Pick<Context, "id"> &
-  Partial<Pick<Context, "checkedState" | "disabled" | "value">>;
+  Partial<Pick<Context, "checkedState" | "disabled" | "value" | "form">>;
 
 export type Events =
   | { type: "CHECK" }

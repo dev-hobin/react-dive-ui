@@ -7,6 +7,8 @@ export function connect(service: Service) {
   const context = snapshot.context;
   const send = service.send;
 
+  const form = context.form;
+
   return {
     controlProps: properties.button({
       id: dom.getControlId(context),
@@ -30,6 +32,8 @@ export function connect(service: Service) {
       value: "on",
       "aria-labelledby": dom.getLabelId(context),
       checked: context.checkedState === "checked",
+      name: form ? form.name : undefined,
+      required: form?.required ?? undefined,
       onChange: (ev) => {
         send({ type: "SET.CHECKED", checked: ev.target.checked });
       },

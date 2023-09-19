@@ -14,12 +14,19 @@ export const Default = () => {
   const { service } = useCheckbox();
   return (
     <div>
-      <form onChange={(ev) => console.log(ev)}>
+      <form
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          console.log(ev);
+        }}
+        onChange={(ev) => console.log(ev)}
+      >
         <Checkbox.Provider service={service}>
           <Checkbox.Control>Control</Checkbox.Control>
           <Checkbox.Label>라벨</Checkbox.Label>
           <Checkbox.HiddenInput />
         </Checkbox.Provider>
+        <button type="submit">submit</button>
       </form>
     </div>
   );

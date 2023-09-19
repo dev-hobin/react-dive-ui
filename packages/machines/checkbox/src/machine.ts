@@ -9,6 +9,7 @@ export const machine = createMachine(
       checkedState: input?.checkedState ?? "unchecked",
       disabled: input?.disabled ?? false,
       value: input?.value ?? "on",
+      form: input?.form ?? null,
     }),
     initial: "idle",
     states: {

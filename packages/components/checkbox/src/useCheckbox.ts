@@ -9,6 +9,7 @@ export function useCheckbox() {
       id: internalId,
       checkedState: "unchecked",
       disabled: false,
+      form: { name: "test", required: true },
     },
   });
 
