@@ -7,17 +7,14 @@ export function connect(service: Service) {
   const context = snapshot.context;
 
   return {
-    getControlProps: (value: string) =>
-      properties.button({
-        id: dom.getControlId(context, value),
-      }),
-    getLabelProps: (value: string) =>
-      properties.label({
-        id: dom.getLabelId(context, value),
-      }),
-    getHiddenInputProps: (value: string) =>
-      properties.input({
-        id: dom.getHiddenInputId(context, value),
-      }),
+    controlProps: properties.button({
+      id: dom.getControlId(context),
+    }),
+    labelProps: properties.label({
+      id: dom.getLabelId(context),
+    }),
+    hiddenInputProps: properties.input({
+      id: dom.getHiddenInputId(context),
+    }),
   };
 }
