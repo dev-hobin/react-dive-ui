@@ -25,6 +25,11 @@ export function connect(service: Service) {
     labelProps: properties.label({
       id: dom.getLabelId(context),
       htmlFor: dom.getHiddenInputId(context),
+      onClick: (ev) => {
+        if (context.disabled) {
+          ev.preventDefault();
+        }
+      },
     }),
     hiddenInputProps: properties.input({
       type: "checkbox",

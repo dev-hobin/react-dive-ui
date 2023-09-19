@@ -1,5 +1,6 @@
 import { assign, createMachine } from "xstate";
 import { Context, Events, Actions, Guards, CheckedState, Input } from "./types";
+import { dom } from "./dom";
 
 export const machine = createMachine(
   {
@@ -12,6 +13,7 @@ export const machine = createMachine(
       form: input?.form ?? null,
     }),
     initial: "idle",
+    entry: ["syncInputWithIndeterminate"],
     states: {
       idle: {
         on: {
@@ -26,9 +28,17 @@ export const machine = createMachine(
                     checkedState: "checked",
                   },
                 },
+                "syncInputWithIndeterminate",
+                "dispatchCheckedEvent",
               ],
             },
-            { actions: ["toggleCheckedState"] },
+            {
+              actions: [
+                "toggleCheckedState",
+                "syncInputWithIndeterminate",
+                "dispatchCheckedEvent",
+              ],
+            },
           ],
           "SET.INDETERMINATE": {
             actions: [
@@ -36,6 +46,7 @@ export const machine = createMachine(
                 type: "setCheckedState",
                 params: { checkedState: "indeterminate" },
               },
+              "syncInputWithIndeterminate",
             ],
           },
           "SET.DISABLED": {
@@ -54,6 +65,8 @@ export const machine = createMachine(
                   checkedState: event.checked ? "checked" : "unchecked",
                 }),
               },
+              "syncInputWithIndeterminate",
+              "dispatchCheckedEvent",
             ],
           },
         },
@@ -80,6 +93,29 @@ export const machine = createMachine(
       setDisabled: assign(({ action }) => ({
         disabled: action.params.disabled,
       })),
+      syncInputWithIndeterminate: ({ context }) => {
+        const inputEl = dom.getHiddenInputEl(context);
+        if (!inputEl) return;
+
+        inputEl.indeterminate = context.checkedState === "indeterminate";
+      },
+      dispatchCheckedEvent: ({ context }) => {
+        const checked = context.checkedState === "checked";
+
+        const inputEl = dom.getHiddenInputEl(context);
+        if (!inputEl) return;
+        if (!(inputEl instanceof globalThis.HTMLInputElement)) return;
+
+        const prototype = Object.getPrototypeOf(inputEl);
+        const descriptor = Object.getOwnPropertyDescriptor(
+          prototype,
+          "checked"
+        );
+        if (!descriptor) return;
+
+        descriptor.set?.call(inputEl, checked);
+        inputEl.dispatchEvent(new globalThis.Event("click", { bubbles: true }));
+      },
     },
     guards: {
       isDisabled: ({ context }) => context.disabled,

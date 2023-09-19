@@ -7,7 +7,7 @@ export function useCheckbox() {
   const [state, send, actorRef] = useActor(machine, {
     input: {
       id: internalId,
-      checkedState: "unchecked",
+      checkedState: "indeterminate",
       disabled: false,
       form: { name: "test", required: true },
     },

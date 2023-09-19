@@ -5,4 +5,9 @@ export const dom = {
   getLabelId: (context: Context) => `checkbox::label::${context.id}`,
   getHiddenInputId: (context: Context) =>
     `checkbox::hidden-input::${context.id}`,
+
+  getHiddenInputEl: (context: Context) =>
+    document.getElementById(
+      dom.getHiddenInputId(context)
+    ) as HTMLInputElement | null,
 };

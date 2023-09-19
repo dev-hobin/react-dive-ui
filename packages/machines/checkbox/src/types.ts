@@ -31,7 +31,9 @@ export type Actions =
       type: "setCheckedState";
       params: { checkedState: CheckedState };
     }
-  | { type: "setDisabled"; params: { disabled: boolean } };
+  | { type: "setDisabled"; params: { disabled: boolean } }
+  | { type: "syncInputWithIndeterminate" }
+  | { type: "dispatchCheckedEvent" };
 
 export type Guards = { type: "isDisabled" } | { type: "isIndeterminate" };
 

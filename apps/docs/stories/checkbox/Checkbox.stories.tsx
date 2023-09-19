@@ -11,7 +11,7 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { service } = useCheckbox();
+  const { apis, service } = useCheckbox();
   return (
     <div>
       <form
@@ -21,6 +21,9 @@ export const Default = () => {
         }}
         onChange={(ev) => console.log(ev)}
       >
+        <button type="button" onClick={() => apis.setIndeterminate()}>
+          set indeterminate
+        </button>
         <Checkbox.Provider service={service}>
           <Checkbox.Control>Control</Checkbox.Control>
           <Checkbox.Label>라벨</Checkbox.Label>
