@@ -7,7 +7,11 @@ export type Context = {
   id: string;
   checkedState: CheckedState;
   disabled: boolean;
+  value: string;
 };
+
+export type Input = Pick<Context, "id"> &
+  Partial<Pick<Context, "checkedState" | "disabled" | "value">>;
 
 export type Events =
   | { type: "CHECK" }

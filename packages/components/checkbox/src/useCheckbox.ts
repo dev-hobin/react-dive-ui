@@ -1,9 +1,19 @@
-import { machine } from "@react-dive-ui/checkbox-machine";
+import { useCallback, useId } from "react";
 import { useActor } from "@xstate/react";
-import { useCallback } from "react";
+import { machine } from "@react-dive-ui/checkbox-machine";
 
 export function useCheckbox() {
-  const [state, send, actorRef] = useActor(machine);
+  const internalId = useId();
+  const [state, send, actorRef] = useActor(machine, {
+    input: {
+      id: internalId,
+      checkedState: "unchecked",
+      disabled: false,
+    },
+  });
+
+  console.log("----------");
+  console.log(state.context);
 
   const check = useCallback(() => {
     send({ type: "CHECK" });

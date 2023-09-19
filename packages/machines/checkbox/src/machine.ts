@@ -1,14 +1,15 @@
 import { assign, createMachine } from "xstate";
-import { Context, Events, Actions, Guards, CheckedState } from "./types";
+import { Context, Events, Actions, Guards, CheckedState, Input } from "./types";
 
 export const machine = createMachine(
   {
     id: "Checkbox",
-    context: {
-      id: "id",
-      checkedState: "checked",
-      disabled: false,
-    },
+    context: ({ input }) => ({
+      id: input.id,
+      checkedState: input?.checkedState ?? "unchecked",
+      disabled: input?.disabled ?? false,
+      value: input?.value ?? "on",
+    }),
     initial: "idle",
     states: {
       idle: {
@@ -59,6 +60,7 @@ export const machine = createMachine(
     },
     types: {
       context: {} as Context,
+      input: {} as Input,
       events: {} as Events,
       actions: {} as Actions,
       guards: {} as Guards,

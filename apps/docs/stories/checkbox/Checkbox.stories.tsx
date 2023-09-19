@@ -14,10 +14,13 @@ export const Default = () => {
   const { service } = useCheckbox();
   return (
     <div>
-      <Checkbox.Provider service={service}>
-        <Checkbox.Control>Control</Checkbox.Control>
-        <Checkbox.Label>라벨</Checkbox.Label>
-      </Checkbox.Provider>
+      <form onChange={(ev) => console.log(ev)}>
+        <Checkbox.Provider service={service}>
+          <Checkbox.Control>Control</Checkbox.Control>
+          <Checkbox.Label>라벨</Checkbox.Label>
+          <Checkbox.HiddenInput />
+        </Checkbox.Provider>
+      </form>
     </div>
   );
 };
