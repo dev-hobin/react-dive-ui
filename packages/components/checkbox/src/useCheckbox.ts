@@ -1,17 +1,39 @@
 import { useCallback, useId } from "react";
 import { useActor } from "@xstate/react";
-import { machine } from "@react-dive-ui/checkbox-machine";
+import {
+  CheckedState,
+  FormOptions,
+  machine,
+} from "@react-dive-ui/checkbox-machine";
 
-export function useCheckbox() {
+type CheckboxOptions = {
+  id?: string;
+  checkedState?: CheckedState;
+  disabled?: boolean;
+  form?: FormOptions;
+  value?: string;
+  onChange?: (checked: CheckedState) => void;
+};
+export function useCheckbox(options: CheckboxOptions = {}) {
   const internalId = useId();
-  const [state, send, actorRef] = useActor(machine, {
-    input: {
-      id: internalId,
-      checkedState: "indeterminate",
-      disabled: false,
-      form: { name: "test", required: true },
-    },
-  });
+  const [state, send, actorRef] = useActor(
+    machine.provide({
+      actions: {
+        onChange: ({ context }) => {
+          options.onChange?.(context.checkedState);
+        },
+      },
+    }),
+    {
+      input: {
+        id: options.id ?? internalId,
+        checkedState: options.checkedState,
+        disabled: options.disabled,
+        form: options.form,
+        value: options.value,
+      },
+    }
+  );
 
   console.log("----------");
   console.log(state.context);
