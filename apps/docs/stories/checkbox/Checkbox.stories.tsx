@@ -11,5 +11,10 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  return <div></div>;
+  return (
+    <div>
+      <Checkbox.Control>Control</Checkbox.Control>
+      <Checkbox.Label>라벨</Checkbox.Label>
+    </div>
+  );
 };

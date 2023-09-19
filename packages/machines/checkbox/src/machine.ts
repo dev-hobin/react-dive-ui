@@ -5,6 +5,7 @@ export const machine = createMachine(
   {
     id: "Checkbox",
     context: {
+      id: "id",
       checkedState: "checked",
       disabled: false,
     },

@@ -4,6 +4,7 @@ import { machine } from "./machine";
 export type CheckedState = "checked" | "unchecked" | "indeterminate";
 
 export type Context = {
+  id: string;
   checkedState: CheckedState;
   disabled: boolean;
 };
