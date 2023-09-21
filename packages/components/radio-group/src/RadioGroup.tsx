@@ -1,13 +1,11 @@
-import { Group, Radio, Label, Indicator } from "./parts";
-import { RadioGroupStoreProvider } from "./providers/radio-group";
+import { Group, Control, HiddenInput, Label } from "./parts";
 
 export const RadioGroup = Object.assign(
   {},
   {
-    Provider: RadioGroupStoreProvider,
     Group,
-    Radio,
+    Control,
     Label,
-    Indicator,
+    HiddenInput,
   }
 );
