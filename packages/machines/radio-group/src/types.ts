@@ -15,4 +15,5 @@ export type Context = {
   selectedValue: Item["value"] | null;
   itemMap: Map<Item["value"], Item>;
   orientation: Orientation;
+  disabled: boolean;
 };

@@ -18,6 +18,7 @@ export const Default = () => {
       { value: "value-3" },
     ],
     defaultValue: "value-1",
+    disabled: true,
   });
 
   const { groupProps, getRadioProps, getLabelProps } = connect(service);

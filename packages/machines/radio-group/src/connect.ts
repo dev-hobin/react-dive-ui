@@ -13,6 +13,8 @@ export function connect(service: Service) {
   const itemMap = context.itemMap;
   const itemArr = Array.from(itemMap.values());
 
+  const groupDisabled = context.disabled;
+
   const isItemLabelledby = (value: Item["value"]) =>
     itemMap.get(value)?.labelledby ?? true;
 
@@ -20,7 +22,7 @@ export function connect(service: Service) {
     !!itemMap.get(value)?.disabled;
 
   const getRadioTabIndex = (value: Item["value"]) => {
-    if (isItemDisabled(value)) {
+    if (groupDisabled || isItemDisabled(value)) {
       return -1;
     }
 
@@ -45,6 +47,7 @@ export function connect(service: Service) {
         type: "button",
         role: "radio",
         tabIndex: getRadioTabIndex(value),
+        disabled: groupDisabled || isItemDisabled(value),
         "aria-checked": selectedValue === value,
         "aria-labelledby": isItemLabelledby(value)
           ? dom.getLabelId(context, value)

@@ -11,6 +11,7 @@ export const machine = createMachine(
       selectedValue: input.selectedValue ?? null,
       itemMap: input.itemMap ?? new Map(),
       orientation: input.orientation ?? "vertical",
+      disabled: input.disabled ?? false,
     }),
     initial: "idle",
     states: {
@@ -66,6 +67,7 @@ export const machine = createMachine(
         itemMap?: Map<Item["value"], Item>;
         selectedValue?: Item["value"];
         orientation?: Orientation;
+        disabled?: boolean;
       },
       actions: {} as
         | {

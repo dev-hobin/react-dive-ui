@@ -11,6 +11,7 @@ type RadioGroupOptions = {
   items: ItemOption[];
   defaultValue?: ItemOption["value"];
   orientation?: Orientation;
+  disabled?: boolean;
 };
 export function useRadioGroup(options: RadioGroupOptions) {
   const internalId = useId();
@@ -29,6 +30,7 @@ export function useRadioGroup(options: RadioGroupOptions) {
       ),
       selectedValue: options.defaultValue,
       orientation: options.orientation,
+      disabled: options.disabled,
     },
   });
 
