@@ -84,15 +84,12 @@ export function connect(service: Service) {
             }
           }
         },
-        style: {
-          all: "unset",
-        },
       });
     },
     getIndicatorProps: (value: Item["value"]) => {
       return properties.element({
         id: dom.getRadioId(context, value),
-        tabIndex: getRadioTabIndex(value),
+        tabIndex: -1,
         "data-disabled":
           groupDisabled || isItemDisabled(value) ? "" : undefined,
         "data-state": selectedValue === value ? "checked" : "unchecked",

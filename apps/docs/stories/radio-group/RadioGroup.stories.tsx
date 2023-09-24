@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react";
 import { RadioGroup, useRadioGroup, connect } from "@react-dive-ui/radio-group";
+import * as css from "./style.css";
 
 const meta = {
   title: "Component/RadioGroup",
@@ -10,28 +11,34 @@ const meta = {
 
 export default meta;
 
+const VALUE_TO_LABEL: Record<string, string> = {
+  apple: "사과",
+  banana: "바나나",
+  orange: "오렌지",
+};
+
 export const Default = () => {
   const { state, service } = useRadioGroup({
-    items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
-    defaultValue: "value-1",
-    disabled: true,
+    items: [{ value: "apple" }, { value: "banana" }, { value: "orange" }],
   });
 
   const { groupProps, getRadioProps, getIndicatorProps, getLabelProps } =
     connect(service);
   return (
-    <div>
-      <code>{JSON.stringify(state, null, 2)}</code>
-      <div {...groupProps}>
-        {state.items.map((item) => (
-          <div key={item.value} data-part="item">
-            <button {...getRadioProps(item.value)}>
-              <span {...getIndicatorProps(item.value)} />
-            </button>
-            <label {...getLabelProps(item.value)}>{item.value}</label>
-          </div>
-        ))}
-      </div>
+    <div {...groupProps} className={css.group}>
+      {state.items.map((item) => (
+        <div key={item.value} className={css.item}>
+          <button {...getRadioProps(item.value)} className={css.radio}>
+            <span
+              {...getIndicatorProps(item.value)}
+              className={css.indicator}
+            />
+          </button>
+          <label {...getLabelProps(item.value)} className={css.label}>
+            {VALUE_TO_LABEL[item.value]}
+          </label>
+        </div>
+      ))}
     </div>
   );
 };
