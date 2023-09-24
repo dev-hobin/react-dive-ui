@@ -11,9 +11,17 @@ export function connect(service: Service) {
   const focusedValue = context.focusedValue;
   const selectedValue = context.selectedValue;
   const itemMap = context.itemMap;
+  const itemKeys = Array.from(itemMap.keys());
 
   const isItemLabelledby = (value: Item["value"]) =>
     itemMap.get(value)?.labelledby ?? true;
+
+  const getRadioTabIndex = (value: Item["value"]) => {
+    if (selectedValue !== null) {
+      return selectedValue === value ? 0 : -1;
+    }
+    return itemKeys[0] === value ? 0 : -1;
+  };
 
   return {
     groupProps: properties.element({
@@ -24,6 +32,7 @@ export function connect(service: Service) {
         id: dom.getRadioId(context, value),
         type: "button",
         role: "radio",
+        tabIndex: getRadioTabIndex(value),
         "aria-checked": selectedValue === value,
         "aria-labelledby": isItemLabelledby(value)
           ? dom.getLabelId(context, value)
