@@ -2,6 +2,8 @@ import { ActorRefFrom } from "xstate";
 import { machine } from "./machine";
 
 export type Item = { value: string; labelledby: boolean; disabled: boolean };
+export type Orientation = "horizontal" | "vertical";
+
 export type ItemOption = Pick<Item, "value"> &
   Partial<Pick<Item, "labelledby" | "disabled">>;
 
@@ -12,4 +14,5 @@ export type Context = {
   focusedValue: Item["value"] | null;
   selectedValue: Item["value"] | null;
   itemMap: Map<Item["value"], Item>;
+  orientation: Orientation;
 };

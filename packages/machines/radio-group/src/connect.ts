@@ -2,6 +2,8 @@ import { properties } from "@react-dive-ui/properties";
 import { Item, Service } from "./types";
 import { dom } from "./dom";
 
+const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
+
 export function connect(service: Service) {
   const snapshot = service.getSnapshot();
   const context = snapshot.context;
@@ -57,10 +59,22 @@ export function connect(service: Service) {
           send({ type: "RADIO.SELECT", value });
         },
         onKeyDown: (ev) => {
-          if (ev.key === "ArrowRight" || ev.key === "ArrowDown") {
-            send({ type: "RADIO.SELECT.NEXT" });
-          } else if (ev.key === "ArrowUp" || ev.key === "ArrowLeft") {
-            send({ type: "RADIO.SELECT.PREV" });
+          if (ARROW_KEYS.includes(ev.key)) {
+            ev.preventDefault();
+          }
+
+          if (context.orientation === "vertical") {
+            if (ev.key === "ArrowDown") {
+              send({ type: "RADIO.SELECT.NEXT" });
+            } else if (ev.key === "ArrowUp") {
+              send({ type: "RADIO.SELECT.PREV" });
+            }
+          } else {
+            if (ev.key === "ArrowRight") {
+              send({ type: "RADIO.SELECT.NEXT" });
+            } else if (ev.key === "ArrowLeft") {
+              send({ type: "RADIO.SELECT.PREV" });
+            }
           }
         },
       });

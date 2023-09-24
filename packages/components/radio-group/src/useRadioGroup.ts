@@ -1,4 +1,8 @@
-import { ItemOption, machine } from "@react-dive-ui/radio-group-machine";
+import {
+  ItemOption,
+  Orientation,
+  machine,
+} from "@react-dive-ui/radio-group-machine";
 import { useActor } from "@xstate/react";
 import { useId } from "react";
 
@@ -6,6 +10,7 @@ type RadioGroupOptions = {
   id?: string;
   items: ItemOption[];
   defaultValue?: ItemOption["value"];
+  orientation?: Orientation;
 };
 export function useRadioGroup(options: RadioGroupOptions) {
   const internalId = useId();
@@ -23,6 +28,7 @@ export function useRadioGroup(options: RadioGroupOptions) {
         ])
       ),
       selectedValue: options.defaultValue,
+      orientation: options.orientation,
     },
   });
 

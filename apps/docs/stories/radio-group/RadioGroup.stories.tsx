@@ -22,14 +22,17 @@ export const Default = () => {
 
   const { groupProps, getRadioProps, getLabelProps } = connect(service);
   return (
-    <div {...groupProps}>
-      {state.items.map((item) => (
-        <div key={item.value} data-part="item">
-          <button {...getRadioProps(item.value)}>Radio</button>
-          {/* <input {...getHiddenInputProps()} /> */}
-          <label {...getLabelProps(item.value)}>{item.value}</label>
-        </div>
-      ))}
+    <div>
+      <code>{JSON.stringify(state, null, 2)}</code>
+      <div {...groupProps}>
+        {state.items.map((item) => (
+          <div key={item.value} data-part="item">
+            <button {...getRadioProps(item.value)}>Radio</button>
+            {/* <input {...getHiddenInputProps()} /> */}
+            <label {...getLabelProps(item.value)}>{item.value}</label>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

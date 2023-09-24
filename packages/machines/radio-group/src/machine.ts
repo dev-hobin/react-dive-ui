@@ -1,5 +1,5 @@
 import { assign, createMachine, pure } from "xstate";
-import { Context, Item } from "./types";
+import { Context, Item, Orientation } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
@@ -10,6 +10,7 @@ export const machine = createMachine(
       focusedValue: null,
       selectedValue: input.selectedValue ?? null,
       itemMap: input.itemMap ?? new Map(),
+      orientation: input.orientation ?? "vertical",
     }),
     initial: "idle",
     states: {
@@ -64,6 +65,7 @@ export const machine = createMachine(
         id: string;
         itemMap?: Map<Item["value"], Item>;
         selectedValue?: Item["value"];
+        orientation?: Orientation;
       },
       actions: {} as
         | {
