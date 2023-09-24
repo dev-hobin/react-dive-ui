@@ -40,6 +40,7 @@ export function connect(service: Service) {
   return {
     groupProps: properties.element({
       role: "radiogroup",
+      "data-disabled": groupDisabled ? "" : undefined,
     }),
     getRadioProps: (value: Item["value"]) => {
       return properties.button({
@@ -52,6 +53,9 @@ export function connect(service: Service) {
         "aria-labelledby": isItemLabelledby(value)
           ? dom.getLabelId(context, value)
           : undefined,
+        "data-disabled":
+          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        "data-state": selectedValue === value ? "checked" : "unchecked",
         onFocus: () => {
           send({ type: "RADIO.FOCUS", value });
         },
@@ -88,13 +92,18 @@ export function connect(service: Service) {
         htmlFor: isItemLabelledby(value)
           ? dom.getRadioId(context, value)
           : undefined,
+        "data-disabled":
+          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
-    getHiddenInputProps: () => {
+    getHiddenInputProps: (value: Item["value"]) => {
       return properties.input({
         type: "radio",
         "aria-hidden": true,
         tabIndex: -1,
+        "data-disabled":
+          groupDisabled || isItemDisabled(value) ? "" : undefined,
         style: {
           position: "absolute",
           overflow: "hidden",
