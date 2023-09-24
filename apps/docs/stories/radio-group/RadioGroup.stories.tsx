@@ -17,6 +17,7 @@ export const Default = () => {
       { value: "value-2" },
       { value: "value-3" },
     ],
+    defaultValue: "value-1",
   });
 
   const { groupProps, getRadioProps, getLabelProps } = connect(service);

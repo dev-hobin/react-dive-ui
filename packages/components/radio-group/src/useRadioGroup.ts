@@ -5,6 +5,7 @@ import { useId } from "react";
 type RadioGroupOptions = {
   id?: string;
   items: ItemOption[];
+  defaultValue?: ItemOption["value"];
 };
 export function useRadioGroup(options: RadioGroupOptions) {
   const internalId = useId();
@@ -17,6 +18,7 @@ export function useRadioGroup(options: RadioGroupOptions) {
           { ...item, labelled: item.labelledby ?? true },
         ])
       ),
+      selectedValue: options.defaultValue,
     },
   });
 
