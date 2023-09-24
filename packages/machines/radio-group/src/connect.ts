@@ -84,6 +84,18 @@ export function connect(service: Service) {
             }
           }
         },
+        style: {
+          all: "unset",
+        },
+      });
+    },
+    getIndicatorProps: (value: Item["value"]) => {
+      return properties.element({
+        id: dom.getRadioId(context, value),
+        tabIndex: getRadioTabIndex(value),
+        "data-disabled":
+          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
     getLabelProps: (value: Item["value"]) => {
