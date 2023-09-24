@@ -1,5 +1,6 @@
 import { properties } from "@react-dive-ui/properties";
 import { Item, Service, Status } from "./types";
+import { dom } from "./dom";
 
 export function connect(service: Service) {
   const snapshot = service.getSnapshot();
@@ -7,24 +8,44 @@ export function connect(service: Service) {
   const context = snapshot.context;
   const send = service.send;
 
+  const focusedValue = context.focusedValue;
+  const selectedValue = context.selectedValue;
+  const itemMap = context.itemMap;
+
+  const isItemLabelledby = (value: Item["value"]) =>
+    itemMap.get(value)?.labelledby ?? true;
+
   return {
     groupProps: properties.element({
       role: "radiogroup",
     }),
     getRadioProps: (value: Item["value"]) => {
       return properties.button({
+        id: dom.getRadioId(context, value),
         type: "button",
         role: "radio",
+        "aria-checked": selectedValue === value,
+        "aria-labelledby": isItemLabelledby(value)
+          ? dom.getLabelId(context, value)
+          : undefined,
         onFocus: () => {
-          send({ type: "RADIO.FOCUS", value: value });
+          send({ type: "RADIO.FOCUS", value });
         },
         onBlur: () => {
           send({ type: "RADIO.BLUR" });
         },
+        onClick: () => {
+          send({ type: "RADIO.SELECT", value });
+        },
       });
     },
-    getLabelProps: () => {
-      return properties.label({});
+    getLabelProps: (value: Item["value"]) => {
+      return properties.label({
+        id: dom.getLabelId(context, value),
+        htmlFor: isItemLabelledby(value)
+          ? dom.getRadioId(context, value)
+          : undefined,
+      });
     },
     getHiddenInputProps: () => {
       return properties.input({

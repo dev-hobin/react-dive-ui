@@ -12,7 +12,11 @@ export default meta;
 
 export const Default = () => {
   const { state, service } = useRadioGroup({
-    items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
+    items: [
+      { value: "value-1", labelledby: false },
+      { value: "value-2" },
+      { value: "value-3" },
+    ],
   });
 
   const { groupProps, getRadioProps, getLabelProps } = connect(service);
@@ -22,7 +26,7 @@ export const Default = () => {
         <div key={item.value} data-part="item">
           <button {...getRadioProps(item.value)}>Radio</button>
           {/* <input {...getHiddenInputProps()} /> */}
-          <label {...getLabelProps()}>{item.value}</label>
+          <label {...getLabelProps(item.value)}>{item.value}</label>
         </div>
       ))}
     </div>

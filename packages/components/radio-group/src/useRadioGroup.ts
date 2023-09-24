@@ -1,13 +1,22 @@
-import { Item, machine } from "@react-dive-ui/radio-group-machine";
+import { ItemOption, machine } from "@react-dive-ui/radio-group-machine";
 import { useActor } from "@xstate/react";
+import { useId } from "react";
 
 type RadioGroupOptions = {
-  items: Item[];
+  id?: string;
+  items: ItemOption[];
 };
 export function useRadioGroup(options: RadioGroupOptions) {
+  const internalId = useId();
   const [state, send, service] = useActor(machine, {
     input: {
-      itemMap: new Map(options.items.map((item) => [item.value, item])),
+      id: options.id ?? internalId,
+      itemMap: new Map(
+        options.items.map((item) => [
+          item.value,
+          { ...item, labelled: item.labelledby ?? true },
+        ])
+      ),
     },
   });
 
