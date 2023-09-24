@@ -1,10 +1,10 @@
-import { Group, Control, HiddenInput, Label } from "./parts";
+import { Group, Radio, HiddenInput, Label } from "./parts";
 
 export const RadioGroup = Object.assign(
   {},
   {
     Group,
-    Control,
+    Radio,
     Label,
     HiddenInput,
   }

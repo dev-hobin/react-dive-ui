@@ -1,4 +1,4 @@
 export * from "./Group";
-export * from "./Control";
+export * from "./Radio";
 export * from "./Label";
 export * from "./HiddenInput";

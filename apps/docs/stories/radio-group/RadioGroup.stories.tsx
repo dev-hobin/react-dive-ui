@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { RadioGroup, useRadioGroup } from "@react-dive-ui/radio-group";
+import { RadioGroup, useRadioGroup, connect } from "@react-dive-ui/radio-group";
 
 const meta = {
   title: "Component/RadioGroup",
@@ -11,29 +11,28 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const radioGroup = useRadioGroup({ id: "radio-group" });
+  const { state, apis, service } = useRadioGroup();
+
+  const { groupProps, getRadioProps, getHiddenInputProps, getLabelProps } =
+    connect(service);
+
   return (
-    <RadioGroup.Provider store={radioGroup}>
-      <RadioGroup.Group>
-        <div>
-          <RadioGroup.Radio value="value-1" labelled>
-            <RadioGroup.Indicator>Radio</RadioGroup.Indicator>
-          </RadioGroup.Radio>
-          <RadioGroup.Label value="value-1">value-1 label</RadioGroup.Label>
-        </div>
-        <div>
-          <RadioGroup.Radio value="value-2">
-            <RadioGroup.Indicator>Radio</RadioGroup.Indicator>
-          </RadioGroup.Radio>
-          <RadioGroup.Label value="value-2">value-2 label</RadioGroup.Label>
-        </div>
-        <div>
-          <RadioGroup.Radio value="value-3">
-            <RadioGroup.Indicator>Radio</RadioGroup.Indicator>
-          </RadioGroup.Radio>
-          <RadioGroup.Label value="value-3">value-3 label</RadioGroup.Label>
-        </div>
-      </RadioGroup.Group>
-    </RadioGroup.Provider>
+    <div {...groupProps}>
+      <div data-part="item">
+        <button {...getRadioProps()}>Radio 1</button>
+        <input {...getHiddenInputProps()} />
+        <label {...getLabelProps()}>아이템 1</label>
+      </div>
+      <div data-part="item">
+        <button {...getRadioProps()}>Radio 2</button>
+        <input {...getHiddenInputProps()} />
+        <label {...getLabelProps()}>아이템 2</label>
+      </div>
+      <div data-part="item">
+        <button {...getRadioProps()}>Radio 3</button>
+        <input {...getHiddenInputProps()} />
+        <label {...getLabelProps()}>아이템 3</label>
+      </div>
+    </div>
   );
 };
