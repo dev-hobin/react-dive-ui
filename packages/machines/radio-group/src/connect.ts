@@ -1,14 +1,12 @@
 import { properties } from "@react-dive-ui/properties";
-import { Item, Service, Status } from "./types";
+import { Item, Service } from "./types";
 import { dom } from "./dom";
 
 export function connect(service: Service) {
   const snapshot = service.getSnapshot();
-  const status = snapshot.value as Status;
   const context = snapshot.context;
   const send = service.send;
 
-  const focusedValue = context.focusedValue;
   const selectedValue = context.selectedValue;
   const itemMap = context.itemMap;
   const itemKeys = Array.from(itemMap.keys());
@@ -45,6 +43,13 @@ export function connect(service: Service) {
         },
         onClick: () => {
           send({ type: "RADIO.SELECT", value });
+        },
+        onKeyDown: (ev) => {
+          if (ev.key === "ArrowRight" || ev.key === "ArrowDown") {
+            send({ type: "RADIO.SELECT.NEXT" });
+          } else if (ev.key === "ArrowUp" || ev.key === "ArrowLeft") {
+            send({ type: "RADIO.SELECT.PREV" });
+          }
         },
       });
     },

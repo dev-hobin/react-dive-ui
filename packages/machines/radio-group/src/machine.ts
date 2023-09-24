@@ -1,5 +1,6 @@
-import { assign, createMachine } from "xstate";
+import { assign, createMachine, pure } from "xstate";
 import { Context, Item } from "./types";
+import { dom } from "./dom";
 
 export const machine = createMachine(
   {
@@ -34,8 +35,12 @@ export const machine = createMachine(
               params: { value: null },
             },
           },
-          "RADIO.SELECT.NEXT": {},
-          "RADIO.SELECT.PREV": {},
+          "RADIO.SELECT.NEXT": {
+            actions: ["selectNext", "focusCurrentSelectedRadio"],
+          },
+          "RADIO.SELECT.PREV": {
+            actions: ["selectPrev", "focusCurrentSelectedRadio"],
+          },
           "RADIO.SELECT": {
             actions: [
               {
@@ -68,7 +73,10 @@ export const machine = createMachine(
         | {
             type: "select";
             params: { value: Item["value"] };
-          },
+          }
+        | { type: "selectNext" }
+        | { type: "selectPrev" }
+        | { type: "focusCurrentSelectedRadio" },
     },
   },
   {
@@ -77,7 +85,34 @@ export const machine = createMachine(
         focusedValue: action.params.value,
       })),
       select: assign(({ action }) => ({ selectedValue: action.params.value })),
+      selectNext: pure(({ context }) => {
+        const currentValue = context.focusedValue ?? context.selectedValue;
+        const items = Array.from(context.itemMap.values());
+        const currentIndex = items.findIndex(
+          (item) => item.value === currentValue
+        );
+        if (currentIndex === -1) return;
+        const nextItem = items[(currentIndex + 1) % items.length];
+        return assign({ selectedValue: nextItem.value });
+      }),
+      selectPrev: pure(({ context }) => {
+        const currentValue = context.focusedValue ?? context.selectedValue;
+        const items = Array.from(context.itemMap.values());
+        const currentIndex = items.findIndex(
+          (item) => item.value === currentValue
+        );
+        if (currentIndex === -1) return;
+
+        const prevItem = items.at((currentIndex - 1) % items.length);
+        if (!prevItem) return;
+
+        return assign({ selectedValue: prevItem.value });
+      }),
+      focusCurrentSelectedRadio: ({ context }) => {
+        if (context.selectedValue === null) return;
+        const radioEl = dom.getRadioEl(context, context.selectedValue);
+        radioEl?.focus();
+      },
     },
-    guards: {},
   }
 );
