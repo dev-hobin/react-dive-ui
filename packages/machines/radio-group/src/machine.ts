@@ -87,7 +87,9 @@ export const machine = createMachine(
       select: assign(({ action }) => ({ selectedValue: action.params.value })),
       selectNext: pure(({ context }) => {
         const currentValue = context.focusedValue ?? context.selectedValue;
-        const items = Array.from(context.itemMap.values());
+        const items = Array.from(context.itemMap.values()).filter(
+          (item) => !item.disabled
+        );
         const currentIndex = items.findIndex(
           (item) => item.value === currentValue
         );
@@ -97,7 +99,9 @@ export const machine = createMachine(
       }),
       selectPrev: pure(({ context }) => {
         const currentValue = context.focusedValue ?? context.selectedValue;
-        const items = Array.from(context.itemMap.values());
+        const items = Array.from(context.itemMap.values()).filter(
+          (item) => !item.disabled
+        );
         const currentIndex = items.findIndex(
           (item) => item.value === currentValue
         );

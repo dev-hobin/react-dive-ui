@@ -13,7 +13,7 @@ export default meta;
 export const Default = () => {
   const { state, service } = useRadioGroup({
     items: [
-      { value: "value-1", labelledby: false },
+      { value: "value-1", disabled: true },
       { value: "value-2" },
       { value: "value-3" },
     ],

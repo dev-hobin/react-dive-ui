@@ -1,9 +1,9 @@
 import { ActorRefFrom } from "xstate";
 import { machine } from "./machine";
 
-export type Item = { value: string; labelledby: boolean };
+export type Item = { value: string; labelledby: boolean; disabled: boolean };
 export type ItemOption = Pick<Item, "value"> &
-  Partial<Pick<Item, "labelledby">>;
+  Partial<Pick<Item, "labelledby" | "disabled">>;
 
 export type Service = ActorRefFrom<typeof machine>;
 export type Status = "idle" | "focused";

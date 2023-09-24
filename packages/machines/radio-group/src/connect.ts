@@ -9,16 +9,28 @@ export function connect(service: Service) {
 
   const selectedValue = context.selectedValue;
   const itemMap = context.itemMap;
-  const itemKeys = Array.from(itemMap.keys());
+  const itemArr = Array.from(itemMap.values());
 
   const isItemLabelledby = (value: Item["value"]) =>
     itemMap.get(value)?.labelledby ?? true;
 
+  const isItemDisabled = (value: Item["value"]) =>
+    !!itemMap.get(value)?.disabled;
+
   const getRadioTabIndex = (value: Item["value"]) => {
+    if (isItemDisabled(value)) {
+      return -1;
+    }
+
+    const enabledItems = itemArr.filter((item) => !item.disabled);
     if (selectedValue !== null) {
+      if (isItemDisabled(selectedValue)) {
+        return enabledItems[0].value === value ? 0 : -1;
+      }
       return selectedValue === value ? 0 : -1;
     }
-    return itemKeys[0] === value ? 0 : -1;
+
+    return enabledItems[0].value === value ? 0 : -1;
   };
 
   return {

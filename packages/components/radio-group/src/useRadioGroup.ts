@@ -15,7 +15,11 @@ export function useRadioGroup(options: RadioGroupOptions) {
       itemMap: new Map(
         options.items.map((item) => [
           item.value,
-          { ...item, labelled: item.labelledby ?? true },
+          {
+            ...item,
+            labelled: item.labelledby ?? true,
+            disabled: item.disabled ?? false,
+          },
         ])
       ),
       selectedValue: options.defaultValue,
@@ -30,7 +34,7 @@ export function useRadioGroup(options: RadioGroupOptions) {
   const items = Array.from(itemMap.values());
 
   return {
-    state: { status: state.value, items },
+    state: { status: state.value, items, ...state.context },
     apis: { send },
     service,
   };
