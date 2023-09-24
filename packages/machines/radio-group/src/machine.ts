@@ -1,162 +1,126 @@
-import { assign, createMachine, not, pure, raise } from "xstate";
-import { MachineContext, MachineEvent, UserInput } from "./types";
+import { assign, createMachine, pure } from "xstate";
+import { Context, Item, Orientation } from "./types";
 import { dom } from "./dom";
 
 export const machine = createMachine(
   {
     id: "RadioGroup",
-    initial: "idle",
     context: ({ input }) => ({
       id: input.id,
-      ids: input?.ids ?? null,
-      value: input?.value ?? null,
       focusedValue: null,
-      disabled: input?.disabled ?? false,
-      orientation: input?.orientation ?? "vertical",
-      form: input?.form ?? null,
+      selectedValue: input.selectedValue ?? null,
+      itemMap: input.itemMap ?? new Map(),
+      orientation: input.orientation ?? "vertical",
+      disabled: input.disabled ?? false,
     }),
+    initial: "idle",
     states: {
       idle: {
         on: {
-          "RADIO.FOCUS": [
-            {
-              guard: not("isSelectedRadioExist"),
-              target: "focused",
-              actions: [
-                "focusFirstSelectableRadio",
-                {
-                  type: "setFocusedValue",
-                  params: ({ event }) => ({ value: event.value }),
-                },
-              ],
-            },
-            {
-              target: "focused",
-              actions: [
-                {
-                  type: "setFocusedValue",
-                  params: ({ event }) => ({ value: event.value }),
-                },
-              ],
-            },
-          ],
+          "RADIO.FOCUS": {
+            target: "focused",
+            actions: [
+              {
+                type: "setFocusedValue",
+                params: ({ event }) => ({ value: event.value }),
+              },
+            ],
+          },
         },
       },
       focused: {
         on: {
           "RADIO.BLUR": {
             target: "idle",
-            actions: ["unsetFocusedValue"],
-          },
-          "RADIO.FOCUS": {
-            actions: [
-              {
-                type: "setFocusedValue",
-                params: ({ event }) => ({ value: event.value }),
-              },
-              "selectCurrentFocused",
-            ],
+            actions: {
+              type: "setFocusedValue",
+              params: { value: null },
+            },
           },
           "RADIO.SELECT.NEXT": {
-            actions: ["focusNextRadio"],
+            actions: ["selectNext", "focusCurrentSelectedRadio"],
           },
           "RADIO.SELECT.PREV": {
-            actions: ["focusPrevRadio"],
+            actions: ["selectPrev", "focusCurrentSelectedRadio"],
+          },
+          "RADIO.SELECT": {
+            actions: [
+              {
+                type: "select",
+                params: ({ event }) => ({ value: event.value }),
+              },
+            ],
           },
         },
       },
     },
-    on: {
-      "RADIO.SELECT": {
-        actions: [
-          { type: "setValue", params: ({ event }) => ({ value: event.value }) },
-        ],
-      },
-      "CONTEXT.SET": {
-        actions: [
-          {
-            type: "setContext",
-            params: ({ event }) => ({ context: event.context }),
-          },
-        ],
-      },
-    },
     types: {
-      context: {} as MachineContext,
-      events: {} as MachineEvent,
-      input: {} as UserInput,
-      guards: {} as { type: "isSelectedRadioExist" },
+      events: {} as
+        | { type: "RADIO.FOCUS"; value: Item["value"] }
+        | { type: "RADIO.BLUR" }
+        | { type: "RADIO.SELECT"; value: Item["value"] }
+        | { type: "RADIO.SELECT.PREV" }
+        | { type: "RADIO.SELECT.NEXT" },
+      context: {} as Context,
+      input: {} as {
+        id: string;
+        itemMap?: Map<Item["value"], Item>;
+        selectedValue?: Item["value"];
+        orientation?: Orientation;
+        disabled?: boolean;
+      },
       actions: {} as
-        | { type: "setFocusedValue"; params: { value: string } }
-        | { type: "setValue"; params: { value: string } }
-        | { type: "unsetFocusedValue" }
-        | { type: "focusNextRadio" }
-        | { type: "focusPrevRadio" }
-        | { type: "focusFirstSelectableRadio" }
-        | { type: "selectCurrentFocused" }
-        | { type: "setContext"; params: { context: Partial<MachineContext> } },
+        | {
+            type: "setFocusedValue";
+            params: { value: Item["value"] | null };
+          }
+        | {
+            type: "select";
+            params: { value: Item["value"] };
+          }
+        | { type: "selectNext" }
+        | { type: "selectPrev" }
+        | { type: "focusCurrentSelectedRadio" },
     },
   },
   {
-    guards: {
-      isSelectedRadioExist: ({ context }) => context.value !== null,
-    },
     actions: {
       setFocusedValue: assign(({ action }) => ({
         focusedValue: action.params.value,
       })),
-      unsetFocusedValue: assign({ focusedValue: null }),
-      focusNextRadio: ({ context }) => {
-        if (!context.focusedValue) return;
-
-        const currentRadioEl = dom.getRadioEl(context, context.focusedValue);
-        if (!currentRadioEl) return;
-
-        const radioEls = dom.getRadioEls(context);
-        if (radioEls.length === 0) return;
-
-        const currentIndex = radioEls.indexOf(currentRadioEl);
+      select: assign(({ action }) => ({ selectedValue: action.params.value })),
+      selectNext: pure(({ context }) => {
+        const currentValue = context.focusedValue ?? context.selectedValue;
+        const items = Array.from(context.itemMap.values()).filter(
+          (item) => !item.disabled
+        );
+        const currentIndex = items.findIndex(
+          (item) => item.value === currentValue
+        );
         if (currentIndex === -1) return;
-
-        radioEls[getNextIndex(currentIndex, radioEls)]?.focus();
-      },
-      focusPrevRadio: ({ context }) => {
-        if (!context.focusedValue) return;
-
-        const currentRadioEl = dom.getRadioEl(context, context.focusedValue);
-        if (!currentRadioEl) return;
-
-        const radioEls = dom.getRadioEls(context);
-        if (radioEls.length === 0) return;
-
-        const currentIndex = radioEls.indexOf(currentRadioEl);
-        if (currentIndex === -1) return;
-
-        radioEls.at(getPrevIndex(currentIndex, radioEls))?.focus();
-      },
-      focusFirstSelectableRadio: ({ context }) => {
-        const radioEls = dom.getRadioEls(context);
-        if (radioEls.length === 0) return;
-        radioEls[0]?.focus();
-      },
-      selectCurrentFocused: pure(({ context }) => {
-        if (!context.focusedValue) return;
-        return raise({
-          type: "RADIO.SELECT",
-          value: context.focusedValue,
-        });
+        const nextItem = items[(currentIndex + 1) % items.length];
+        return assign({ selectedValue: nextItem.value });
       }),
-      setValue: assign(({ action }) => ({ value: action.params.value })),
-      setContext: assign(({ action }) => action.params.context),
+      selectPrev: pure(({ context }) => {
+        const currentValue = context.focusedValue ?? context.selectedValue;
+        const items = Array.from(context.itemMap.values()).filter(
+          (item) => !item.disabled
+        );
+        const currentIndex = items.findIndex(
+          (item) => item.value === currentValue
+        );
+        if (currentIndex === -1) return;
+
+        const prevItem = items.at((currentIndex - 1) % items.length);
+        if (!prevItem) return;
+
+        return assign({ selectedValue: prevItem.value });
+      }),
+      focusCurrentSelectedRadio: ({ context }) => {
+        if (context.selectedValue === null) return;
+        const radioEl = dom.getRadioEl(context, context.selectedValue);
+        radioEl?.focus();
+      },
     },
   }
 );
-
-function getNextIndex(currentIndex: number, array: unknown[]) {
-  if (array.length === 0) return 0;
-  return (currentIndex + 1) % array.length;
-}
-function getPrevIndex(currentIndex: number, array: unknown[]) {
-  if (array.length === 0) return 0;
-  return (currentIndex - 1) % array.length;
-}

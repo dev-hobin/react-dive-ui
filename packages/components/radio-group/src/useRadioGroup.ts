@@ -1,68 +1,49 @@
 import {
-  ElementIds,
-  FormOption,
-  connect,
-  radioGroupMachine,
+  ItemOption,
+  Orientation,
+  machine,
 } from "@react-dive-ui/radio-group-machine";
 import { useActor } from "@xstate/react";
-import { useCallback } from "react";
+import { useId } from "react";
 
-type Orientation = "vertical" | "horizontal";
-export type RadioGroupOption = {
-  id: string;
-  ids?: ElementIds;
+type RadioGroupOptions = {
+  id?: string;
+  items: ItemOption[];
+  defaultValue?: ItemOption["value"];
   orientation?: Orientation;
-  form?: FormOption;
   disabled?: boolean;
-  defaultValue?: string;
 };
-
-export function useRadioGroup(option: RadioGroupOption) {
-  const [state, send] = useActor(radioGroupMachine, {
+export function useRadioGroup(options: RadioGroupOptions) {
+  const internalId = useId();
+  const [state, send, service] = useActor(machine, {
     input: {
-      id: option.id,
-      ids: option.ids,
-      orientation: option.orientation,
-      value: option.defaultValue,
-      disabled: option.disabled,
-      form: option.form,
+      id: options.id ?? internalId,
+      itemMap: new Map(
+        options.items.map((item) => [
+          item.value,
+          {
+            ...item,
+            labelled: item.labelledby ?? true,
+            disabled: item.disabled ?? false,
+          },
+        ])
+      ),
+      selectedValue: options.defaultValue,
+      orientation: options.orientation,
+      disabled: options.disabled,
     },
   });
-  const { value, context } = state;
 
-  const select = useCallback(
-    (value: string) => {
-      send({ type: "RADIO.SELECT", value });
-    },
-    [send]
-  );
+  console.log("---------");
+  console.log("status", state.value);
+  console.log("context", state.context);
 
-  const setDisabled = useCallback(
-    (disabled: boolean) => {
-      send({ type: "CONTEXT.SET", context: { disabled } });
-    },
-    [send]
-  );
-
-  const setOrientation = useCallback(
-    (orientation: Orientation) => {
-      send({ type: "CONTEXT.SET", context: { orientation } });
-    },
-    [send]
-  );
-
-  const setFormOption = useCallback(
-    (option: FormOption) => {
-      send({ type: "CONTEXT.SET", context: { form: option } });
-    },
-    [send]
-  );
+  const itemMap = state.context.itemMap;
+  const items = Array.from(itemMap.values());
 
   return {
-    state: { status: value, ...context },
-    apis: { select, setDisabled, setOrientation, setFormOption },
-    props: connect(state, send),
+    state: { status: state.value, items, ...state.context },
+    apis: { send },
+    service,
   };
 }
-
-export type RadioGroupStore = ReturnType<typeof useRadioGroup>;

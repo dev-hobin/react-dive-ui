@@ -1,26 +1,16 @@
-import { MachineContext } from "./types";
+import { Context, Item } from "./types";
 
 export const dom = {
-  getGroupId: (context: MachineContext) =>
-    context.ids?.group ?? `radio-group:${context.id}:group`,
-  getRadioId: (context: MachineContext, value: string) =>
-    context.ids?.group ?? `radio-group:${context.id}:radio:${value}`,
-  getLabelId: (context: MachineContext, value: string) =>
-    context.ids?.group ?? `radio-group:${context.id}:label:${value}`,
-  getIndicatorId: (context: MachineContext, value: string) =>
-    context.ids?.group ?? `radio-group:${context.id}:indicator:${value}`,
+  getRadioId: (context: Context, value: Item["value"]) =>
+    `radio-group::${context.id}::radio::${value}`,
+  getLabelId: (context: Context, value: Item["value"]) =>
+    `radio-group::${context.id}::label::${value}`,
 
-  getGroupEl: (context: MachineContext) =>
-    document.getElementById(dom.getGroupId(context)),
-  getRadioEls: (context: MachineContext) => {
-    return Array.from<HTMLElement>(
-      dom
-        .getGroupEl(context)
-        ?.querySelectorAll(`[data-part='radio']:not([disabled])`) ?? []
-    );
+  getRadioEl: (context: Context, value: Item["value"]) => {
+    const selector = `#${CSS.escape(
+      dom.getRadioId(context, value)
+    )}:not([disabled])`;
+
+    return document.querySelector<HTMLElement>(selector);
   },
-  getRadioEl: (context: MachineContext, value: string) =>
-    document.getElementById(dom.getRadioId(context, value)),
-  getLabelEl: (context: MachineContext, value: string) =>
-    document.getElementById(dom.getLabelId(context, value)),
 };

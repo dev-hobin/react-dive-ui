@@ -1,50 +1,19 @@
-import { ActorRefFrom, StateFrom } from "xstate";
+import { ActorRefFrom } from "xstate";
 import { machine } from "./machine";
 
-export type MachineState = StateFrom<typeof machine>;
+export type Item = { value: string; labelledby: boolean; disabled: boolean };
+export type Orientation = "horizontal" | "vertical";
 
-export type MachineSend = ActorRefFrom<typeof machine>["send"];
+export type ItemOption = Pick<Item, "value"> &
+  Partial<Pick<Item, "labelledby" | "disabled">>;
 
-export type MachineContext = {
+export type Service = ActorRefFrom<typeof machine>;
+export type Status = "idle" | "focused";
+export type Context = {
   id: string;
-  ids: ElementIds | null;
-  value: string | null;
-  focusedValue: string | null;
+  focusedValue: Item["value"] | null;
+  selectedValue: Item["value"] | null;
+  itemMap: Map<Item["value"], Item>;
+  orientation: Orientation;
   disabled: boolean;
-  orientation: "vertical" | "horizontal";
-  form: FormOption | null;
-};
-
-export type UserInput = Required<Pick<MachineContext, "id">> &
-  Partial<
-    Pick<MachineContext, "ids" | "value" | "disabled" | "orientation" | "form">
-  >;
-
-export type ElementIds = Partial<{
-  group: string;
-  radio(value: string): string;
-  label(value: string): string;
-  indicator(value: string): string;
-}>;
-
-export type FormOption = {
-  name: string;
-  required?: boolean;
-  readonly?: boolean;
-};
-
-export type MachineEvent =
-  | { type: "RADIO.FOCUS"; value: string }
-  | { type: "RADIO.BLUR" }
-  | { type: "RADIO.SELECT"; value: string }
-  | { type: "RADIO.SELECT.NEXT" }
-  | { type: "RADIO.SELECT.PREV" }
-  | { type: "CONTEXT.SET"; context: Partial<MachineContext> };
-
-export type ChangeDetails = {
-  value: string | null;
-};
-
-export type FocusChangeDetails = {
-  value: string | null;
 };
