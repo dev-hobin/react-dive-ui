@@ -1,3 +1,5 @@
+import { useDialog, connect } from "@react-dive-ui/dialog";
+
 const meta = {
   title: "Component/Dialog",
   parameters: {
@@ -8,22 +10,23 @@ const meta = {
 export default meta;
 
 export const Default = () => {
+  const { state, service } = useDialog({ initialOpen: true });
+
+  const { triggerProps, closeProps } = connect(service);
   return (
     <div>
-      <button type="button" data-part="trigger">
-        Trigger
-      </button>
+      <button {...triggerProps}>Trigger</button>
 
-      <div data-part="portal">
-        <div data-part="overlay"></div>
-        <div data-part="panel">
-          <h2 data-part="title">Title</h2>
-          <p data-part="description">description</p>
-          <button type="button" data-part="close">
-            Close
-          </button>
+      {state.open && (
+        <div data-part="portal">
+          <div data-part="overlay"></div>
+          <div data-part="panel">
+            <h2 data-part="title">Title</h2>
+            <p data-part="description">description</p>
+            <button {...closeProps}>Close</button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
