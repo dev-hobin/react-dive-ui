@@ -1,0 +1,32 @@
+{
+  "name": "@react-dive-ui/dialog-machine",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@react-dive-ui/tsconfig": "workspace:*",
+    "eslint": "^8.15.0",
+    "eslint-config-dive": "workspace:*",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "xstate": "5.0.0-beta.27",
+    "@react-dive-ui/properties": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
