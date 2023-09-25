@@ -15,7 +15,8 @@ export function useDialog(options: DialogOptions = {}) {
     },
   });
 
-  console.log("state", state);
+  console.log("status", state.value);
+  console.log("context", state.context);
 
   return {
     state: { status: state.value, ...state.context },

@@ -22,7 +22,7 @@ export function connect(service: Service) {
         send({ type: "CLOSE" });
       },
     }),
-    panelProps: properties.div({
+    panelProps: properties.element({
       id: dom.getPanelId(context),
     }),
   };

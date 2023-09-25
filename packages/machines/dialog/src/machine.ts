@@ -1,21 +1,31 @@
+import { dismissManager } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 import { Context, Events } from "./types";
 import { dom } from "./dom";
 
 const outsideInteractionLogic = fromCallback<Events, { context: Context }>(
   ({ sendBack, input }) => {
+    const { id } = input.context;
+
+    dismissManager.register({
+      type: "modal",
+      id: id,
+      dismiss: () => sendBack({ type: "CLOSE" }),
+    });
+
     const outsideClickHandler = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const panelEl = dom.getPanelEl(input.context);
       if (!target || !panelEl) return;
       if (panelEl.contains(target)) return;
 
-      sendBack({ type: "CLOSE" });
+      dismissManager.dismiss(id);
     };
 
     document.addEventListener("click", outsideClickHandler, {
       capture: true,
     });
+
     return () => {
       document.removeEventListener("click", outsideClickHandler, {
         capture: true,
@@ -52,7 +62,10 @@ export const machine = createMachine(
         on: {
           CLOSE: {
             target: "closed",
-            actions: [{ type: "setIsOpen", params: { open: false } }],
+            actions: [
+              { type: "setIsOpen", params: { open: false } },
+              "dismissLayer",
+            ],
           },
         },
       },
@@ -69,7 +82,9 @@ export const machine = createMachine(
       events: {} as Events,
       context: {} as Context,
       input: {} as { id: string; open?: boolean },
-      actions: {} as { type: "setIsOpen"; params: { open: boolean } },
+      actions: {} as
+        | { type: "setIsOpen"; params: { open: boolean } }
+        | { type: "dismissLayer" },
       actors: {} as {
         src: "outsideInteractLogic";
         logic: typeof outsideInteractionLogic;
@@ -80,6 +95,9 @@ export const machine = createMachine(
   {
     actions: {
       setIsOpen: assign(({ action }) => ({ open: action.params.open })),
+      dismissLayer: ({ context }) => {
+        dismissManager.dismiss(context.id);
+      },
     },
     guards: { isOpen: ({ context }) => context.open },
     actors: {

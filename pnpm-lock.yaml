@@ -333,6 +333,24 @@ importers:
         specifier: ^5.1.6
         version: 5.2.2
 
+  packages/core/dismissible-layer:
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
   packages/core/dive:
     dependencies:
       '@react-dive-ui/compose-refs':
@@ -467,6 +485,9 @@ importers:
 
   packages/machines/dialog:
     dependencies:
+      '@react-dive-ui/dismissible-layer':
+        specifier: workspace:*
+        version: link:../../core/dismissible-layer
       '@react-dive-ui/properties':
         specifier: workspace:*
         version: link:../../core/properties

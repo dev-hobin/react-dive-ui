@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "xstate": "5.0.0-beta.27",
-    "@react-dive-ui/properties": "workspace:*"
+    "@react-dive-ui/properties": "workspace:*",
+    "@react-dive-ui/dismissible-layer": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
