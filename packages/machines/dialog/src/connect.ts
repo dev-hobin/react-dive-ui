@@ -1,8 +1,12 @@
 import { properties } from "@react-dive-ui/properties";
 
 import type { Service } from "./types";
+import { dom } from "./dom";
 
 export function connect(service: Service) {
+  const snapshot = service.getSnapshot();
+
+  const context = snapshot.context;
   const send = service.send;
 
   return {
@@ -17,6 +21,9 @@ export function connect(service: Service) {
       onClick: () => {
         send({ type: "CLOSE" });
       },
+    }),
+    panelProps: properties.div({
+      id: dom.getPanelId(context),
     }),
   };
 }

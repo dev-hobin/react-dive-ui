@@ -14,7 +14,7 @@ export default meta;
 export const Default = () => {
   const { state, service } = useDialog({ initialOpen: true });
 
-  const { triggerProps, closeProps } = connect(service);
+  const { triggerProps, closeProps, panelProps } = connect(service);
   return (
     <div>
       <button {...triggerProps} className={css.trigger}>
@@ -25,7 +25,7 @@ export const Default = () => {
         createPortal(
           <>
             <div data-part="backdrop" className={css.backdrop}></div>
-            <div data-part="panel" className={css.panel}>
+            <div {...panelProps} className={css.panel}>
               <h2 data-part="title" className={css.title}>
                 Title
               </h2>
