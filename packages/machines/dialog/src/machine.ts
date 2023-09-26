@@ -37,6 +37,26 @@ const outsideInteractionLogic = fromCallback<any, { context: Context }>(
   }
 );
 
+const escapeLogic = fromCallback<any, { context: Context }>(({ input }) => {
+  const { id } = input.context;
+  const escapeHandler = (event: KeyboardEvent) => {
+    if (event.key !== "Escape") return;
+
+    const target = event.target as HTMLElement;
+    const panelEl = dom.getPanelEl(input.context);
+    if (!target || !panelEl) return;
+    if (!panelEl.contains(target)) return;
+
+    dismissManager.dismiss(id);
+  };
+
+  document.addEventListener("keydown", escapeHandler);
+
+  return () => {
+    document.removeEventListener("keydown", escapeHandler);
+  };
+});
+
 const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
   const context = input.context;
 
@@ -46,7 +66,10 @@ const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
     if (!el) return;
 
     const initialFocusEl = context.initialFocusEl?.();
-    trap = createFocusTrap(el, { initialFocus: initialFocusEl });
+    trap = createFocusTrap(el, {
+      initialFocus: initialFocusEl,
+      escapeDeactivates: false,
+    });
     trap.activate();
   });
 
@@ -78,12 +101,14 @@ export const machine = createMachine(
         invoke: [
           {
             src: "outsideInteractLogic",
-            input: ({ context }) => ({
-              context,
-            }),
+            input: ({ context }) => ({ context }),
           },
           {
             src: "focusTrapLogic",
+            input: ({ context }) => ({ context }),
+          },
+          {
+            src: "escapeLogic",
             input: ({ context }) => ({ context }),
           },
         ],
@@ -127,6 +152,11 @@ export const machine = createMachine(
             src: "focusTrapLogic";
             logic: typeof focusTrapLogic;
             input: { context: Context };
+          }
+        | {
+            src: "escapeLogic";
+            logic: typeof escapeLogic;
+            input: { context: Context };
           },
     },
   },
@@ -141,6 +171,7 @@ export const machine = createMachine(
     actors: {
       outsideInteractLogic: outsideInteractionLogic,
       focusTrapLogic: focusTrapLogic,
+      escapeLogic: escapeLogic,
     },
   }
 );
