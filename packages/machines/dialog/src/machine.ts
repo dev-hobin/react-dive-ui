@@ -1,9 +1,12 @@
 import { dismissManager } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
+
 import { Context, Events } from "./types";
 import { dom } from "./dom";
 
-const outsideInteractionLogic = fromCallback<Events, { context: Context }>(
+import { createFocusTrap, type FocusTrap } from "focus-trap";
+
+const outsideInteractionLogic = fromCallback<any, { context: Context }>(
   ({ sendBack, input }) => {
     const { id } = input.context;
 
@@ -34,6 +37,25 @@ const outsideInteractionLogic = fromCallback<Events, { context: Context }>(
   }
 );
 
+const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
+  const context = input.context;
+
+  let trap: FocusTrap | null = null;
+  const rId = requestAnimationFrame(() => {
+    const el = dom.getPanelEl(context);
+    if (!el) return;
+
+    const initialFocusEl = context.initialFocusEl?.();
+    trap = createFocusTrap(el, { initialFocus: initialFocusEl });
+    trap.activate();
+  });
+
+  return () => {
+    cancelAnimationFrame(rId);
+    trap?.deactivate();
+  };
+});
+
 export const machine = createMachine(
   {
     id: "Dialog",
@@ -53,12 +75,18 @@ export const machine = createMachine(
         ],
       },
       opened: {
-        invoke: {
-          src: "outsideInteractLogic",
-          input: ({ context }) => ({
-            context,
-          }),
-        },
+        invoke: [
+          {
+            src: "outsideInteractLogic",
+            input: ({ context }) => ({
+              context,
+            }),
+          },
+          {
+            src: "focusTrapLogic",
+            input: ({ context }) => ({ context }),
+          },
+        ],
         on: {
           CLOSE: {
             target: "closed",
@@ -81,15 +109,25 @@ export const machine = createMachine(
     types: {
       events: {} as Events,
       context: {} as Context,
-      input: {} as { id: string; open?: boolean },
+      input: {} as {
+        id: string;
+        open?: boolean;
+        initialFocus?: () => HTMLElement | null;
+      },
       actions: {} as
         | { type: "setIsOpen"; params: { open: boolean } }
         | { type: "dismissLayer" },
-      actors: {} as {
-        src: "outsideInteractLogic";
-        logic: typeof outsideInteractionLogic;
-        input: { context: Context };
-      },
+      actors: {} as
+        | {
+            src: "outsideInteractLogic";
+            logic: typeof outsideInteractionLogic;
+            input: { context: Context };
+          }
+        | {
+            src: "focusTrapLogic";
+            logic: typeof focusTrapLogic;
+            input: { context: Context };
+          },
     },
   },
   {
@@ -102,6 +140,7 @@ export const machine = createMachine(
     guards: { isOpen: ({ context }) => context.open },
     actors: {
       outsideInteractLogic: outsideInteractionLogic,
+      focusTrapLogic: focusTrapLogic,
     },
   }
 );

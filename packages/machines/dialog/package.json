@@ -23,9 +23,10 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "xstate": "5.0.0-beta.27",
+    "@react-dive-ui/dismissible-layer": "workspace:*",
     "@react-dive-ui/properties": "workspace:*",
-    "@react-dive-ui/dismissible-layer": "workspace:*"
+    "focus-trap": "^7.5.3",
+    "xstate": "5.0.0-beta.27"
   },
   "publishConfig": {
     "access": "public"
