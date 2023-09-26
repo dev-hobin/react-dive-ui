@@ -7,6 +7,7 @@ export type Send = Service["send"];
 export type Context = {
   id: string;
   open: boolean;
+  type: "modal" | "non-modal";
   initialFocusEl: () => HTMLElement | undefined;
 };
 export type Events = { type: "OPEN" } | { type: "CLOSE" };

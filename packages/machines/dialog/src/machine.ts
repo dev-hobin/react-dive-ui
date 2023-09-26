@@ -1,4 +1,4 @@
-import { dismissManager } from "@react-dive-ui/dismissible-layer";
+import { dismissManager, Layer } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 
 import { Context, Events } from "./types";
@@ -6,48 +6,55 @@ import { dom } from "./dom";
 
 import { createFocusTrap, type FocusTrap } from "focus-trap";
 
-const outsideInteractionLogic = fromCallback<any, { context: Context }>(
-  ({ sendBack, input }) => {
-    const { id } = input.context;
+const outsideInteractionLogic = fromCallback<
+  any,
+  {
+    layer: Layer;
+    getTargetEl: () => HTMLElement | null;
+  }
+>(({ input }) => {
+  const { layer, getTargetEl } = input;
 
-    dismissManager.register({
-      type: "modal",
-      id: id,
-      dismiss: () => sendBack({ type: "CLOSE" }),
-    });
+  dismissManager.register(layer);
 
-    const outsideClickHandler = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const panelEl = dom.getPanelEl(input.context);
-      if (!target || !panelEl) return;
-      if (panelEl.contains(target)) return;
+  const outsideClickHandler = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target) return;
 
-      dismissManager.dismiss(id);
-    };
+    const el = getTargetEl();
+    if (!el) return;
+    if (el.contains(target)) return;
 
-    document.addEventListener("click", outsideClickHandler, {
+    dismissManager.dismiss(layer.id);
+  };
+
+  document.addEventListener("click", outsideClickHandler, {
+    capture: true,
+  });
+
+  return () => {
+    document.removeEventListener("click", outsideClickHandler, {
       capture: true,
     });
+  };
+});
 
-    return () => {
-      document.removeEventListener("click", outsideClickHandler, {
-        capture: true,
-      });
-    };
-  }
-);
-
-const escapeLogic = fromCallback<any, { context: Context }>(({ input }) => {
-  const { id } = input.context;
+const escapeLogic = fromCallback<
+  any,
+  { layerId: Layer["id"]; getTargetEl: () => HTMLElement | null }
+>(({ input }) => {
+  const { layerId, getTargetEl } = input;
   const escapeHandler = (event: KeyboardEvent) => {
     if (event.key !== "Escape") return;
 
     const target = event.target as HTMLElement;
-    const panelEl = dom.getPanelEl(input.context);
-    if (!target || !panelEl) return;
-    if (!panelEl.contains(target)) return;
+    if (!target) return;
 
-    dismissManager.dismiss(id);
+    const el = getTargetEl();
+    if (!el) return;
+    if (!el.contains(target)) return;
+
+    dismissManager.dismiss(layerId);
   };
 
   document.addEventListener("keydown", escapeHandler);
@@ -57,15 +64,21 @@ const escapeLogic = fromCallback<any, { context: Context }>(({ input }) => {
   };
 });
 
-const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
-  const context = input.context;
+const focusTrapLogic = fromCallback<
+  any,
+  {
+    getTargetEl: () => HTMLElement | null;
+    getInitialFocusEl?: () => HTMLElement | undefined;
+  }
+>(({ input }) => {
+  const { getInitialFocusEl, getTargetEl } = input;
 
   let trap: FocusTrap | null = null;
   const rId = requestAnimationFrame(() => {
-    const el = dom.getPanelEl(context);
+    const el = getTargetEl();
     if (!el) return;
 
-    const initialFocusEl = context.initialFocusEl?.();
+    const initialFocusEl = getInitialFocusEl?.();
     trap = createFocusTrap(el, {
       initialFocus: initialFocusEl,
       escapeDeactivates: false,
@@ -79,7 +92,7 @@ const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
   };
 });
 
-const scrollLockLogic = fromCallback<any, { context: Context }>(() => {
+const scrollLockLogic = fromCallback(() => {
   const overflow = getComputedStyle(document.body).overflow;
 
   document.body.style.overflow = "hidden";
@@ -94,6 +107,7 @@ export const machine = createMachine(
     initial: "setup",
     context: ({ input }) => ({
       id: input.id,
+      type: input.type,
       open: input.open ?? false,
       initialFocusEl: input.initialFocusEl ?? (() => undefined),
     }),
@@ -111,20 +125,30 @@ export const machine = createMachine(
         invoke: [
           {
             src: "outsideInteractLogic",
-            input: ({ context }) => ({ context }),
+            input: ({ context, self }) => ({
+              layer: {
+                id: context.id,
+                type: context.type,
+                dismiss: () => self.send({ type: "CLOSE" }),
+              },
+              getTargetEl: () => dom.getPanelEl(context),
+            }),
           },
           {
             src: "focusTrapLogic",
-            input: ({ context }) => ({ context }),
+            input: ({ context }) => ({
+              getTargetEl: () => dom.getPanelEl(context),
+              getInitialFocusEl: context.initialFocusEl,
+            }),
           },
           {
             src: "escapeLogic",
-            input: ({ context }) => ({ context }),
+            input: ({ context }) => ({
+              getTargetEl: () => dom.getPanelEl(context),
+              layerId: context.id,
+            }),
           },
-          {
-            src: "scrollLockLogic",
-            input: ({ context }) => ({ context }),
-          },
+          { src: "scrollLockLogic" },
         ],
         on: {
           CLOSE: {
@@ -150,6 +174,7 @@ export const machine = createMachine(
       context: {} as Context,
       input: {} as {
         id: string;
+        type: "modal" | "non-modal";
         open?: boolean;
         initialFocusEl?: () => HTMLElement | undefined;
       },

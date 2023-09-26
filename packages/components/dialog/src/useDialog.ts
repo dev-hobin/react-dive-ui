@@ -6,6 +6,7 @@ import type { Context, Send, Service } from "@react-dive-ui/dialog-machine";
 
 type DialogOptions = {
   id?: string;
+  type: "modal" | "non-modal";
   initialOpen?: boolean;
 };
 
@@ -24,6 +25,7 @@ export function useDialog(options: DialogOptions = { type: "modal" }): Dialog {
   const [state, send, service] = useActor(machine, {
     input: {
       id: options.id ?? internalId,
+      type: options.type,
       open: options.initialOpen ?? false,
     },
   });
