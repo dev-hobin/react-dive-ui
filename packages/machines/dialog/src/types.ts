@@ -6,6 +6,6 @@ export type Service = ActorRefFrom<typeof machine>;
 export type Context = {
   id: string;
   open: boolean;
-  initialFocusEl?: () => HTMLElement | undefined;
+  initialFocusEl: () => HTMLElement | undefined;
 };
 export type Events = { type: "OPEN" } | { type: "CLOSE" };

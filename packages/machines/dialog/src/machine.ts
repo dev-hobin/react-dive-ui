@@ -86,6 +86,7 @@ export const machine = createMachine(
     context: ({ input }) => ({
       id: input.id,
       open: input.open ?? false,
+      initialFocusEl: input.initialFocusEl ?? (() => undefined),
     }),
     states: {
       setup: {
@@ -137,7 +138,7 @@ export const machine = createMachine(
       input: {} as {
         id: string;
         open?: boolean;
-        initialFocus?: () => HTMLElement | null;
+        initialFocusEl?: () => HTMLElement | undefined;
       },
       actions: {} as
         | { type: "setIsOpen"; params: { open: boolean } }
