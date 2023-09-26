@@ -79,6 +79,15 @@ const focusTrapLogic = fromCallback<any, { context: Context }>(({ input }) => {
   };
 });
 
+const scrollLockLogic = fromCallback<any, { context: Context }>(() => {
+  const overflow = getComputedStyle(document.body).overflow;
+
+  document.body.style.overflow = "hidden";
+  return () => {
+    document.body.style.overflow = overflow;
+  };
+});
+
 export const machine = createMachine(
   {
     id: "Dialog",
@@ -110,6 +119,10 @@ export const machine = createMachine(
           },
           {
             src: "escapeLogic",
+            input: ({ context }) => ({ context }),
+          },
+          {
+            src: "scrollLockLogic",
             input: ({ context }) => ({ context }),
           },
         ],
@@ -158,6 +171,11 @@ export const machine = createMachine(
             src: "escapeLogic";
             logic: typeof escapeLogic;
             input: { context: Context };
+          }
+        | {
+            src: "scrollLockLogic";
+            logic: typeof scrollLockLogic;
+            input: { context: Context };
           },
     },
   },
@@ -173,6 +191,7 @@ export const machine = createMachine(
       outsideInteractLogic: outsideInteractionLogic,
       focusTrapLogic: focusTrapLogic,
       escapeLogic: escapeLogic,
+      scrollLockLogic: scrollLockLogic,
     },
   }
 );
