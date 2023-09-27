@@ -12,6 +12,7 @@ export function connect(service: Service) {
   return {
     triggerProps: properties.button({
       type: "button",
+      id: dom.getTriggerId(context),
       onClick: () => {
         send({ type: "OPEN" });
       },

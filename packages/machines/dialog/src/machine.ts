@@ -1,96 +1,59 @@
-import { dismissManager, Layer } from "@react-dive-ui/dismissible-layer";
+import { dismissManager } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 
 import { Context, Events } from "./types";
 import { dom } from "./dom";
 
-import { createFocusTrap, type FocusTrap } from "focus-trap";
+type OutsideClickLogicOption = {
+  id: string;
+  type: "modal" | "non-modal";
+  getElement: () => HTMLElement | undefined | null;
+  dismiss: () => void;
+  exclude: (HTMLElement | (() => HTMLElement | undefined | null))[];
+};
+const outsideClickLogic = fromCallback<any, OutsideClickLogicOption>(
+  ({ input }) => {
+    const cleanups: Array<() => void> = [];
+    const rId = requestAnimationFrame(() => {
+      const element = input.getElement();
+      if (!element) return;
 
-const outsideInteractionLogic = fromCallback<
-  any,
-  {
-    layer: Layer;
-    getTargetEl: () => HTMLElement | null;
-  }
->(({ input }) => {
-  const { layer, getTargetEl } = input;
+      dismissManager.add({
+        type: input.type,
+        id: input.id,
+        element: element,
+        dismiss: input.dismiss,
+      });
+      cleanups.push(() => {
+        dismissManager.remove(input.id);
+      });
 
-  dismissManager.register(layer);
+      const dismissHandler = (ev: MouseEvent) => {
+        const target = ev.target as Node;
+        const excludeEls = input.exclude.map((v) =>
+          typeof v === "function" ? v() : v
+        );
+        if (dismissManager.isUnderModal(input.id)) return;
+        if (excludeEls.find((el) => el?.contains(target))) return;
 
-  const outsideClickHandler = (event: MouseEvent) => {
-    const target = event.target as HTMLElement;
-    if (!target) return;
+        dismissManager.dismiss(target);
+      };
 
-    const el = getTargetEl();
-    if (!el) return;
-    if (el.contains(target)) return;
-
-    dismissManager.dismiss(layer.id);
-  };
-
-  document.addEventListener("click", outsideClickHandler, {
-    capture: true,
-  });
-
-  return () => {
-    document.removeEventListener("click", outsideClickHandler, {
-      capture: true,
+      document.addEventListener("click", dismissHandler, { capture: true });
+      cleanups.push(() => {
+        document.removeEventListener("click", dismissHandler, {
+          capture: true,
+        });
+      });
     });
-  };
-});
+    cleanups.push(() => cancelAnimationFrame(rId));
 
-const escapeLogic = fromCallback<
-  any,
-  { layerId: Layer["id"]; getTargetEl: () => HTMLElement | null }
->(({ input }) => {
-  const { layerId, getTargetEl } = input;
-  const escapeHandler = (event: KeyboardEvent) => {
-    if (event.key !== "Escape") return;
-
-    const target = event.target as HTMLElement;
-    if (!target) return;
-
-    const el = getTargetEl();
-    if (!el) return;
-    if (!el.contains(target)) return;
-
-    dismissManager.dismiss(layerId);
-  };
-
-  document.addEventListener("keydown", escapeHandler);
-
-  return () => {
-    document.removeEventListener("keydown", escapeHandler);
-  };
-});
-
-const focusTrapLogic = fromCallback<
-  any,
-  {
-    getTargetEl: () => HTMLElement | null;
-    getInitialFocusEl?: () => HTMLElement | undefined;
+    return () => {
+      console.log("cleanup");
+      cleanups.forEach((cleanup) => cleanup());
+    };
   }
->(({ input }) => {
-  const { getInitialFocusEl, getTargetEl } = input;
-
-  let trap: FocusTrap | null = null;
-  const rId = requestAnimationFrame(() => {
-    const el = getTargetEl();
-    if (!el) return;
-
-    const initialFocusEl = getInitialFocusEl?.();
-    trap = createFocusTrap(el, {
-      initialFocus: initialFocusEl,
-      escapeDeactivates: false,
-    });
-    trap.activate();
-  });
-
-  return () => {
-    cancelAnimationFrame(rId);
-    trap?.deactivate();
-  };
-});
+);
 
 const scrollLockLogic = fromCallback(() => {
   const overflow = getComputedStyle(document.body).overflow;
@@ -124,28 +87,13 @@ export const machine = createMachine(
       opened: {
         invoke: [
           {
-            src: "outsideInteractLogic",
+            src: "outsideClickLogic",
             input: ({ context, self }) => ({
-              layer: {
-                id: context.id,
-                type: context.type,
-                dismiss: () => self.send({ type: "CLOSE" }),
-              },
-              getTargetEl: () => dom.getPanelEl(context),
-            }),
-          },
-          {
-            src: "focusTrapLogic",
-            input: ({ context }) => ({
-              getTargetEl: () => dom.getPanelEl(context),
-              getInitialFocusEl: context.initialFocusEl,
-            }),
-          },
-          {
-            src: "escapeLogic",
-            input: ({ context }) => ({
-              getTargetEl: () => dom.getPanelEl(context),
-              layerId: context.id,
+              id: context.id,
+              type: context.type,
+              getElement: () => dom.getPanelEl(context),
+              dismiss: () => self.send({ type: "CLOSE" }),
+              exclude: [() => dom.getTriggerEl(context)],
             }),
           },
           { src: "scrollLockLogic" },
@@ -178,29 +126,20 @@ export const machine = createMachine(
         open?: boolean;
         initialFocusEl?: () => HTMLElement | undefined;
       },
+
       actions: {} as
         | { type: "setIsOpen"; params: { open: boolean } }
         | { type: "dismissLayer" },
+
       actors: {} as
         | {
-            src: "outsideInteractLogic";
-            logic: typeof outsideInteractionLogic;
-            input: { context: Context };
-          }
-        | {
-            src: "focusTrapLogic";
-            logic: typeof focusTrapLogic;
-            input: { context: Context };
-          }
-        | {
-            src: "escapeLogic";
-            logic: typeof escapeLogic;
-            input: { context: Context };
+            src: "outsideClickLogic";
+            logic: typeof outsideClickLogic;
+            input: OutsideClickLogicOption;
           }
         | {
             src: "scrollLockLogic";
             logic: typeof scrollLockLogic;
-            input: { context: Context };
           },
     },
   },
@@ -208,14 +147,12 @@ export const machine = createMachine(
     actions: {
       setIsOpen: assign(({ action }) => ({ open: action.params.open })),
       dismissLayer: ({ context }) => {
-        dismissManager.dismiss(context.id);
+        dismissManager.remove(context.id);
       },
     },
     guards: { isOpen: ({ context }) => context.open },
     actors: {
-      outsideInteractLogic: outsideInteractionLogic,
-      focusTrapLogic: focusTrapLogic,
-      escapeLogic: escapeLogic,
+      outsideClickLogic: outsideClickLogic,
       scrollLockLogic: scrollLockLogic,
     },
   }

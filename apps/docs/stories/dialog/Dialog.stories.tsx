@@ -11,16 +11,51 @@ const meta = {
 
 export default meta;
 
-export const Default = () => {
-  const { state, service } = useDialog();
-  const { state: childState, service: childService } = useDialog();
+const Child = () => {
+  const { state: childState, service: childService } = useDialog({
+    type: "modal",
+  });
 
-  const { triggerProps, closeProps, panelProps } = connect(service);
   const {
     triggerProps: childTriggerProps,
     closeProps: childCloseProps,
     panelProps: childPanelProps,
   } = connect(childService);
+
+  return (
+    <>
+      <button {...childTriggerProps} className={css.trigger}>
+        Child Trigger
+      </button>
+      {childState.open &&
+        createPortal(
+          <>
+            <div className={css.backdrop}></div>
+            <div {...childPanelProps} className={css.panel}>
+              <h2 data-part="title" className={css.title}>
+                Title
+              </h2>
+              <p data-part="description" className={css.description}>
+                description
+              </p>
+
+              <p>Child Content</p>
+
+              <button {...childCloseProps} className={css.close}>
+                Child Close
+              </button>
+            </div>
+          </>,
+          document.body
+        )}
+    </>
+  );
+};
+
+export const Default = () => {
+  const { state, service } = useDialog({ type: "modal" });
+
+  const { triggerProps, closeProps, panelProps } = connect(service);
   return (
     <div>
       <button {...triggerProps} className={css.trigger}>
@@ -157,30 +192,7 @@ export const Default = () => {
               <p data-part="description" className={css.description}>
                 description
               </p>
-              <button {...childTriggerProps} className={css.trigger}>
-                Child Trigger
-              </button>
-              {childState.open &&
-                createPortal(
-                  <>
-                    <div className={css.backdrop}></div>
-                    <div {...childPanelProps} className={css.panel}>
-                      <h2 data-part="title" className={css.title}>
-                        Title
-                      </h2>
-                      <p data-part="description" className={css.description}>
-                        description
-                      </p>
-
-                      <p>Child Content</p>
-
-                      <button {...childCloseProps} className={css.close}>
-                        Child Close
-                      </button>
-                    </div>
-                  </>,
-                  document.body
-                )}
+              <Child />
               <button {...closeProps} className={css.close}>
                 Close
               </button>
