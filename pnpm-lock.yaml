@@ -32,6 +32,9 @@ importers:
       '@react-dive-ui/checkbox':
         specifier: workspace:0.0.0
         version: link:../../packages/components/checkbox
+      '@react-dive-ui/dialog':
+        specifier: workspace:0.0.0
+        version: link:../../packages/components/dialog
       '@react-dive-ui/dive':
         specifier: workspace:0.0.0
         version: link:../../packages/core/dive
@@ -192,6 +195,52 @@ importers:
         specifier: ^5.1.6
         version: 5.2.2
 
+  packages/components/dialog:
+    dependencies:
+      '@react-dive-ui/compose-event-handlers':
+        specifier: workspace:*
+        version: link:../../utils/composeEventHandlers
+      '@react-dive-ui/dialog-machine':
+        specifier: workspace:*
+        version: link:../../machines/dialog
+      '@react-dive-ui/dive':
+        specifier: workspace:*
+        version: link:../../core/dive
+      '@react-dive-ui/merge-props':
+        specifier: workspace:*
+        version: link:../../utils/mergeProps
+      '@xstate/react':
+        specifier: 4.0.0-beta.8
+        version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)(xstate@5.0.0-beta.27)
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.2.20
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.2.7
+      eslint:
+        specifier: ^8.46.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.1.6
+        version: 5.2.2
+
   packages/components/radio-group:
     dependencies:
       '@react-dive-ui/compose-event-handlers':
@@ -282,6 +331,24 @@ importers:
         version: 7.2.0(typescript@5.2.2)
       typescript:
         specifier: ^5.1.6
+        version: 5.2.2
+
+  packages/core/dismissible-layer:
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
         version: 5.2.2
 
   packages/core/dive:
@@ -396,6 +463,37 @@ importers:
       '@react-dive-ui/properties':
         specifier: workspace:*
         version: link:../../core/properties
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
+  packages/machines/dialog:
+    dependencies:
+      '@react-dive-ui/dismissible-layer':
+        specifier: workspace:*
+        version: link:../../core/dismissible-layer
+      '@react-dive-ui/properties':
+        specifier: workspace:*
+        version: link:../../core/properties
+      focus-trap:
+        specifier: ^7.5.3
+        version: 7.5.3
       xstate:
         specifier: 5.0.0-beta.27
         version: 5.0.0-beta.27
@@ -6717,6 +6815,12 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: true
 
+  /focus-trap@7.5.3:
+    resolution: {integrity: sha512-7UsT/eSJcTPF0aZp73u7hBRTABz26knRRTJfoTGFCQD5mUImLIIOwWWCrtoQdmWa7dykBi6H+Cp5i3S/kvsMeA==}
+    dependencies:
+      tabbable: 6.2.0
+    dev: false
+
   /for-each@0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
     dependencies:
@@ -9607,6 +9711,10 @@ packages:
   /synchronous-promise@2.0.17:
     resolution: {integrity: sha512-AsS729u2RHUfEra9xJrE39peJcc2stq2+poBXX8bcM08Y6g9j/i/PUzwNQqkaJde7Ntg1TO7bSREbR5sdosQ+g==}
     dev: true
+
+  /tabbable@6.2.0:
+    resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
+    dev: false
 
   /tar-fs@2.1.1:
     resolution: {integrity: sha512-V0r2Y9scmbDRLCNex/+hYzvp/zyYjvFbHPNgVTKfQvVrb6guiE/fxP+XblDNR011utopbkex2nM4dHNV6GDsng==}
