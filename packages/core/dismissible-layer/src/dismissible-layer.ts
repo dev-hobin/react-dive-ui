@@ -3,40 +3,101 @@ export type Layer = {
   type: "modal" | "non-modal";
   element: HTMLElement;
   dismiss: () => void;
+  parentId?: Layer["id"];
+  childIds?: Layer["id"][];
 };
 
 class DismissManager {
-  private layers: Layer[] = [];
+  private layerMap: Map<Layer["id"], Layer> = new Map();
 
-  add(layer: Layer) {
-    this.layers.push(layer);
-    console.log("layers", this.layers);
+  registerLayer(layer: Layer) {
+    this.layerMap.set(layer.id, layer);
+
+    const parentId = layer.parentId;
+    if (!parentId) return;
+
+    console.log("parentId", parentId);
+
+    const parentLayer = this.layerMap.get(parentId);
+    if (!parentLayer) return;
+
+    this.layerMap.set(parentId, {
+      ...parentLayer,
+      childIds: [...(parentLayer.childIds ?? []), layer.id],
+    });
   }
 
-  remove(id: string) {
-    this.layers = this.layers.filter((l) => l.id !== id);
-  }
+  unregister(id: string) {
+    const layer = this.layerMap.get(id);
 
-  isUnderModal(id: string) {
-    const index = this.layers.findIndex((l) => l.id === id);
-    return !!this.layers.find((l, i) => i > index && l.type === "modal");
-  }
-
-  dismiss(node: Node) {
-    for (let i = this.layers.length - 1; i >= 0; i--) {
-      const layer = this.layers[i];
-
-      if (layer.element.contains(node)) {
-        return;
-      }
-
-      layer.dismiss();
-      this.remove(layer.id);
-
-      if (layer.type === "modal") {
-        return;
+    if (layer?.parentId) {
+      const parentId = layer.parentId;
+      const parentLayer = this.layerMap.get(parentId);
+      if (parentLayer) {
+        this.layerMap.set(parentId, {
+          ...parentLayer,
+          childIds: parentLayer.childIds?.filter((childId) => childId !== id),
+        });
       }
     }
+
+    this.layerMap.delete(id);
+  }
+
+  handleDismiss(id: Layer["id"]) {
+    if (!this.isDismissible(id)) return;
+
+    const index = this.getIndex(id);
+    const layers = this.getLayers();
+    const layer = layers[index];
+    const dismissLayers =
+      layer.type === "modal" ? layers.splice(index) : layers.splice(index, 1);
+
+    dismissLayers.reverse().forEach((l) => {
+      l.dismiss();
+      this.unregister(l.id);
+    });
+  }
+
+  private isDismissible(id: Layer["id"]) {
+    const layer = this.layerMap.get(id);
+    if (!layer) return false;
+
+    return !this.isUnderModal(layer);
+  }
+
+  private isUnderModal(layer: Layer) {
+    const index = this.getIndex(layer.id);
+    return !!this.getLayers().find((l, i) => i > index && l.type === "modal");
+  }
+
+  private getIndex(id: Layer["id"]) {
+    const layers = Array.from(this.layerMap.values());
+    return layers.findIndex((l) => l.id === id);
+  }
+
+  getNestedLayers(id: Layer["id"]) {
+    const result: Layer[] = [];
+
+    const search = (id: Layer["id"]) => {
+      const layer = this.layerMap.get(id);
+      if (layer) {
+        result.push(layer);
+        layer.childIds?.forEach((childId) => {
+          search(childId);
+        });
+      }
+    };
+
+    const layer = this.layerMap.get(id);
+    if (!layer) return result;
+    else search(layer.id);
+
+    return result;
+  }
+
+  private getLayers() {
+    return Array.from(this.layerMap.values());
   }
 }
 

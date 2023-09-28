@@ -13,7 +13,9 @@ export default meta;
 
 const Child = () => {
   const { state: childState, service: childService } = useDialog({
-    type: "modal",
+    id: "child",
+    type: "non-modal",
+    parentLayerId: "parent",
   });
 
   const {
@@ -30,8 +32,12 @@ const Child = () => {
       {childState.open &&
         createPortal(
           <>
-            <div className={css.backdrop}></div>
-            <div {...childPanelProps} className={css.panel}>
+            {/* <div className={css.backdrop}></div> */}
+            <div
+              {...childPanelProps}
+              className={css.panel}
+              style={{ width: 100 }}
+            >
               <h2 data-part="title" className={css.title}>
                 Title
               </h2>
@@ -53,7 +59,7 @@ const Child = () => {
 };
 
 export const Default = () => {
-  const { state, service } = useDialog({ type: "modal" });
+  const { state, service } = useDialog({ type: "modal", id: "parent" });
 
   const { triggerProps, closeProps, panelProps } = connect(service);
   return (

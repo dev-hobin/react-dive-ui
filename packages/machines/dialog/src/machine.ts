@@ -1,4 +1,4 @@
-import { dismissManager } from "@react-dive-ui/dismissible-layer";
+import { Layer, dismissManager } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 import { createFocusTrap } from "focus-trap";
 
@@ -11,33 +11,47 @@ type OutsideClickLogicOption = {
   getElement: () => HTMLElement | undefined | null;
   dismiss: () => void;
   exclude: (HTMLElement | (() => HTMLElement | undefined | null))[];
+  parentLayerId?: Layer["id"];
+  childLayerIds?: Layer["id"][];
 };
 const outsideClickLogic = fromCallback<any, OutsideClickLogicOption>(
   ({ input }) => {
+    console.log("outsideClick", input);
     const cleanups: Array<() => void> = [];
     const rId = requestAnimationFrame(() => {
       const element = input.getElement();
       if (!element) return;
 
-      dismissManager.add({
+      dismissManager.registerLayer({
         type: input.type,
         id: input.id,
         element: element,
         dismiss: input.dismiss,
+        parentId: input.parentLayerId,
+        childIds: input.childLayerIds,
       });
       cleanups.push(() => {
-        dismissManager.remove(input.id);
+        dismissManager.unregister(input.id);
       });
 
       const dismissHandler = (ev: MouseEvent) => {
-        const target = ev.target as Node;
+        const target = ev.target as HTMLElement;
         const excludeEls = input.exclude.map((v) =>
           typeof v === "function" ? v() : v
         );
-        if (dismissManager.isUnderModal(input.id)) return;
+
+        if (
+          element.contains(target) ||
+          dismissManager
+            .getNestedLayers(input.id)
+            .find((l) => l.element.contains(target))
+        ) {
+          return;
+        }
         if (excludeEls.find((el) => el?.contains(target))) return;
 
-        dismissManager.dismiss(target);
+        console.log("execute");
+        dismissManager.handleDismiss(input.id);
       };
 
       document.addEventListener("click", dismissHandler, { capture: true });
@@ -50,7 +64,6 @@ const outsideClickLogic = fromCallback<any, OutsideClickLogicOption>(
     cleanups.push(() => cancelAnimationFrame(rId));
 
     return () => {
-      console.log("cleanup");
       cleanups.forEach((cleanup) => cleanup());
     };
   }
@@ -99,6 +112,8 @@ export const machine = createMachine(
       type: input.type,
       open: input.open ?? false,
       initialFocusEl: input.initialFocusEl ?? (() => undefined),
+      parentLayerId: input.parentLayerId ?? null,
+      childLayerIds: input.childLayerIds ?? null,
     }),
     states: {
       setup: {
@@ -120,6 +135,8 @@ export const machine = createMachine(
               getElement: () => dom.getPanelEl(context),
               dismiss: () => self.send({ type: "CLOSE" }),
               exclude: [() => dom.getTriggerEl(context)],
+              parentLayerId: context.parentLayerId ?? undefined,
+              childLayerIds: context.childLayerIds ?? [],
             }),
           },
           {
@@ -158,6 +175,8 @@ export const machine = createMachine(
         type: "modal" | "non-modal";
         open?: boolean;
         initialFocusEl?: () => HTMLElement | undefined;
+        parentLayerId?: Layer["id"];
+        childLayerIds?: Layer["id"][];
       },
 
       actions: {} as
@@ -184,7 +203,7 @@ export const machine = createMachine(
     actions: {
       setIsOpen: assign(({ action }) => ({ open: action.params.open })),
       dismissLayer: ({ context }) => {
-        dismissManager.remove(context.id);
+        dismissManager.unregister(context.id);
       },
     },
     guards: { isOpen: ({ context }) => context.open },
