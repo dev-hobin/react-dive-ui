@@ -1,5 +1,6 @@
 import { dismissManager } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
+import { createFocusTrap } from "focus-trap";
 
 import { Context, Events } from "./types";
 import { dom } from "./dom";
@@ -64,6 +65,31 @@ const scrollLockLogic = fromCallback(() => {
   };
 });
 
+type FocusTrapLogicOption = {
+  getElement: () => HTMLElement | undefined | null;
+  getInitialFocusElement?: () => HTMLElement | undefined | null;
+};
+const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
+  const cleanups: Array<() => void> = [];
+  const rId = requestAnimationFrame(() => {
+    const element = input.getElement();
+    if (!element) return;
+
+    const trap = createFocusTrap(element, {
+      fallbackFocus: element,
+      initialFocus: input.getInitialFocusElement?.() ?? undefined,
+    });
+    trap.activate();
+
+    cleanups.push(() => trap.deactivate());
+  });
+  cleanups.push(() => cancelAnimationFrame(rId));
+
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
+  };
+});
+
 export const machine = createMachine(
   {
     id: "Dialog",
@@ -94,6 +120,13 @@ export const machine = createMachine(
               getElement: () => dom.getPanelEl(context),
               dismiss: () => self.send({ type: "CLOSE" }),
               exclude: [() => dom.getTriggerEl(context)],
+            }),
+          },
+          {
+            src: "focusTrapLogic",
+            input: ({ context }) => ({
+              getElement: () => dom.getPanelEl(context),
+              getInitialFocusElement: context.initialFocusEl,
             }),
           },
           { src: "scrollLockLogic" },
@@ -140,6 +173,10 @@ export const machine = createMachine(
         | {
             src: "scrollLockLogic";
             logic: typeof scrollLockLogic;
+          }
+        | {
+            src: "focusTrapLogic";
+            logic: typeof focusTrapLogic;
           },
     },
   },
@@ -154,6 +191,7 @@ export const machine = createMachine(
     actors: {
       outsideClickLogic: outsideClickLogic,
       scrollLockLogic: scrollLockLogic,
+      focusTrapLogic: focusTrapLogic,
     },
   }
 );
