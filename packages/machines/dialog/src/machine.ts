@@ -91,10 +91,51 @@ const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
     const trap = createFocusTrap(element, {
       fallbackFocus: element,
       initialFocus: input.getInitialFocusElement?.() ?? undefined,
+      escapeDeactivates: false,
     });
     trap.activate();
 
     cleanups.push(() => trap.deactivate());
+  });
+  cleanups.push(() => cancelAnimationFrame(rId));
+
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
+  };
+});
+
+type EscapeLogicOption = {
+  id: string;
+  getElement: () => HTMLElement | undefined | null;
+};
+const escapeLogic = fromCallback<any, EscapeLogicOption>(({ input }) => {
+  const cleanups: Array<() => void> = [];
+  const rId = requestAnimationFrame(() => {
+    const element = input.getElement();
+    if (!element) return;
+
+    const escapeHandler = (ev: KeyboardEvent) => {
+      if (ev.key !== "Escape") return;
+      const target = ev.target as HTMLElement;
+
+      console.log("layers", dismissManager.getNestedLayers(input.id));
+
+      if (
+        !element.contains(target) ||
+        dismissManager
+          .getNestedLayers(input.id)
+          .find((l) => l.element.contains(target))
+      ) {
+        return;
+      }
+
+      dismissManager.handleDismiss(input.id);
+    };
+
+    document.addEventListener("keydown", escapeHandler);
+    cleanups.push(() => {
+      document.removeEventListener("keydown", escapeHandler);
+    });
   });
   cleanups.push(() => cancelAnimationFrame(rId));
 
@@ -144,6 +185,13 @@ export const machine = createMachine(
             input: ({ context }) => ({
               getElement: () => dom.getPanelEl(context),
               getInitialFocusElement: context.initialFocusEl,
+            }),
+          },
+          {
+            src: "escapeLogic",
+            input: ({ context }) => ({
+              id: context.id,
+              getElement: () => dom.getPanelEl(context),
             }),
           },
           { src: "scrollLockLogic" },
@@ -196,6 +244,11 @@ export const machine = createMachine(
         | {
             src: "focusTrapLogic";
             logic: typeof focusTrapLogic;
+          }
+        | {
+            src: "escapeLogic";
+            logic: typeof escapeLogic;
+            input: EscapeLogicOption;
           },
     },
   },
@@ -211,6 +264,7 @@ export const machine = createMachine(
       outsideClickLogic: outsideClickLogic,
       scrollLockLogic: scrollLockLogic,
       focusTrapLogic: focusTrapLogic,
+      escapeLogic: escapeLogic,
     },
   }
 );
