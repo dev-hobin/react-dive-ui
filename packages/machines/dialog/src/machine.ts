@@ -144,6 +144,61 @@ const escapeLogic = fromCallback<any, EscapeLogicOption>(({ input }) => {
   };
 });
 
+type InertLogicOption = {
+  id: string;
+  getElement: () => HTMLElement | undefined | null;
+  enabled: boolean;
+};
+const inertLogic = fromCallback<any, InertLogicOption>(({ input }) => {
+  if (!input.enabled) return;
+
+  const cleanups: Array<() => void> = [];
+  const rId = requestAnimationFrame(() => {
+    const element = input.getElement();
+    if (!element) return;
+
+    const treeWalker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_ELEMENT,
+      {
+        acceptNode: (node) => {
+          if (!(node instanceof Element)) {
+            return NodeFilter.FILTER_SKIP;
+          }
+          if (node.tagName === "STYLE" || node.tagName === "SCRIPT") {
+            return NodeFilter.FILTER_SKIP;
+          }
+          if (
+            node.id === input.id ||
+            node.closest(`#${CSS.escape(input.id)}`)
+          ) {
+            return NodeFilter.FILTER_SKIP;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      }
+    );
+
+    const elements: Element[] = [];
+    while (treeWalker.nextNode()) {
+      const currentNode = treeWalker.currentNode as Element;
+      if (!currentNode.closest("[inert]")) {
+        currentNode.setAttribute("inert", "");
+        elements.push(currentNode);
+      }
+    }
+    cleanups.push(() => {
+      elements.forEach((el) => el.removeAttribute("inert"));
+    });
+  });
+  cleanups.push(() => cancelAnimationFrame(rId));
+
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
+  };
+});
+
 export const machine = createMachine(
   {
     id: "Dialog",
@@ -195,6 +250,15 @@ export const machine = createMachine(
             }),
           },
           { src: "scrollLockLogic" },
+          {
+            id: "inertLogic",
+            src: "inertLogic",
+            input: ({ context }) => ({
+              id: dom.getPanelId(context),
+              getElement: () => dom.getPanelEl(context),
+              enabled: context.type === "modal",
+            }),
+          },
         ],
         on: {
           CLOSE: {
@@ -249,6 +313,11 @@ export const machine = createMachine(
             src: "escapeLogic";
             logic: typeof escapeLogic;
             input: EscapeLogicOption;
+          }
+        | {
+            src: "inertLogic";
+            logic: typeof inertLogic;
+            input: InertLogicOption;
           },
     },
   },
@@ -265,6 +334,7 @@ export const machine = createMachine(
       scrollLockLogic: scrollLockLogic,
       focusTrapLogic: focusTrapLogic,
       escapeLogic: escapeLogic,
+      inertLogic: inertLogic,
     },
   }
 );
