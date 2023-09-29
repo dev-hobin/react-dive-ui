@@ -16,8 +16,6 @@ class DismissManager {
     const parentId = layer.parentId;
     if (!parentId) return;
 
-    console.log("parentId", parentId);
-
     const parentLayer = this.layerMap.get(parentId);
     if (!parentLayer) return;
 
@@ -91,7 +89,9 @@ class DismissManager {
 
     const layer = this.layerMap.get(id);
     if (!layer) return result;
-    else search(layer.id);
+    else {
+      layer.childIds?.forEach((id) => search(id));
+    }
 
     return result;
   }
