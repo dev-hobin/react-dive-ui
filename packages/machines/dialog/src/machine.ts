@@ -1,73 +1,40 @@
-import { Layer, dismissManager } from "@react-dive-ui/dismissible-layer";
+import { dismissHandler } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 import { createFocusTrap } from "focus-trap";
 
 import { Context, Events } from "./types";
 import { dom } from "./dom";
 
-type OutsideClickLogicOption = {
-  id: string;
-  type: "modal" | "non-modal";
-  getElement: () => HTMLElement | undefined | null;
+type DismissLogicOptions = {
+  getElement: () => HTMLElement | null;
   dismiss: () => void;
-  exclude: (HTMLElement | (() => HTMLElement | undefined | null))[];
-  parentLayerId?: Layer["id"];
-  childLayerIds?: Layer["id"][];
+  options: {
+    enabled: Array<"outsideClick" | "escape">;
+    modal?: boolean;
+    onOutsideClick?: (ev: MouseEvent) => void;
+    onEscape?: (ev: KeyboardEvent) => void;
+    branchFrom?: HTMLElement;
+  };
 };
-const outsideClickLogic = fromCallback<any, OutsideClickLogicOption>(
-  ({ input }) => {
-    console.log("outsideClick", input);
-    const cleanups: Array<() => void> = [];
-    const rId = requestAnimationFrame(() => {
-      const element = input.getElement();
-      if (!element) return;
+const dismissLogic = fromCallback<any, DismissLogicOptions>(({ input }) => {
+  const cleanups: Array<() => void> = [];
+  const rId = requestAnimationFrame(() => {
+    const element = input.getElement();
+    if (!element) return;
 
-      dismissManager.registerLayer({
-        type: input.type,
-        id: input.id,
-        element: element,
-        dismiss: input.dismiss,
-        parentId: input.parentLayerId,
-        childIds: input.childLayerIds,
-      });
-      cleanups.push(() => {
-        dismissManager.unregister(input.id);
-      });
-
-      const dismissHandler = (ev: MouseEvent) => {
-        const target = ev.target as HTMLElement;
-        const excludeEls = input.exclude.map((v) =>
-          typeof v === "function" ? v() : v
-        );
-
-        if (
-          element.contains(target) ||
-          dismissManager
-            .getNestedLayers(input.id)
-            .find((l) => l.element.contains(target))
-        ) {
-          return;
-        }
-        if (excludeEls.find((el) => el?.contains(target))) return;
-
-        console.log("execute");
-        dismissManager.handleDismiss(input.id);
-      };
-
-      document.addEventListener("click", dismissHandler, { capture: true });
-      cleanups.push(() => {
-        document.removeEventListener("click", dismissHandler, {
-          capture: true,
-        });
-      });
+    const cleanup = dismissHandler({
+      element,
+      dismiss: input.dismiss,
+      options: input.options,
     });
-    cleanups.push(() => cancelAnimationFrame(rId));
+    cleanups.push(cleanup);
+  });
+  cleanups.push(() => cancelAnimationFrame(rId));
 
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
-    };
-  }
-);
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
+  };
+});
 
 const scrollLockLogic = fromCallback(() => {
   const overflow = getComputedStyle(document.body).overflow;
@@ -96,46 +63,6 @@ const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
     trap.activate();
 
     cleanups.push(() => trap.deactivate());
-  });
-  cleanups.push(() => cancelAnimationFrame(rId));
-
-  return () => {
-    cleanups.forEach((cleanup) => cleanup());
-  };
-});
-
-type EscapeLogicOption = {
-  id: string;
-  getElement: () => HTMLElement | undefined | null;
-};
-const escapeLogic = fromCallback<any, EscapeLogicOption>(({ input }) => {
-  const cleanups: Array<() => void> = [];
-  const rId = requestAnimationFrame(() => {
-    const element = input.getElement();
-    if (!element) return;
-
-    const escapeHandler = (ev: KeyboardEvent) => {
-      if (ev.key !== "Escape") return;
-      const target = ev.target as HTMLElement;
-
-      console.log("layers", dismissManager.getNestedLayers(input.id));
-
-      if (
-        !element.contains(target) ||
-        dismissManager
-          .getNestedLayers(input.id)
-          .find((l) => l.element.contains(target))
-      ) {
-        return;
-      }
-
-      dismissManager.handleDismiss(input.id);
-    };
-
-    document.addEventListener("keydown", escapeHandler);
-    cleanups.push(() => {
-      document.removeEventListener("keydown", escapeHandler);
-    });
   });
   cleanups.push(() => cancelAnimationFrame(rId));
 
@@ -208,8 +135,6 @@ export const machine = createMachine(
       type: input.type,
       open: input.open ?? false,
       initialFocusEl: input.initialFocusEl ?? (() => undefined),
-      parentLayerId: input.parentLayerId ?? null,
-      childLayerIds: input.childLayerIds ?? null,
     }),
     states: {
       setup: {
@@ -224,15 +149,14 @@ export const machine = createMachine(
       opened: {
         invoke: [
           {
-            src: "outsideClickLogic",
+            src: "dismissLogic",
             input: ({ context, self }) => ({
-              id: context.id,
-              type: context.type,
               getElement: () => dom.getPanelEl(context),
               dismiss: () => self.send({ type: "CLOSE" }),
-              exclude: [() => dom.getTriggerEl(context)],
-              parentLayerId: context.parentLayerId ?? undefined,
-              childLayerIds: context.childLayerIds ?? [],
+              options: {
+                enabled: ["outsideClick", "escape"],
+                modal: context.type === "modal",
+              },
             }),
           },
           {
@@ -240,13 +164,6 @@ export const machine = createMachine(
             input: ({ context }) => ({
               getElement: () => dom.getPanelEl(context),
               getInitialFocusElement: context.initialFocusEl,
-            }),
-          },
-          {
-            src: "escapeLogic",
-            input: ({ context }) => ({
-              id: context.id,
-              getElement: () => dom.getPanelEl(context),
             }),
           },
           { src: "scrollLockLogic" },
@@ -263,10 +180,7 @@ export const machine = createMachine(
         on: {
           CLOSE: {
             target: "closed",
-            actions: [
-              { type: "setIsOpen", params: { open: false } },
-              "dismissLayer",
-            ],
+            actions: [{ type: "setIsOpen", params: { open: false } }],
           },
         },
       },
@@ -287,19 +201,15 @@ export const machine = createMachine(
         type: "modal" | "non-modal";
         open?: boolean;
         initialFocusEl?: () => HTMLElement | undefined;
-        parentLayerId?: Layer["id"];
-        childLayerIds?: Layer["id"][];
       },
 
-      actions: {} as
-        | { type: "setIsOpen"; params: { open: boolean } }
-        | { type: "dismissLayer" },
+      actions: {} as { type: "setIsOpen"; params: { open: boolean } },
 
       actors: {} as
         | {
-            src: "outsideClickLogic";
-            logic: typeof outsideClickLogic;
-            input: OutsideClickLogicOption;
+            src: "dismissLogic";
+            logic: typeof dismissLogic;
+            input: DismissLogicOptions;
           }
         | {
             src: "scrollLockLogic";
@@ -308,11 +218,6 @@ export const machine = createMachine(
         | {
             src: "focusTrapLogic";
             logic: typeof focusTrapLogic;
-          }
-        | {
-            src: "escapeLogic";
-            logic: typeof escapeLogic;
-            input: EscapeLogicOption;
           }
         | {
             src: "inertLogic";
@@ -324,16 +229,12 @@ export const machine = createMachine(
   {
     actions: {
       setIsOpen: assign(({ action }) => ({ open: action.params.open })),
-      dismissLayer: ({ context }) => {
-        dismissManager.unregister(context.id);
-      },
     },
     guards: { isOpen: ({ context }) => context.open },
     actors: {
-      outsideClickLogic: outsideClickLogic,
+      dismissLogic: dismissLogic,
       scrollLockLogic: scrollLockLogic,
       focusTrapLogic: focusTrapLogic,
-      escapeLogic: escapeLogic,
       inertLogic: inertLogic,
     },
   }

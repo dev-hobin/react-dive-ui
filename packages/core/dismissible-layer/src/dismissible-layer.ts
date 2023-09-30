@@ -1,96 +1,71 @@
 export type Layer = {
-  id: string;
-  type: "modal" | "non-modal";
   element: HTMLElement;
   dismiss: () => void;
-  parentId?: Layer["id"];
-  childIds?: Layer["id"][];
+  modal: boolean;
+  branchFrom?: Layer["element"];
 };
 
 class DismissManager {
-  private layerMap: Map<Layer["id"], Layer> = new Map();
+  private layerMap: Map<Layer["element"], Layer> = new Map();
 
-  registerLayer(layer: Layer) {
-    this.layerMap.set(layer.id, layer);
-
-    const parentId = layer.parentId;
-    if (!parentId) return;
-
-    const parentLayer = this.layerMap.get(parentId);
-    if (!parentLayer) return;
-
-    this.layerMap.set(parentId, {
-      ...parentLayer,
-      childIds: [...(parentLayer.childIds ?? []), layer.id],
-    });
+  register(layer: Layer) {
+    this.layerMap.set(layer.element, layer);
   }
 
-  unregister(id: string) {
-    const layer = this.layerMap.get(id);
-
-    if (layer?.parentId) {
-      const parentId = layer.parentId;
-      const parentLayer = this.layerMap.get(parentId);
-      if (parentLayer) {
-        this.layerMap.set(parentId, {
-          ...parentLayer,
-          childIds: parentLayer.childIds?.filter((childId) => childId !== id),
-        });
-      }
-    }
-
-    this.layerMap.delete(id);
+  unregister(element: Layer["element"]) {
+    this.layerMap.delete(element);
   }
 
-  handleDismiss(id: Layer["id"]) {
-    if (!this.isDismissible(id)) return;
+  dismiss(element: Layer["element"]) {
+    if (!this.isDismissible(element)) return;
 
-    const index = this.getIndex(id);
+    const index = this.getIndex(element);
     const layers = this.getLayers();
     const layer = layers[index];
-    const dismissLayers =
-      layer.type === "modal" ? layers.splice(index) : layers.splice(index, 1);
+    const dismissLayers = layer.modal
+      ? layers.splice(index)
+      : layers.splice(index, 1);
 
     dismissLayers.reverse().forEach((l) => {
       l.dismiss();
-      this.unregister(l.id);
+      this.unregister(l.element);
     });
   }
 
-  private isDismissible(id: Layer["id"]) {
-    const layer = this.layerMap.get(id);
+  isElementOfNestedLayer(element: Layer["element"], target: HTMLElement) {
+    return this.getNestedLayers(element).find((l) =>
+      l.element.contains(target)
+    );
+  }
+
+  private isDismissible(element: Layer["element"]) {
+    const layer = this.layerMap.get(element);
     if (!layer) return false;
 
-    return !this.isUnderModal(layer);
+    return !this.isUnderModal(element);
   }
 
-  private isUnderModal(layer: Layer) {
-    const index = this.getIndex(layer.id);
-    return !!this.getLayers().find((l, i) => i > index && l.type === "modal");
+  private isUnderModal(element: Layer["element"]) {
+    const index = this.getIndex(element);
+    return !!this.getLayers().find((l, i) => i > index && l.modal);
   }
 
-  private getIndex(id: Layer["id"]) {
-    const layers = Array.from(this.layerMap.values());
-    return layers.findIndex((l) => l.id === id);
+  private getIndex(element: Layer["element"]) {
+    const elements = Array.from(this.layerMap.keys());
+    return elements.findIndex((l) => l === element);
   }
 
-  getNestedLayers(id: Layer["id"]) {
+  private getNestedLayers(element: Layer["element"]) {
     const result: Layer[] = [];
 
-    const search = (id: Layer["id"]) => {
-      const layer = this.layerMap.get(id);
-      if (layer) {
-        result.push(layer);
-        layer.childIds?.forEach((childId) => {
-          search(childId);
-        });
-      }
-    };
+    const index = this.getIndex(element);
+    if (index === -1) return result;
 
-    const layer = this.layerMap.get(id);
-    if (!layer) return result;
-    else {
-      layer.childIds?.forEach((id) => search(id));
+    const candidates = Array.from(this.layerMap.values()).splice(index + 1);
+    for (const layer of candidates) {
+      if (element.contains(layer.element) || layer.branchFrom === element) {
+        result.push(layer);
+      }
     }
 
     return result;
@@ -102,3 +77,78 @@ class DismissManager {
 }
 
 export const dismissManager = new DismissManager();
+
+type HandlerProps = {
+  element: HTMLElement;
+  dismiss: () => void;
+  options: {
+    enabled: Array<"outsideClick" | "escape">;
+    modal?: boolean;
+    onOutsideClick?: (ev: MouseEvent) => void;
+    onEscape?: (ev: KeyboardEvent) => void;
+    branchFrom?: HTMLElement;
+  };
+};
+export function dismissHandler(props: HandlerProps) {
+  const { element, dismiss, options } = props;
+
+  dismissManager.register({
+    element,
+    dismiss,
+    modal: options?.modal ?? false,
+    branchFrom: options?.branchFrom,
+  });
+
+  const doc = element.ownerDocument;
+  const outsideClickHandler = (ev: MouseEvent) => {
+    const target = ev.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (
+      element.contains(target) ||
+      dismissManager.isElementOfNestedLayer(element, target)
+    ) {
+      return;
+    }
+
+    options.onOutsideClick?.(ev);
+    if (ev.defaultPrevented) return;
+
+    dismissManager.dismiss(element);
+  };
+  const escapeHandler = (ev: KeyboardEvent) => {
+    if (ev.key !== "Escape") return;
+    const target = ev.target;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    if (
+      !element.contains(target) ||
+      dismissManager.isElementOfNestedLayer(element, target)
+    ) {
+      return;
+    }
+
+    options.onEscape?.(ev);
+    if (ev.defaultPrevented) return;
+
+    dismissManager.dismiss(element);
+  };
+
+  if (options.enabled.includes("outsideClick") || options?.onOutsideClick) {
+    doc.addEventListener("click", outsideClickHandler, {
+      capture: true,
+    });
+  }
+  if (options.enabled.includes("escape") || options?.onEscape) {
+    doc.addEventListener("keydown", escapeHandler);
+  }
+
+  return () => {
+    doc.removeEventListener("click", outsideClickHandler, {
+      capture: true,
+    });
+    doc.removeEventListener("keydown", escapeHandler);
+    dismissManager.unregister(element);
+  };
+}

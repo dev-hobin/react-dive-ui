@@ -14,8 +14,7 @@ export default meta;
 const Child = () => {
   const { state: childState, service: childService } = useDialog({
     id: "child",
-    type: "non-modal",
-    parentLayerId: "parent",
+    type: "modal",
   });
 
   const {

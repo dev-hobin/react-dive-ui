@@ -8,8 +8,6 @@ type DialogOptions = {
   id?: string;
   type: "modal" | "non-modal";
   initialOpen?: boolean;
-  parentLayerId?: string;
-  childLayerIds?: string[];
 };
 
 type Dialog = {
@@ -29,8 +27,6 @@ export function useDialog(options: DialogOptions = { type: "modal" }): Dialog {
       id: options.id ?? internalId,
       type: options.type,
       open: options.initialOpen ?? false,
-      parentLayerId: options.parentLayerId,
-      childLayerIds: options.childLayerIds,
     },
   });
 
