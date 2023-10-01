@@ -8,28 +8,34 @@ import { dom } from "./dom";
 type DismissLogicOptions = {
   getElement: () => HTMLElement | null;
   dismiss: () => void;
-  options: {
-    enabled: Array<"outsideClick" | "escape">;
-    modal?: boolean;
-    onOutsideClick?: (ev: MouseEvent) => void;
-    onEscape?: (ev: KeyboardEvent) => void;
-    branchFrom?: HTMLElement;
-  };
+  modal: boolean;
+  exclude?: Array<(() => HTMLElement | null) | HTMLElement>;
 };
 const dismissLogic = fromCallback<any, DismissLogicOptions>(({ input }) => {
   const cleanups: Array<() => void> = [];
+
   const rId = requestAnimationFrame(() => {
     const element = input.getElement();
     if (!element) return;
 
-    const cleanup = dismissHandler({
-      element,
-      dismiss: input.dismiss,
-      options: input.options,
-    });
-    cleanups.push(cleanup);
+    const excludeElements = (input.exclude ?? [])
+      .map((v) => (typeof v === "function" ? v() : v))
+      .filter((v): v is HTMLElement => !!v);
+
+    cleanups.push(() => cancelAnimationFrame(rId));
+    cleanups.push(
+      dismissHandler({
+        layer: {
+          element,
+          dismiss: input.dismiss,
+          modal: input.modal,
+        },
+        options: {
+          exclude: excludeElements,
+        },
+      })
+    );
   });
-  cleanups.push(() => cancelAnimationFrame(rId));
 
   return () => {
     cleanups.forEach((cleanup) => cleanup());
@@ -153,10 +159,8 @@ export const machine = createMachine(
             input: ({ context, self }) => ({
               getElement: () => dom.getPanelEl(context),
               dismiss: () => self.send({ type: "CLOSE" }),
-              options: {
-                enabled: ["outsideClick", "escape"],
-                modal: context.type === "modal",
-              },
+              modal: context.type === "modal",
+              exclude: [() => dom.getTriggerEl(context)],
             }),
           },
           {
