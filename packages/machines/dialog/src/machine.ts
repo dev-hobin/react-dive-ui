@@ -42,7 +42,13 @@ const dismissLogic = fromCallback<any, DismissLogicOptions>(({ input }) => {
   };
 });
 
-const scrollLockLogic = fromCallback(() => {
+type ScrollLockOptions = {
+  enabled: boolean;
+};
+const scrollLockLogic = fromCallback<any, ScrollLockOptions>(({ input }) => {
+  const { enabled } = input;
+  if (!enabled) return;
+
   const overflow = getComputedStyle(document.body).overflow;
 
   document.body.style.overflow = "hidden";
@@ -77,12 +83,12 @@ const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
   };
 });
 
-type InertLogicOption = {
+type InertLogicOptions = {
   id: string;
   getElement: () => HTMLElement | undefined | null;
   enabled: boolean;
 };
-const inertLogic = fromCallback<any, InertLogicOption>(({ input }) => {
+const inertLogic = fromCallback<any, InertLogicOptions>(({ input }) => {
   if (!input.enabled) return;
 
   const cleanups: Array<() => void> = [];
@@ -170,7 +176,12 @@ export const machine = createMachine(
               getInitialFocusElement: context.initialFocusEl,
             }),
           },
-          { src: "scrollLockLogic" },
+          {
+            src: "scrollLockLogic",
+            input: ({ context }) => ({
+              enabled: context.type === "modal",
+            }),
+          },
           {
             id: "inertLogic",
             src: "inertLogic",
@@ -218,6 +229,7 @@ export const machine = createMachine(
         | {
             src: "scrollLockLogic";
             logic: typeof scrollLockLogic;
+            input: ScrollLockOptions;
           }
         | {
             src: "focusTrapLogic";
@@ -226,7 +238,7 @@ export const machine = createMachine(
         | {
             src: "inertLogic";
             logic: typeof inertLogic;
-            input: InertLogicOption;
+            input: InertLogicOptions;
           },
     },
   },
