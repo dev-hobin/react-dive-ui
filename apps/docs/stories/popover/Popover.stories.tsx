@@ -20,7 +20,14 @@ export const Default = () => {
     },
   });
 
-  const { triggerProps, closeProps, arrowProps, panelProps } = connect(service);
+  const {
+    triggerProps,
+    closeProps,
+    arrowProps,
+    panelProps,
+    titleProps,
+    descriptionProps,
+  } = connect(service);
   return (
     <div>
       <button {...triggerProps}>Toggle Popover</button>
@@ -28,7 +35,8 @@ export const Default = () => {
       {state.status === "opened" &&
         createPortal(
           <article {...panelProps}>
-            Popover Content
+            <h2 {...titleProps}>Title</h2>
+            <p {...descriptionProps}>Description</p>
             <button {...closeProps}>Close</button>
             <div
               {...arrowProps}

@@ -147,10 +147,7 @@ export const machine = createMachine(
             actions: [{ type: "setIsOpen", params: { open: false } }],
           },
           "UPDATE.META_ELEMENTS": {
-            actions: [
-              "updateMetaElements",
-              ({ context }) => console.log(context),
-            ],
+            actions: ["updateMetaElements"],
           },
         },
       },

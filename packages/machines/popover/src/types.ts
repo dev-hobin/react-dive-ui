@@ -10,6 +10,10 @@ export type Context = {
   id: string;
   isOpen: boolean;
   floatingOptions: Partial<FloatingOptions>;
+  metaElements: {
+    title: boolean;
+    description: boolean;
+  };
 };
 
 export type FloatingOptions = {
@@ -23,4 +27,8 @@ export type FloatingOptions = {
 export type Input = Pick<Context, "id"> &
   Partial<Pick<Context, "isOpen" | "floatingOptions">>;
 
-export type Events = { type: "OPEN" } | { type: "CLOSE" } | { type: "TOGGLE" };
+export type Events =
+  | { type: "OPEN" }
+  | { type: "CLOSE" }
+  | { type: "TOGGLE" }
+  | { type: "UPDATE.META_ELEMENTS" };

@@ -1,4 +1,4 @@
-import { createMachine, fromCallback } from "xstate";
+import { assign, createMachine, fromCallback, raise } from "xstate";
 import {
   dismissLogic,
   DismissLogicOptions,
@@ -98,6 +98,10 @@ export const machine = createMachine(
       id: input.id,
       isOpen: input.isOpen ?? false,
       floatingOptions: input.floatingOptions ?? {},
+      metaElements: {
+        title: false,
+        description: false,
+      },
     }),
     states: {
       setup: {
@@ -136,12 +140,16 @@ export const machine = createMachine(
             }),
           },
         ],
+        entry: ["checkRenderedMetaElements"],
         on: {
           CLOSE: {
             target: "closed",
           },
           TOGGLE: {
             target: "closed",
+          },
+          "UPDATE.META_ELEMENTS": {
+            actions: ["updateMetaElements", () => console.log("activate!!!")],
           },
         },
       },
@@ -161,6 +169,9 @@ export const machine = createMachine(
       context: {} as Context,
       input: {} as Input,
       guards: {} as { type: "isOpen" },
+      actions: {} as
+        | { type: "checkRenderedMetaElements" }
+        | { type: "updateMetaElements" },
       actors: {} as
         | {
             src: "floatingLogic";
@@ -182,6 +193,18 @@ export const machine = createMachine(
   {
     guards: {
       isOpen: ({ context }) => context.isOpen,
+    },
+    actions: {
+      checkRenderedMetaElements: raise(
+        { type: "UPDATE.META_ELEMENTS" },
+        { delay: 0 }
+      ),
+      updateMetaElements: assign(({ context }) => ({
+        metaElements: {
+          title: !!dom.getTitleEl(context),
+          description: !!dom.getDescriptionEl(context),
+        },
+      })),
     },
     actors: {
       dismissLogic: dismissLogic,

@@ -5,6 +5,7 @@ import { dom } from "./dom";
 export function connect(service: Service) {
   const snapshot = service.getSnapshot();
 
+  const status = snapshot.value;
   const context = snapshot.context;
   const send = service.send;
 
@@ -15,13 +16,29 @@ export function connect(service: Service) {
       onClick: () => {
         send({ type: "TOGGLE" });
       },
+      "aria-haspopup": "dialog",
+      "aria-expanded": status === "opened",
+      "aria-controls": dom.getPanelId(context),
+      "data-state": status === "opened" ? "open" : "closed",
     }),
     panelProps: properties.element({
+      role: "dialog",
       id: dom.getPanelId(context),
-      style: {
-        position: "absolute",
-        background: "gray",
-      },
+      tabIndex: -1,
+      style: { position: "absolute" },
+      "data-state": status === "opened" ? "open" : "closed",
+      "aria-labelledby": context.metaElements.title
+        ? dom.getTitleId(context)
+        : undefined,
+      "aria-describedby": context.metaElements.description
+        ? dom.getDescriptionId(context)
+        : undefined,
+    }),
+    titleProps: properties.h2({
+      id: dom.getTitleId(context),
+    }),
+    descriptionProps: properties.p({
+      id: dom.getDescriptionId(context),
     }),
     closeProps: properties.button({
       type: "button",
@@ -35,7 +52,6 @@ export function connect(service: Service) {
       style: {
         display: "block",
         position: "absolute",
-        background: "gray",
         "--rotate-deg": "45deg",
         "--arrow-size-x": 0,
         "--arrow-size-y": 0,
