@@ -25,7 +25,9 @@ export function connect(service: Service) {
       role: "dialog",
       id: dom.getPanelId(context),
       tabIndex: -1,
-      style: { position: "absolute" },
+      style: {
+        position: "absolute",
+      },
       "data-state": status === "opened" ? "open" : "closed",
       "aria-labelledby": context.metaElements.title
         ? dom.getTitleId(context)
@@ -50,15 +52,8 @@ export function connect(service: Service) {
     arrowProps: properties.element({
       id: dom.getArrowId(context),
       style: {
-        display: "block",
+        display: "inline-block",
         position: "absolute",
-        "--rotate-deg": "45deg",
-        "--arrow-size-x": 0,
-        "--arrow-size-y": 0,
-        width: "var(--arrow-size-x, 0)",
-        height: "var(--arrow-size-y, 0)",
-        rotate: "var(--rotate-deg, 0deg)",
-        zIndex: -1,
       },
     }),
   };

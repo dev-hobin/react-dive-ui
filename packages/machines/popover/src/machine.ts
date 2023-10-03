@@ -149,7 +149,7 @@ export const machine = createMachine(
             target: "closed",
           },
           "UPDATE.META_ELEMENTS": {
-            actions: ["updateMetaElements", () => console.log("activate!!!")],
+            actions: ["updateMetaElements"],
           },
         },
       },

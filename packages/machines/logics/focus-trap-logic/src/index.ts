@@ -16,6 +16,7 @@ export const focusTrapLogic = fromCallback<any, FocusTrapLogicOptions>(
         fallbackFocus: element,
         initialFocus: input.getInitialFocusElement?.() ?? undefined,
         escapeDeactivates: false,
+        allowOutsideClick: true,
       });
       trap.activate();
 

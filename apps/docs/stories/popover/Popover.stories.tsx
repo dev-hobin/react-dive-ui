@@ -1,5 +1,6 @@
 import { connect, usePopover } from "@react-dive-ui/popover";
 import { createPortal } from "react-dom";
+import * as css from "./style.css";
 
 const meta = {
   title: "Component/Popover",
@@ -15,7 +16,7 @@ export const Default = () => {
     floatingOptions: {
       offset: 12,
       shiftPadding: 12,
-      placement: "right-start",
+      placement: "bottom-start",
       arrowLength: 4,
     },
   });
@@ -30,22 +31,24 @@ export const Default = () => {
   } = connect(service);
   return (
     <div>
-      <button {...triggerProps}>Toggle Popover</button>
+      <button {...triggerProps} className={css.trigger}>
+        Toggle Popover
+      </button>
 
       {state.status === "opened" &&
         createPortal(
-          <article {...panelProps}>
-            <h2 {...titleProps}>Title</h2>
-            <p {...descriptionProps}>Description</p>
-            <button {...closeProps}>Close</button>
-            <div
-              {...arrowProps}
-              style={{
-                ...arrowProps.style,
-                "--arrow-size-x": "10px",
-                "--arrow-size-y": "10px",
-              }}
-            />
+          <article {...panelProps} className={css.panel}>
+            <h2 {...titleProps} className={css.title}>
+              About Popover
+            </h2>
+            <p {...descriptionProps} className={css.description}>
+              Popovers are perfect for floating panels with arbitrary content
+              like navigation menus, mobile menus and flyout menus.
+            </p>
+            <button {...closeProps} className={css.close}>
+              Close
+            </button>
+            <div {...arrowProps} className={css.arrow} />
           </article>,
           document.body
         )}
