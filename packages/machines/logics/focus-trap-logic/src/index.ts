@@ -2,8 +2,8 @@ import { createFocusTrap } from "focus-trap";
 import { fromCallback } from "xstate";
 
 export type FocusTrapLogicOptions = {
-  getElement: () => HTMLElement | undefined | null;
-  getInitialFocusElement?: () => HTMLElement | undefined | null;
+  getElement: () => HTMLElement | null;
+  getInitialFocusElement?: () => HTMLElement | null;
 };
 export const focusTrapLogic = fromCallback<any, FocusTrapLogicOptions>(
   ({ input }) => {

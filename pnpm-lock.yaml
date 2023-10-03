@@ -621,12 +621,12 @@ importers:
       '@react-dive-ui/dismiss-logic':
         specifier: workspace:*
         version: link:../logics/dismiss-logic
+      '@react-dive-ui/focus-trap-logic':
+        specifier: workspace:*
+        version: link:../logics/focus-trap-logic
       '@react-dive-ui/properties':
         specifier: workspace:*
         version: link:../../core/properties
-      focus-trap:
-        specifier: ^7.5.3
-        version: 7.5.3
       xstate:
         specifier: 5.0.0-beta.27
         version: 5.0.0-beta.27

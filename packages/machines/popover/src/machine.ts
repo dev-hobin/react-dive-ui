@@ -4,6 +4,10 @@ import {
   DismissLogicOptions,
 } from "@react-dive-ui/dismiss-logic";
 import {
+  focusTrapLogic,
+  FocusTrapLogicOptions,
+} from "@react-dive-ui/focus-trap-logic";
+import {
   computePosition,
   autoUpdate,
   flip,
@@ -117,6 +121,12 @@ export const machine = createMachine(
             }),
           },
           {
+            src: "focusTrapLogic",
+            input: ({ context }) => ({
+              getElement: () => dom.getPanelEl(context),
+            }),
+          },
+          {
             src: "floatingLogic",
             input: ({ context }) => ({
               referenceEl: () => dom.getTriggerEl(context),
@@ -161,6 +171,11 @@ export const machine = createMachine(
             src: "dismissLogic";
             logic: typeof dismissLogic;
             input: DismissLogicOptions;
+          }
+        | {
+            src: "focusTrapLogic";
+            logic: typeof focusTrapLogic;
+            input: FocusTrapLogicOptions;
           },
     },
   },
@@ -170,6 +185,7 @@ export const machine = createMachine(
     },
     actors: {
       dismissLogic: dismissLogic,
+      focusTrapLogic: focusTrapLogic,
       floatingLogic: floatingLogic,
     },
   }
