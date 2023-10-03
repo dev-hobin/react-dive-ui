@@ -2,8 +2,11 @@ import {
   dismissLogic,
   DismissLogicOptions,
 } from "@react-dive-ui/dismiss-logic";
+import {
+  focusTrapLogic,
+  FocusTrapLogicOptions,
+} from "@react-dive-ui/focus-trap-logic";
 import { assign, createMachine, fromCallback, raise } from "xstate";
-import { createFocusTrap } from "focus-trap";
 
 import { Context, Events, Input } from "./types";
 import { dom } from "./dom";
@@ -20,32 +23,6 @@ const scrollLockLogic = fromCallback<any, ScrollLockOptions>(({ input }) => {
   document.body.style.overflow = "hidden";
   return () => {
     document.body.style.overflow = overflow;
-  };
-});
-
-type FocusTrapLogicOption = {
-  getElement: () => HTMLElement | undefined | null;
-  getInitialFocusElement?: () => HTMLElement | undefined | null;
-};
-const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
-  const cleanups: Array<() => void> = [];
-  const rId = requestAnimationFrame(() => {
-    const element = input.getElement();
-    if (!element) return;
-
-    const trap = createFocusTrap(element, {
-      fallbackFocus: element,
-      initialFocus: input.getInitialFocusElement?.() ?? undefined,
-      escapeDeactivates: false,
-    });
-    trap.activate();
-
-    cleanups.push(() => trap.deactivate());
-  });
-  cleanups.push(() => cancelAnimationFrame(rId));
-
-  return () => {
-    cleanups.forEach((cleanup) => cleanup());
   };
 });
 
@@ -210,6 +187,7 @@ export const machine = createMachine(
         | {
             src: "focusTrapLogic";
             logic: typeof focusTrapLogic;
+            input: FocusTrapLogicOptions;
           }
         | {
             src: "inertLogic";
