@@ -12,6 +12,7 @@
     "@react-dive-ui/accordion": "workspace:0.0.0",
     "@react-dive-ui/checkbox": "workspace:0.0.0",
     "@react-dive-ui/dialog": "workspace:0.0.0",
+    "@react-dive-ui/popover": "workspace:0.0.0",
     "@react-dive-ui/dive": "workspace:0.0.0",
     "@react-dive-ui/radio-group": "workspace:0.0.0",
     "@react-dive-ui/tabs": "workspace:0.0.0",
