@@ -1,46 +1,15 @@
-import { dismissHandler } from "@react-dive-ui/dismissible-layer";
+import {
+  dismissLogic,
+  DismissLogicOptions,
+} from "@react-dive-ui/dismiss-logic";
+import {
+  focusTrapLogic,
+  FocusTrapLogicOptions,
+} from "@react-dive-ui/focus-trap-logic";
 import { assign, createMachine, fromCallback, raise } from "xstate";
-import { createFocusTrap } from "focus-trap";
 
 import { Context, Events, Input } from "./types";
 import { dom } from "./dom";
-
-type DismissLogicOptions = {
-  getElement: () => HTMLElement | null;
-  dismiss: () => void;
-  modal: boolean;
-  exclude?: Array<(() => HTMLElement | null) | HTMLElement>;
-};
-const dismissLogic = fromCallback<any, DismissLogicOptions>(({ input }) => {
-  const cleanups: Array<() => void> = [];
-
-  const rId = requestAnimationFrame(() => {
-    const element = input.getElement();
-    if (!element) return;
-
-    const excludeElements = (input.exclude ?? [])
-      .map((v) => (typeof v === "function" ? v() : v))
-      .filter((v): v is HTMLElement => !!v);
-
-    cleanups.push(() => cancelAnimationFrame(rId));
-    cleanups.push(
-      dismissHandler({
-        layer: {
-          element,
-          dismiss: input.dismiss,
-          modal: input.modal,
-        },
-        options: {
-          exclude: excludeElements,
-        },
-      })
-    );
-  });
-
-  return () => {
-    cleanups.forEach((cleanup) => cleanup());
-  };
-});
 
 type ScrollLockOptions = {
   enabled: boolean;
@@ -54,32 +23,6 @@ const scrollLockLogic = fromCallback<any, ScrollLockOptions>(({ input }) => {
   document.body.style.overflow = "hidden";
   return () => {
     document.body.style.overflow = overflow;
-  };
-});
-
-type FocusTrapLogicOption = {
-  getElement: () => HTMLElement | undefined | null;
-  getInitialFocusElement?: () => HTMLElement | undefined | null;
-};
-const focusTrapLogic = fromCallback<any, FocusTrapLogicOption>(({ input }) => {
-  const cleanups: Array<() => void> = [];
-  const rId = requestAnimationFrame(() => {
-    const element = input.getElement();
-    if (!element) return;
-
-    const trap = createFocusTrap(element, {
-      fallbackFocus: element,
-      initialFocus: input.getInitialFocusElement?.() ?? undefined,
-      escapeDeactivates: false,
-    });
-    trap.activate();
-
-    cleanups.push(() => trap.deactivate());
-  });
-  cleanups.push(() => cancelAnimationFrame(rId));
-
-  return () => {
-    cleanups.forEach((cleanup) => cleanup());
   };
 });
 
@@ -204,10 +147,7 @@ export const machine = createMachine(
             actions: [{ type: "setIsOpen", params: { open: false } }],
           },
           "UPDATE.META_ELEMENTS": {
-            actions: [
-              "updateMetaElements",
-              ({ context }) => console.log(context),
-            ],
+            actions: ["updateMetaElements"],
           },
         },
       },
@@ -244,6 +184,7 @@ export const machine = createMachine(
         | {
             src: "focusTrapLogic";
             logic: typeof focusTrapLogic;
+            input: FocusTrapLogicOptions;
           }
         | {
             src: "inertLogic";

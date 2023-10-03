@@ -1,0 +1,39 @@
+{
+  "name": "@react-dive-ui/popover",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
+    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@react-dive-ui/tsconfig": "workspace:*",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "eslint": "^8.46.0",
+    "eslint-config-dive": "workspace:*",
+    "react": "^18.2.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@react-dive-ui/popover-machine": "workspace:*",
+    "@react-dive-ui/dive": "workspace:*",
+    "@react-dive-ui/merge-props": "workspace:*",
+    "@react-dive-ui/compose-event-handlers": "workspace:*",
+    "xstate": "5.0.0-beta.27",
+    "@xstate/react": "4.0.0-beta.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

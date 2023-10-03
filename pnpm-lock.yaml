@@ -38,6 +38,9 @@ importers:
       '@react-dive-ui/dive':
         specifier: workspace:0.0.0
         version: link:../../packages/core/dive
+      '@react-dive-ui/popover':
+        specifier: workspace:0.0.0
+        version: link:../../packages/components/popover
       '@react-dive-ui/radio-group':
         specifier: workspace:0.0.0
         version: link:../../packages/components/radio-group
@@ -209,6 +212,52 @@ importers:
       '@react-dive-ui/merge-props':
         specifier: workspace:*
         version: link:../../utils/mergeProps
+      '@xstate/react':
+        specifier: 4.0.0-beta.8
+        version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)(xstate@5.0.0-beta.27)
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.2.20
+        version: 18.2.20
+      '@types/react-dom':
+        specifier: ^18.2.7
+        version: 18.2.7
+      eslint:
+        specifier: ^8.46.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.1.6
+        version: 5.2.2
+
+  packages/components/popover:
+    dependencies:
+      '@react-dive-ui/compose-event-handlers':
+        specifier: workspace:*
+        version: link:../../utils/composeEventHandlers
+      '@react-dive-ui/dive':
+        specifier: workspace:*
+        version: link:../../core/dive
+      '@react-dive-ui/merge-props':
+        specifier: workspace:*
+        version: link:../../utils/mergeProps
+      '@react-dive-ui/popover-machine':
+        specifier: workspace:*
+        version: link:../../machines/popover
       '@xstate/react':
         specifier: 4.0.0-beta.8
         version: 4.0.0-beta.8(@types/react@18.2.20)(react@18.2.0)(xstate@5.0.0-beta.27)
@@ -485,15 +534,99 @@ importers:
 
   packages/machines/dialog:
     dependencies:
-      '@react-dive-ui/dismissible-layer':
+      '@react-dive-ui/dismiss-logic':
         specifier: workspace:*
-        version: link:../../core/dismissible-layer
+        version: link:../logics/dismiss-logic
+      '@react-dive-ui/focus-trap-logic':
+        specifier: workspace:*
+        version: link:../logics/focus-trap-logic
       '@react-dive-ui/properties':
         specifier: workspace:*
         version: link:../../core/properties
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
+  packages/machines/logics/dismiss-logic:
+    dependencies:
+      '@react-dive-ui/dismissible-layer':
+        specifier: workspace:*
+        version: link:../../../core/dismissible-layer
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
+  packages/machines/logics/focus-trap-logic:
+    dependencies:
       focus-trap:
         specifier: ^7.5.3
         version: 7.5.3
+      xstate:
+        specifier: 5.0.0-beta.27
+        version: 5.0.0-beta.27
+    devDependencies:
+      '@react-dive-ui/tsconfig':
+        specifier: workspace:*
+        version: link:../../../tsconfig
+      eslint:
+        specifier: ^8.15.0
+        version: 8.46.0
+      eslint-config-dive:
+        specifier: workspace:*
+        version: link:../../../eslint-config-dive
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
+  packages/machines/popover:
+    dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.5.3
+        version: 1.5.3
+      '@react-dive-ui/dismiss-logic':
+        specifier: workspace:*
+        version: link:../logics/dismiss-logic
+      '@react-dive-ui/focus-trap-logic':
+        specifier: workspace:*
+        version: link:../logics/focus-trap-logic
+      '@react-dive-ui/properties':
+        specifier: workspace:*
+        version: link:../../core/properties
       xstate:
         specifier: 5.0.0-beta.27
         version: 5.0.0-beta.27
@@ -2631,18 +2764,16 @@ packages:
     resolution: {integrity: sha512-cEee/Z+I12mZcFJshKcCqC8tuX5hG3s+d+9nZ3LabqKF1vKdF41B92pJVCBggjAGORAeOzyyDDKrZwIkLffeOQ==}
     dev: true
 
-  /@floating-ui/core@1.4.1:
-    resolution: {integrity: sha512-jk3WqquEJRlcyu7997NtR5PibI+y5bi+LS3hPmguVClypenMsCY3CBa3LAQnozRCtCrYWSEtAdiskpamuJRFOQ==}
+  /@floating-ui/core@1.5.0:
+    resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
-      '@floating-ui/utils': 0.1.1
-    dev: true
+      '@floating-ui/utils': 0.1.6
 
-  /@floating-ui/dom@1.5.1:
-    resolution: {integrity: sha512-KwvVcPSXg6mQygvA1TjbN/gh///36kKtllIF8SUm0qpFj8+rvYrpvlYdL1JoA71SHpDqgSSdGOSoQ0Mp3uY5aw==}
+  /@floating-ui/dom@1.5.3:
+    resolution: {integrity: sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==}
     dependencies:
-      '@floating-ui/core': 1.4.1
-      '@floating-ui/utils': 0.1.1
-    dev: true
+      '@floating-ui/core': 1.5.0
+      '@floating-ui/utils': 0.1.6
 
   /@floating-ui/react-dom@2.0.2(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-5qhlDvjaLmAst/rKb3VdlCinwTF4EYMiVxuuc/HVUjs46W0zgtbMmAZ1UTsDrRTxRmUEzl92mOtWbeeXL26lSQ==}
@@ -2650,14 +2781,13 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
-      '@floating-ui/dom': 1.5.1
+      '@floating-ui/dom': 1.5.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: true
 
-  /@floating-ui/utils@0.1.1:
-    resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
-    dev: true
+  /@floating-ui/utils@0.1.6:
+    resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
 
   /@humanwhocodes/config-array@0.11.11:
     resolution: {integrity: sha512-N2brEuAadi0CcdeMXUkhbZB84eskAc8MEX1By6qEchoVywSgXPIjou4rYsl0V3Hj0ZnuGycGCjdNgockbzeWNA==}
