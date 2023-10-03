@@ -1,4 +1,4 @@
-import { usePopover } from "@react-dive-ui/popover";
+import { connect, usePopover } from "@react-dive-ui/popover";
 import { createPortal } from "react-dom";
 
 const meta = {
@@ -11,15 +11,21 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state } = usePopover({ defaultOpen: true });
+  const { state, service } = usePopover();
 
-  console.log("hook state", state);
+  const { triggerProps, closeProps, arrowProps, panelProps } = connect(service);
   return (
     <div>
-      <button type="button">Toggle Popover</button>
+      <button {...triggerProps}>Toggle Popover</button>
 
       {state.status === "opened" &&
-        createPortal(<article>Popover Content</article>, document.body)}
+        createPortal(
+          <article {...panelProps}>
+            Popover Content
+            <button {...arrowProps}>Close</button>
+          </article>,
+          document.body
+        )}
     </div>
   );
 };
