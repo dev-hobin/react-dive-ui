@@ -1,8 +1,8 @@
 import { dismissHandler } from "@react-dive-ui/dismissible-layer";
-import { assign, createMachine, fromCallback } from "xstate";
+import { assign, createMachine, fromCallback, raise } from "xstate";
 import { createFocusTrap } from "focus-trap";
 
-import { Context, Events } from "./types";
+import { Context, Events, Input } from "./types";
 import { dom } from "./dom";
 
 type DismissLogicOptions = {
@@ -146,7 +146,12 @@ export const machine = createMachine(
       id: input.id,
       type: input.type,
       open: input.open ?? false,
-      initialFocusEl: input.initialFocusEl ?? (() => undefined),
+      initialFocusEl: input.initialFocusEl ?? (() => null),
+      scrollLock: input.scrollLock ?? true,
+      metaElements: {
+        title: false,
+        description: false,
+      },
     }),
     states: {
       setup: {
@@ -179,7 +184,7 @@ export const machine = createMachine(
           {
             src: "scrollLockLogic",
             input: ({ context }) => ({
-              enabled: context.type === "modal",
+              enabled: context.scrollLock ?? context.type === "modal",
             }),
           },
           {
@@ -192,10 +197,17 @@ export const machine = createMachine(
             }),
           },
         ],
+        entry: ["checkRenderedMetaElements"],
         on: {
           CLOSE: {
             target: "closed",
             actions: [{ type: "setIsOpen", params: { open: false } }],
+          },
+          "UPDATE.META_ELEMENTS": {
+            actions: [
+              "updateMetaElements",
+              ({ context }) => console.log(context),
+            ],
           },
         },
       },
@@ -211,14 +223,12 @@ export const machine = createMachine(
     types: {
       events: {} as Events,
       context: {} as Context,
-      input: {} as {
-        id: string;
-        type: "modal" | "non-modal";
-        open?: boolean;
-        initialFocusEl?: () => HTMLElement | undefined;
-      },
+      input: {} as Input,
 
-      actions: {} as { type: "setIsOpen"; params: { open: boolean } },
+      actions: {} as
+        | { type: "setIsOpen"; params: { open: boolean } }
+        | { type: "checkRenderedMetaElements" }
+        | { type: "updateMetaElements" },
 
       actors: {} as
         | {
@@ -245,6 +255,16 @@ export const machine = createMachine(
   {
     actions: {
       setIsOpen: assign(({ action }) => ({ open: action.params.open })),
+      checkRenderedMetaElements: raise(
+        { type: "UPDATE.META_ELEMENTS" },
+        { delay: 0 }
+      ),
+      updateMetaElements: assign(({ context }) => ({
+        metaElements: {
+          title: !!dom.getTitleEl(context),
+          description: !!dom.getDescriptionEl(context),
+        },
+      })),
     },
     guards: { isOpen: ({ context }) => context.open },
     actors: {
