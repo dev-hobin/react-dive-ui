@@ -16,6 +16,7 @@ export function connect(service: Service) {
       onClick: () => {
         send({ type: "OPEN" });
       },
+      "data-state": context.open ? "open" : "closed",
     }),
     closeProps: properties.button({
       type: "button",
@@ -23,8 +24,22 @@ export function connect(service: Service) {
         send({ type: "CLOSE" });
       },
     }),
+    backdropProps: properties.element({
+      "aria-hidden": true,
+      "data-state": context.open ? "open" : "closed",
+    }),
     panelProps: properties.element({
+      role: "dialog",
+      tabIndex: -1,
       id: dom.getPanelId(context),
+      "aria-modal": context.type === "modal",
+      "data-state": context.open ? "open" : "closed",
+    }),
+    title: properties.h2({
+      id: dom.getTriggerId(context),
+    }),
+    description: properties.p({
+      id: dom.getDescriptionId(context),
     }),
   };
 }
