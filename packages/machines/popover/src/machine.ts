@@ -1,5 +1,9 @@
 import { createMachine, fromCallback } from "xstate";
 import {
+  dismissLogic,
+  DismissLogicOptions,
+} from "@react-dive-ui/dismiss-logic";
+import {
   computePosition,
   autoUpdate,
   flip,
@@ -104,6 +108,15 @@ export const machine = createMachine(
       opened: {
         invoke: [
           {
+            src: "dismissLogic",
+            input: ({ context, self }) => ({
+              dismiss: () => self.send({ type: "CLOSE" }),
+              exclude: [() => dom.getTriggerEl(context)],
+              getElement: () => dom.getPanelEl(context),
+              modal: false,
+            }),
+          },
+          {
             src: "floatingLogic",
             input: ({ context }) => ({
               referenceEl: () => dom.getTriggerEl(context),
@@ -138,11 +151,17 @@ export const machine = createMachine(
       context: {} as Context,
       input: {} as Input,
       guards: {} as { type: "isOpen" },
-      actors: {} as {
-        src: "floatingLogic";
-        logic: typeof floatingLogic;
-        input: FloatingLogicOptions;
-      },
+      actors: {} as
+        | {
+            src: "floatingLogic";
+            logic: typeof floatingLogic;
+            input: FloatingLogicOptions;
+          }
+        | {
+            src: "dismissLogic";
+            logic: typeof dismissLogic;
+            input: DismissLogicOptions;
+          },
     },
   },
   {
@@ -150,6 +169,7 @@ export const machine = createMachine(
       isOpen: ({ context }) => context.isOpen,
     },
     actors: {
+      dismissLogic: dismissLogic,
       floatingLogic: floatingLogic,
     },
   }

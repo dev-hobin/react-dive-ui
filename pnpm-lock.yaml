@@ -593,6 +593,9 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.5.3
         version: 1.5.3
+      '@react-dive-ui/dismiss-logic':
+        specifier: workspace:*
+        version: link:../logics/dismiss-logic
       '@react-dive-ui/dismissible-layer':
         specifier: workspace:*
         version: link:../../core/dismissible-layer
