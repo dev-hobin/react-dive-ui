@@ -6,8 +6,10 @@ import type { Context, Send, Service } from "@react-dive-ui/dialog-machine";
 
 type DialogOptions = {
   id?: string;
-  type: "modal" | "non-modal";
-  initialOpen?: boolean;
+  modal?: boolean;
+  defaultOpen?: boolean;
+  initialFocusEl?: () => HTMLElement | null;
+  scrollLock?: boolean;
 };
 
 type Dialog = {
@@ -20,13 +22,15 @@ type Dialog = {
   service: Service;
 };
 
-export function useDialog(options: DialogOptions = { type: "modal" }): Dialog {
+export function useDialog(options: DialogOptions = { modal: true }): Dialog {
   const internalId = useId();
   const [state, send, service] = useActor(machine, {
     input: {
       id: options.id ?? internalId,
-      type: options.type,
-      open: options.initialOpen ?? false,
+      type: options.modal ? "modal" : "non-modal",
+      open: options.defaultOpen ?? false,
+      initialFocusEl: options.initialFocusEl,
+      scrollLock: options.scrollLock ?? true,
     },
   });
 

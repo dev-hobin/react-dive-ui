@@ -12,10 +12,7 @@ const meta = {
 export default meta;
 
 const Child = () => {
-  const { state: childState, service: childService } = useDialog({
-    id: "child",
-    type: "modal",
-  });
+  const { state: childState, service: childService } = useDialog();
 
   const {
     triggerProps: childTriggerProps,
@@ -58,7 +55,7 @@ const Child = () => {
 };
 
 export const Default = () => {
-  const { state, service } = useDialog({ type: "modal", id: "parent" });
+  const { state, service } = useDialog();
 
   const { triggerProps, closeProps, panelProps } = connect(service);
   return (

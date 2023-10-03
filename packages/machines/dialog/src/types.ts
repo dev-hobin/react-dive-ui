@@ -8,6 +8,11 @@ export type Context = {
   id: string;
   open: boolean;
   type: "modal" | "non-modal";
-  initialFocusEl: () => HTMLElement | undefined;
+  initialFocusEl: () => HTMLElement | null;
+  scrollLock: boolean;
 };
+
+export type Input = Pick<Context, "id" | "type"> &
+  Partial<Pick<Context, "open" | "initialFocusEl" | "scrollLock">>;
+
 export type Events = { type: "OPEN" } | { type: "CLOSE" };

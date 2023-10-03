@@ -2,7 +2,7 @@ import { dismissHandler } from "@react-dive-ui/dismissible-layer";
 import { assign, createMachine, fromCallback } from "xstate";
 import { createFocusTrap } from "focus-trap";
 
-import { Context, Events } from "./types";
+import { Context, Events, Input } from "./types";
 import { dom } from "./dom";
 
 type DismissLogicOptions = {
@@ -146,7 +146,8 @@ export const machine = createMachine(
       id: input.id,
       type: input.type,
       open: input.open ?? false,
-      initialFocusEl: input.initialFocusEl ?? (() => undefined),
+      initialFocusEl: input.initialFocusEl ?? (() => null),
+      scrollLock: input.scrollLock ?? true,
     }),
     states: {
       setup: {
@@ -179,7 +180,7 @@ export const machine = createMachine(
           {
             src: "scrollLockLogic",
             input: ({ context }) => ({
-              enabled: context.type === "modal",
+              enabled: context.scrollLock ?? context.type === "modal",
             }),
           },
           {
@@ -211,12 +212,7 @@ export const machine = createMachine(
     types: {
       events: {} as Events,
       context: {} as Context,
-      input: {} as {
-        id: string;
-        type: "modal" | "non-modal";
-        open?: boolean;
-        initialFocusEl?: () => HTMLElement | undefined;
-      },
+      input: {} as Input,
 
       actions: {} as { type: "setIsOpen"; params: { open: boolean } },
 
