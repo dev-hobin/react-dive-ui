@@ -20,6 +20,7 @@ export function connect(service: Service) {
       id: dom.getPanelId(context),
       style: {
         position: "absolute",
+        background: "gray",
       },
     }),
     closeProps: properties.button({
@@ -31,6 +32,18 @@ export function connect(service: Service) {
     }),
     arrowProps: properties.element({
       id: dom.getArrowId(context),
+      style: {
+        display: "block",
+        position: "absolute",
+        background: "gray",
+        "--rotate-deg": "45deg",
+        "--arrow-size-x": 0,
+        "--arrow-size-y": 0,
+        width: "var(--arrow-size-x, 0)",
+        height: "var(--arrow-size-y, 0)",
+        rotate: "var(--rotate-deg, 0deg)",
+        zIndex: -1,
+      },
     }),
   };
 }

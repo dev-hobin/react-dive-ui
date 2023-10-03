@@ -6,22 +6,16 @@ import {
   shift,
   offset,
   arrow,
-  Placement,
 } from "@floating-ui/dom";
 
-import { Context, Events, Input } from "./types";
+import { Context, Events, FloatingOptions, Input } from "./types";
 import { dom } from "./dom";
 
 type FloatingLogicOptions = {
   referenceEl: () => HTMLElement | null;
   floatingEl: () => HTMLElement | null;
   arrowEl?: () => HTMLElement | null;
-  floatOptions?: {
-    placement?: Placement;
-    offset?: number;
-    shiftPadding?: number;
-    arrowPadding?: number;
-  };
+  floatOptions?: Partial<FloatingOptions>;
 };
 const floatingLogic = fromCallback<any, FloatingLogicOptions>(({ input }) => {
   const cleanups: Array<() => void> = [];
@@ -34,6 +28,7 @@ const floatingLogic = fromCallback<any, FloatingLogicOptions>(({ input }) => {
       offset: 0,
       shiftPadding: 0,
       arrowPadding: 0,
+      arrowLength: 0,
     };
 
     if (!referenceEl || !floatingEl) return;
@@ -72,7 +67,7 @@ const floatingLogic = fromCallback<any, FloatingLogicOptions>(({ input }) => {
             top: arrowY != null ? `${arrowY}px` : "",
             right: "",
             bottom: "",
-            [staticSide]: "-4px",
+            [staticSide]: `-${floatingOptions.arrowLength}px`,
           });
         }
       });
@@ -94,6 +89,7 @@ export const machine = createMachine(
     context: ({ input }) => ({
       id: input.id,
       isOpen: input.isOpen ?? false,
+      floatingOptions: input.floatingOptions ?? {},
     }),
     states: {
       setup: {
@@ -113,6 +109,7 @@ export const machine = createMachine(
               referenceEl: () => dom.getTriggerEl(context),
               floatingEl: () => dom.getPanelEl(context),
               arrowEl: () => dom.getArrowEl(context),
+              floatOptions: context.floatingOptions,
             }),
           },
         ],

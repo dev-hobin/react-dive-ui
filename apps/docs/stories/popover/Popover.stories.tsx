@@ -11,7 +11,14 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state, service } = usePopover();
+  const { state, service } = usePopover({
+    floatingOptions: {
+      offset: 12,
+      shiftPadding: 12,
+      placement: "right-start",
+      arrowLength: 4,
+    },
+  });
 
   const { triggerProps, closeProps, arrowProps, panelProps } = connect(service);
   return (
@@ -22,7 +29,15 @@ export const Default = () => {
         createPortal(
           <article {...panelProps}>
             Popover Content
-            <button {...arrowProps}>Close</button>
+            <button {...closeProps}>Close</button>
+            <div
+              {...arrowProps}
+              style={{
+                ...arrowProps.style,
+                "--arrow-size-x": "10px",
+                "--arrow-size-y": "10px",
+              }}
+            />
           </article>,
           document.body
         )}

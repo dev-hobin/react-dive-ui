@@ -2,11 +2,17 @@ import { useActor } from "@xstate/react";
 import { machine } from "@react-dive-ui/popover-machine";
 import { useId } from "react";
 
-import type { Context, Send, Service } from "@react-dive-ui/popover-machine";
+import type {
+  Context,
+  FloatingOptions,
+  Send,
+  Service,
+} from "@react-dive-ui/popover-machine";
 
 type PopoverOptions = {
   id?: string;
   defaultOpen?: boolean;
+  floatingOptions?: Partial<FloatingOptions>;
 };
 
 type Popover = {
@@ -25,6 +31,7 @@ export function usePopover(options: PopoverOptions = {}): Popover {
     input: {
       id: options.id ?? internalId,
       isOpen: options.defaultOpen ?? false,
+      floatingOptions: options.floatingOptions,
     },
   });
 
