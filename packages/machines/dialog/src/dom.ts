@@ -14,4 +14,10 @@ export const dom = {
   getTriggerEl: (context: Context) => {
     return document.getElementById(dom.getTriggerId(context));
   },
+  getTitleEl: (context: Context) => {
+    return document.getElementById(dom.getTitleId(context));
+  },
+  getDescriptionEl: (context: Context) => {
+    return document.getElementById(dom.getDescriptionId(context));
+  },
 };

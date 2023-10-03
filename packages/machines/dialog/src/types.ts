@@ -10,9 +10,16 @@ export type Context = {
   type: "modal" | "non-modal";
   initialFocusEl: () => HTMLElement | null;
   scrollLock: boolean;
+  metaElements: {
+    title: boolean;
+    description: boolean;
+  };
 };
 
 export type Input = Pick<Context, "id" | "type"> &
   Partial<Pick<Context, "open" | "initialFocusEl" | "scrollLock">>;
 
-export type Events = { type: "OPEN" } | { type: "CLOSE" };
+export type Events =
+  | { type: "OPEN" }
+  | { type: "CLOSE" }
+  | { type: "UPDATE.META_ELEMENTS" };

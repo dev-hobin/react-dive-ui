@@ -57,7 +57,8 @@ const Child = () => {
 export const Default = () => {
   const { state, service } = useDialog();
 
-  const { triggerProps, closeProps, panelProps } = connect(service);
+  const { triggerProps, closeProps, panelProps, titleProps, descriptionProps } =
+    connect(service);
   return (
     <div>
       <button {...triggerProps} className={css.trigger}>
@@ -188,10 +189,14 @@ export const Default = () => {
           <>
             <div className={css.backdrop}></div>
             <div {...panelProps} className={css.panel}>
-              <h2 data-part="title" className={css.title}>
+              <h2 {...titleProps} data-part="title" className={css.title}>
                 Title
               </h2>
-              <p data-part="description" className={css.description}>
+              <p
+                {...descriptionProps}
+                data-part="description"
+                className={css.description}
+              >
                 description
               </p>
               <Child />

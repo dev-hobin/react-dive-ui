@@ -34,11 +34,17 @@ export function connect(service: Service) {
       id: dom.getPanelId(context),
       "aria-modal": context.type === "modal",
       "data-state": context.open ? "open" : "closed",
+      "aria-labelledby": context.metaElements.title
+        ? dom.getTitleId(context)
+        : undefined,
+      "aria-describedby": context.metaElements.description
+        ? dom.getDescriptionId(context)
+        : undefined,
     }),
-    title: properties.h2({
-      id: dom.getTriggerId(context),
+    titleProps: properties.h2({
+      id: dom.getTitleId(context),
     }),
-    description: properties.p({
+    descriptionProps: properties.p({
       id: dom.getDescriptionId(context),
     }),
   };
