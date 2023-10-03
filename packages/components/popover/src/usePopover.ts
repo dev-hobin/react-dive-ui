@@ -6,6 +6,7 @@ import type { Context, Send, Service } from "@react-dive-ui/popover-machine";
 
 type PopoverOptions = {
   id?: string;
+  defaultOpen?: boolean;
 };
 
 type Popover = {
@@ -23,6 +24,7 @@ export function usePopover(options: PopoverOptions = {}): Popover {
   const [state, send, service] = useActor(machine, {
     input: {
       id: options.id ?? internalId,
+      isOpen: options.defaultOpen ?? false,
     },
   });
 

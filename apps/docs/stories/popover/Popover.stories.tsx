@@ -11,8 +11,9 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state } = usePopover();
+  const { state } = usePopover({ defaultOpen: true });
 
+  console.log("hook state", state);
   return (
     <div>
       <button type="button">Toggle Popover</button>
