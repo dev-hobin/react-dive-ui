@@ -27,6 +27,9 @@ export const panel = style({
   padding: "1rem",
   background: vars.colors.white,
   maxWidth: "20rem",
+
+  display: "flex",
+  flexDirection: "column",
 });
 
 export const arrow = style({
@@ -59,7 +62,7 @@ export const description = style({
 });
 
 export const close = style({
-  color: vars.colors.black[500],
+  color: vars.colors.black,
   borderRadius: 8,
   backgroundColor: vars.colors.white,
   fontSize: vars.fontSizes.md,
@@ -74,5 +77,11 @@ export const close = style({
   ":focus": {
     outline: `2px solid ${vars.colors.gray[200]}`,
     outlineOffset: 2,
+  },
+
+  selectors: {
+    [`${panel} &`]: {
+      alignSelf: "flex-end",
+    },
   },
 });
