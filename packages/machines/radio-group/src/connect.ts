@@ -1,61 +1,47 @@
 import { properties } from "@react-dive-ui/properties";
-import { Item, Service } from "./types";
+import { Item, State, Send } from "./types";
 import { dom } from "./dom";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 
-export function connect(service: Service) {
-  const snapshot = service.getSnapshot();
-  const context = snapshot.context;
-  const send = service.send;
+type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
+
+export function connect(state: State, send: Send) {
+  const context = state.context;
 
   const selectedValue = context.selectedValue;
-  const itemMap = context.itemMap;
-  const itemArr = Array.from(itemMap.values());
 
   const groupDisabled = context.disabled;
 
-  const isItemLabelledby = (value: Item["value"]) =>
-    itemMap.get(value)?.labelledby ?? true;
-
-  const isItemDisabled = (value: Item["value"]) =>
-    !!itemMap.get(value)?.disabled;
-
-  const getRadioTabIndex = (value: Item["value"]) => {
-    if (groupDisabled || isItemDisabled(value)) {
+  const getRadioTabIndex = ({ value, disabled = false }: ItemProp) => {
+    if (groupDisabled || disabled) {
       return -1;
     }
-
-    const enabledItems = itemArr.filter((item) => !item.disabled);
     if (selectedValue !== null) {
-      if (isItemDisabled(selectedValue)) {
-        return enabledItems[0].value === value ? 0 : -1;
-      }
       return selectedValue === value ? 0 : -1;
     }
-
-    return enabledItems[0].value === value ? 0 : -1;
+    return 0;
   };
 
   return {
     groupProps: properties.element({
+      id: dom.getGroupId(context),
       role: "radiogroup",
       "data-disabled": groupDisabled ? "" : undefined,
     }),
-    getRadioProps: (value: Item["value"]) => {
+    getRadioProps: ({ value, disabled = false }: ItemProp) => {
       return properties.button({
         id: dom.getRadioId(context, value),
         type: "button",
         role: "radio",
-        tabIndex: getRadioTabIndex(value),
-        disabled: groupDisabled || isItemDisabled(value),
+        tabIndex: getRadioTabIndex({ value, disabled }),
+        disabled: groupDisabled || disabled,
         "aria-checked": selectedValue === value,
-        "aria-labelledby": isItemLabelledby(value)
-          ? dom.getLabelId(context, value)
-          : undefined,
-        "data-disabled":
-          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        "aria-labelledby": dom.getLabelId(context, value),
+        "data-disabled": groupDisabled || disabled ? "" : undefined,
         "data-state": selectedValue === value ? "checked" : "unchecked",
+        "data-ownedby": dom.getGroupId(context),
+        "data-value": value,
         onFocus: () => {
           send({ type: "RADIO.FOCUS", value });
         },
@@ -86,33 +72,30 @@ export function connect(service: Service) {
         },
       });
     },
-    getIndicatorProps: (value: Item["value"]) => {
+    getIndicatorProps: ({ value, disabled = false }: ItemProp) => {
       return properties.element({
         id: dom.getRadioId(context, value),
         tabIndex: -1,
-        "data-disabled":
-          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        "data-disabled": groupDisabled || disabled ? "" : undefined,
         "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
-    getLabelProps: (value: Item["value"]) => {
+    getLabelProps: ({ value, disabled = false }: ItemProp) => {
       return properties.label({
         id: dom.getLabelId(context, value),
-        htmlFor: isItemLabelledby(value)
-          ? dom.getRadioId(context, value)
-          : undefined,
-        "data-disabled":
-          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        htmlFor: dom.getRadioId(context, value),
+        "data-disabled": groupDisabled || disabled ? "" : undefined,
         "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
-    getHiddenInputProps: (value: Item["value"]) => {
+    getHiddenInputProps: ({ value, disabled = false }: ItemProp) => {
       return properties.input({
+        id: dom.getHiddenInputId(context, value),
         type: "radio",
         "aria-hidden": true,
         tabIndex: -1,
-        "data-disabled":
-          groupDisabled || isItemDisabled(value) ? "" : undefined,
+        value: value,
+        "data-disabled": groupDisabled || disabled ? "" : undefined,
         style: {
           position: "absolute",
           overflow: "hidden",

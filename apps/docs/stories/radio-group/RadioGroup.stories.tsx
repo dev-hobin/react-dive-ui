@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react";
-import { RadioGroup, useRadioGroup, connect } from "@react-dive-ui/radio-group";
+import { RadioGroup } from "@react-dive-ui/radio-group";
+
 import * as css from "./style.css";
 
 const meta = {
@@ -18,27 +19,40 @@ const VALUE_TO_LABEL: Record<string, string> = {
 };
 
 export const Default = () => {
-  const { state, service } = useRadioGroup({
-    items: [{ value: "apple" }, { value: "banana" }, { value: "orange" }],
-  });
-
-  const { groupProps, getRadioProps, getIndicatorProps, getLabelProps } =
-    connect(service);
   return (
-    <div {...groupProps} className={css.group}>
-      {state.items.map((item) => (
-        <div key={item.value} className={css.item}>
-          <button {...getRadioProps(item.value)} className={css.radio}>
-            <span
-              {...getIndicatorProps(item.value)}
-              className={css.indicator}
-            />
-          </button>
-          <label {...getLabelProps(item.value)} className={css.label}>
-            {VALUE_TO_LABEL[item.value]}
-          </label>
-        </div>
-      ))}
-    </div>
+    <RadioGroup.Provider>
+      <RadioGroup.Group className={css.group}>
+        <RadioGroup.ItemProvider value="apple">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["apple"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="banana">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["banana"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="orange">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["orange"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+      </RadioGroup.Group>
+    </RadioGroup.Provider>
   );
 };

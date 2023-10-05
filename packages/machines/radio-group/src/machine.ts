@@ -9,7 +9,6 @@ export const machine = createMachine(
       id: input.id,
       focusedValue: null,
       selectedValue: input.selectedValue ?? null,
-      itemMap: input.itemMap ?? new Map(),
       orientation: input.orientation ?? "vertical",
       disabled: input.disabled ?? false,
     }),
@@ -64,7 +63,6 @@ export const machine = createMachine(
       context: {} as Context,
       input: {} as {
         id: string;
-        itemMap?: Map<Item["value"], Item>;
         selectedValue?: Item["value"];
         orientation?: Orientation;
         disabled?: boolean;
@@ -91,30 +89,39 @@ export const machine = createMachine(
       select: assign(({ action }) => ({ selectedValue: action.params.value })),
       selectNext: pure(({ context }) => {
         const currentValue = context.focusedValue ?? context.selectedValue;
-        const items = Array.from(context.itemMap.values()).filter(
-          (item) => !item.disabled
-        );
-        const currentIndex = items.findIndex(
-          (item) => item.value === currentValue
+        if (currentValue === null) return;
+
+        const radioEls = dom.getRadioEls(context);
+        if (radioEls.length === 0) return;
+
+        const currentIndex = radioEls.findIndex(
+          (el) => el.id === dom.getRadioId(context, currentValue)
         );
         if (currentIndex === -1) return;
-        const nextItem = items[(currentIndex + 1) % items.length];
-        return assign({ selectedValue: nextItem.value });
+
+        const nextValue =
+          radioEls[(currentIndex + 1) % radioEls.length].dataset.value;
+        if (nextValue === undefined) return;
+
+        return assign({ selectedValue: nextValue });
       }),
       selectPrev: pure(({ context }) => {
         const currentValue = context.focusedValue ?? context.selectedValue;
-        const items = Array.from(context.itemMap.values()).filter(
-          (item) => !item.disabled
-        );
-        const currentIndex = items.findIndex(
-          (item) => item.value === currentValue
+        if (currentValue === null) return;
+
+        const radioEls = dom.getRadioEls(context);
+        if (radioEls.length === 0) return;
+
+        const currentIndex = radioEls.findIndex(
+          (el) => el.id === dom.getRadioId(context, currentValue)
         );
         if (currentIndex === -1) return;
 
-        const prevItem = items.at((currentIndex - 1) % items.length);
-        if (!prevItem) return;
+        const prevValue = radioEls.at((currentIndex - 1) % radioEls.length)
+          ?.dataset.value;
+        if (prevValue === undefined) return;
 
-        return assign({ selectedValue: prevItem.value });
+        return assign({ selectedValue: prevValue });
       }),
       focusCurrentSelectedRadio: ({ context }) => {
         if (context.selectedValue === null) return;
