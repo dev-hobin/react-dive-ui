@@ -144,9 +144,17 @@ export const machine = createMachine(
         on: {
           CLOSE: {
             target: "closed",
+            actions: [
+              { type: "setIsOpen", params: { open: false } },
+              "onChange",
+            ],
           },
           TOGGLE: {
             target: "closed",
+            actions: [
+              { type: "setIsOpen", params: { open: false } },
+              "onChange",
+            ],
           },
           "UPDATE.META_ELEMENTS": {
             actions: ["updateMetaElements"],
@@ -157,9 +165,17 @@ export const machine = createMachine(
         on: {
           OPEN: {
             target: "opened",
+            actions: [
+              { type: "setIsOpen", params: { open: true } },
+              "onChange",
+            ],
           },
           TOGGLE: {
             target: "opened",
+            actions: [
+              { type: "setIsOpen", params: { open: true } },
+              "onChange",
+            ],
           },
         },
       },
@@ -171,7 +187,9 @@ export const machine = createMachine(
       guards: {} as { type: "isOpen" },
       actions: {} as
         | { type: "checkRenderedMetaElements" }
-        | { type: "updateMetaElements" },
+        | { type: "updateMetaElements" }
+        | { type: "setIsOpen"; params: { open: boolean } }
+        | { type: "onChange" },
       actors: {} as
         | {
             src: "floatingLogic";
@@ -205,6 +223,10 @@ export const machine = createMachine(
           description: !!dom.getDescriptionEl(context),
         },
       })),
+      setIsOpen: assign(({ action }) => ({ isOpen: action.params.open })),
+
+      // template
+      onChange: () => {},
     },
     actors: {
       dismissLogic: dismissLogic,

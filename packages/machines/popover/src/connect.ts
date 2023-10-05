@@ -1,13 +1,10 @@
 import { properties } from "@react-dive-ui/properties";
-import { Service } from "./types";
+import { Send, State } from "./types";
 import { dom } from "./dom";
 
-export function connect(service: Service) {
-  const snapshot = service.getSnapshot();
-
-  const status = snapshot.value;
-  const context = snapshot.context;
-  const send = service.send;
+export function connect(state: State, send: Send) {
+  const context = state.context;
+  const status = state.value;
 
   return {
     triggerProps: properties.button({
