@@ -11,7 +11,7 @@ import { useCallback, useId } from "react";
 type SingleAccordionOptions = {
   type: "single";
   id?: string;
-  initialExpanded?: Item["value"];
+  defaultValue?: Item["value"];
   orientation?: Orientation;
   collapsible?: boolean;
   onChange?: (details: Item["value"] | null) => void;
@@ -19,7 +19,7 @@ type SingleAccordionOptions = {
 type MultipleAccordionOptions = {
   type: "multiple";
   id?: string;
-  initialExpanded?: Item["value"][];
+  defaultValue?: Item["value"][];
   orientation?: Orientation;
   onChange?: (details: Item["value"][]) => void;
 };
@@ -48,11 +48,11 @@ export function useAccordion(options: AccordionOptions) {
         type: options.type,
         collapsible: options.type === "multiple" || options.collapsible,
         orientation: options.orientation ?? "vertical",
-        expandedValues: !options.initialExpanded
+        expandedValues: !options.defaultValue
           ? []
-          : Array.isArray(options.initialExpanded)
-          ? options.initialExpanded
-          : [options.initialExpanded],
+          : Array.isArray(options.defaultValue)
+          ? options.defaultValue
+          : [options.defaultValue],
       },
     }
   );

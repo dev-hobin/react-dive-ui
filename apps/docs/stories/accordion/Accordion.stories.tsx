@@ -20,8 +20,8 @@ export default meta;
 export const Default = () => {
   return (
     <Accordion.Provider
-      type="single"
-      initialExpanded="value-1"
+      type="multiple"
+      defaultValue={["value-1", "value-2"]}
       onChange={(details) => console.log(details)}
     >
       <Accordion.Root className={rootStyle}>
