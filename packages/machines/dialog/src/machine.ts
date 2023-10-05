@@ -144,7 +144,10 @@ export const machine = createMachine(
         on: {
           CLOSE: {
             target: "closed",
-            actions: [{ type: "setIsOpen", params: { open: false } }],
+            actions: [
+              { type: "setIsOpen", params: { open: false } },
+              "onChange",
+            ],
           },
           "UPDATE.META_ELEMENTS": {
             actions: ["updateMetaElements"],
@@ -155,7 +158,10 @@ export const machine = createMachine(
         on: {
           OPEN: {
             target: "opened",
-            actions: [{ type: "setIsOpen", params: { open: true } }],
+            actions: [
+              { type: "setIsOpen", params: { open: true } },
+              "onChange",
+            ],
           },
         },
       },
@@ -168,7 +174,8 @@ export const machine = createMachine(
       actions: {} as
         | { type: "setIsOpen"; params: { open: boolean } }
         | { type: "checkRenderedMetaElements" }
-        | { type: "updateMetaElements" },
+        | { type: "updateMetaElements" }
+        | { type: "onChange" },
 
       actors: {} as
         | {
@@ -206,6 +213,9 @@ export const machine = createMachine(
           description: !!dom.getDescriptionEl(context),
         },
       })),
+
+      // template
+      onChange: () => {},
     },
     guards: { isOpen: ({ context }) => context.open },
     actors: {
