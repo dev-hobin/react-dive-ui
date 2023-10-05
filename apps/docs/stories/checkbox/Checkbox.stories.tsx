@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { Checkbox, useCheckbox } from "@react-dive-ui/checkbox";
+import { Checkbox } from "@react-dive-ui/checkbox";
 import { controlStyle, iconStyle, labelStyle } from "./style.css";
 import { BsCheck } from "react-icons/bs";
 
@@ -13,11 +13,9 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { service } = useCheckbox();
-
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <Checkbox.Provider service={service}>
+      <Checkbox.Provider>
         <Checkbox.Control className={controlStyle}>
           <BsCheck className={iconStyle} />
         </Checkbox.Control>

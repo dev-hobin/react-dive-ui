@@ -1,13 +1,12 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useService } from "../service-provider";
-import { connect } from "@react-dive-ui/checkbox-machine";
+import { useCheckboxContext } from "../checkbox-provider";
 
 type LabelProps = ComponentPropsWithoutRef<typeof dive.label>;
 export const Label = forwardRef<HTMLLabelElement, LabelProps>((props, ref) => {
-  const service = useService();
+  const context = useCheckboxContext();
 
-  const { labelProps } = connect(service);
+  const { labelProps } = context.props;
   return <dive.label {...labelProps} {...props} ref={ref} />;
 });
 

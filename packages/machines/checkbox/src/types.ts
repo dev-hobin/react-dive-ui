@@ -1,4 +1,4 @@
-import { ActorRefFrom } from "xstate";
+import { ActorRefFrom, StateFrom } from "xstate";
 import { machine } from "./machine";
 
 export type CheckedState = "checked" | "unchecked" | "indeterminate";
@@ -39,3 +39,7 @@ export type Actions =
 export type Guards = { type: "isDisabled" } | { type: "isIndeterminate" };
 
 export type Service = ActorRefFrom<typeof machine>;
+
+export type Send = Service["send"];
+
+export type State = StateFrom<typeof machine>;

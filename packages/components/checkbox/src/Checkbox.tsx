@@ -1,7 +1,7 @@
 import { Control, Label, HiddenInput } from "./parts";
-import { ServiceProvider } from "./service-provider";
+import { CheckboxProvider } from "./checkbox-provider";
 
 export const Checkbox = Object.assign(
   {},
-  { Provider: ServiceProvider, Control, Label, HiddenInput }
+  { Provider: CheckboxProvider, Control, Label, HiddenInput }
 );
