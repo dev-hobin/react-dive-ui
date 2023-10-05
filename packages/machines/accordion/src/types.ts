@@ -8,26 +8,24 @@ export type Item = {
 
 export type Orientation = "vertical" | "horizontal";
 
+export type Status = "idle" | "focused";
+
 export type Context = {
   id: string;
   type: "single" | "multiple";
   focusedValue: Item["value"] | null;
   expandedValues: Item["value"][];
-  itemMap: Map<Item["value"], Item>;
   collapsible: boolean;
   orientation: Orientation;
 };
 
 export type Input = Pick<Context, "id" | "type"> &
-  Partial<
-    Pick<Context, "expandedValues" | "itemMap" | "collapsible" | "orientation">
-  >;
+  Partial<Pick<Context, "expandedValues" | "collapsible" | "orientation">>;
 
 export type Events =
   | { type: "ITEM.EXPAND"; value: Item["value"] }
   | { type: "ITEM.COLLAPSE"; value: Item["value"] }
   | { type: "ITEM.TOGGLE"; value: Item["value"] }
-  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean }
   | { type: "TRIGGER.FOCUSED"; value: Item["value"] }
   | { type: "TRIGGER.BLURRED" }
   | { type: "TRIGGER.FOCUS.NEXT" }
@@ -38,10 +36,6 @@ export type Actions =
   | { type: "removeFromExpandedValues"; params: { value: Item["value"] } }
   | { type: "toggleValueInExpandedValues"; params: { value: Item["value"] } }
   | { type: "resetExpandedValuesWith"; params: { value: Item["value"] } }
-  | {
-      type: "setItemDisabled";
-      params: { value: Item["value"]; disabled: boolean };
-    }
   | { type: "setFocusedValue"; params: { value: Item["value"] | null } }
   | { type: "focusNextTrigger" }
   | { type: "focusPrevTrigger" }

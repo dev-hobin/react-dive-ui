@@ -1,13 +1,15 @@
 import { useActor } from "@xstate/react";
-import { machine, Item, Orientation } from "@react-dive-ui/accordion-machine";
+import {
+  machine,
+  Item,
+  Orientation,
+  Status,
+} from "@react-dive-ui/accordion-machine";
 import { useCallback, useId } from "react";
-
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 type SingleAccordionOptions = {
   type: "single";
   id?: string;
-  items?: Optional<Item, "disabled">[];
   initialExpanded?: Item["value"];
   orientation?: Orientation;
   collapsible?: boolean;
@@ -16,7 +18,6 @@ type SingleAccordionOptions = {
 type MultipleAccordionOptions = {
   type: "multiple";
   id?: string;
-  items?: Optional<Item, "disabled">[];
   initialExpanded?: Item["value"][];
   orientation?: Orientation;
   onChange?: (details: Item["value"][]) => void;
@@ -30,9 +31,9 @@ export function useAccordion(options: AccordionOptions) {
       actions: {
         onChange: ({ context }) => {
           if (options.type === "single") {
-            options?.onChange?.(context.expandedValues[0] ?? null);
+            options.onChange?.(context.expandedValues[0] ?? null);
           } else {
-            options?.onChange?.(context.expandedValues);
+            options.onChange?.(context.expandedValues);
           }
         },
       },
@@ -48,14 +49,6 @@ export function useAccordion(options: AccordionOptions) {
           : Array.isArray(options.initialExpanded)
           ? options.initialExpanded
           : [options.initialExpanded],
-        itemMap: new Map(
-          options.items?.map((item) => {
-            if (item.disabled === undefined) {
-              item.disabled = false;
-            }
-            return [item.value, item];
-          })
-        ),
       },
     }
   );
@@ -84,20 +77,18 @@ export function useAccordion(options: AccordionOptions) {
     [send]
   );
 
-  const setItemDisabled = useCallback(
-    (value: Item["value"], disabled: boolean) => {
-      send({ type: "SET.ITEM.DISABLED", value, disabled });
-    },
-    [send]
-  );
-
   const { value, context } = state;
 
-  const items = Array.from(context.itemMap.values());
-
   return {
-    state: { status: value, items: items },
-    apis: { toggle, open, close, setItemDisabled },
+    state: {
+      status: value as Status,
+      collapsible: context.collapsible,
+      expandedValues: context.expandedValues,
+      focusedValue: context.focusedValue,
+      orientation: context.orientation,
+      type: context.type,
+    },
+    apis: { toggle, open, close },
     service: actorRef,
   };
 }

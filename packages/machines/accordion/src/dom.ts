@@ -10,15 +10,10 @@ export const dom = {
     `accordion::panel::${context.id}::${value}`,
 
   getTriggerEls: (context: Context) => {
-    const triggerValues = Array.from(context.itemMap.keys());
-
-    const selector = triggerValues
-      .map(
-        (value) =>
-          `#${CSS.escape(dom.getTriggerId(context, value))}:not([disabled])`
+    return Array.from<HTMLElement>(
+      document.querySelectorAll(
+        `[data-ownedby=${CSS.escape(dom.getRootId(context))}]:not([disabled])`
       )
-      .join(", ");
-
-    return Array.from<HTMLElement>(document.querySelectorAll(selector));
+    );
   },
 };
