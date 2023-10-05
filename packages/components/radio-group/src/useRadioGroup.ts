@@ -7,7 +7,7 @@ import {
 import { useActor } from "@xstate/react";
 import { useId } from "react";
 
-type RadioGroupOptions = {
+export type RadioGroupOptions = {
   id?: string;
   defaultValue?: Item["value"];
   orientation?: Orientation;
