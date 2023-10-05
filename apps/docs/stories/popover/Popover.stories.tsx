@@ -1,5 +1,4 @@
-import { connect, usePopover } from "@react-dive-ui/popover";
-import { createPortal } from "react-dom";
+import { Popover } from "@react-dive-ui/popover";
 import * as css from "./style.css";
 
 const meta = {
@@ -12,46 +11,38 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { state, service } = usePopover({
-    floatingOptions: {
-      offset: 12,
-      shiftPadding: 12,
-      placement: "bottom-start",
-      arrowLength: 4,
-    },
-  });
-
-  const {
-    triggerProps,
-    closeProps,
-    arrowProps,
-    panelProps,
-    titleProps,
-    descriptionProps,
-  } = connect(service);
   return (
-    <div>
-      <button {...triggerProps} className={css.trigger}>
-        Toggle Popover
-      </button>
+    <Popover.Provider
+      floatingOptions={{
+        offset: 12,
+        shiftPadding: 12,
+        placement: "bottom-start",
+        arrowLength: 4,
+      }}
+    >
+      {({ isOpen }) => (
+        <>
+          <Popover.Trigger className={css.trigger}>
+            Toggle Popover
+          </Popover.Trigger>
+          {isOpen && (
+            <Popover.Portal>
+              <Popover.Panel className={css.panel}>
+                <Popover.Title className={css.title}>
+                  About Popover
+                </Popover.Title>
+                <Popover.Description className={css.description}>
+                  Popovers are perfect for floating panels with arbitrary
+                  content like navigation menus, mobile menus and flyout menus.
+                </Popover.Description>
 
-      {state.status === "opened" &&
-        createPortal(
-          <article {...panelProps} className={css.panel}>
-            <h2 {...titleProps} className={css.title}>
-              About Popover
-            </h2>
-            <p {...descriptionProps} className={css.description}>
-              Popovers are perfect for floating panels with arbitrary content
-              like navigation menus, mobile menus and flyout menus.
-            </p>
-            <button {...closeProps} className={css.close}>
-              Close
-            </button>
-            <div {...arrowProps} className={css.arrow} />
-          </article>,
-          document.body
-        )}
-    </div>
+                <Popover.Close className={css.close}>Close</Popover.Close>
+                <Popover.Arrow className={css.arrow} />
+              </Popover.Panel>
+            </Popover.Portal>
+          )}
+        </>
+      )}
+    </Popover.Provider>
   );
 };

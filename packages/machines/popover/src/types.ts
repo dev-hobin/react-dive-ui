@@ -1,10 +1,12 @@
-import { ActorRefFrom } from "xstate";
+import { ActorRefFrom, StateFrom } from "xstate";
 import { Placement } from "@floating-ui/dom";
 import { machine } from "./machine";
 
 export type Service = ActorRefFrom<typeof machine>;
 
 export type Send = Service["send"];
+
+export type State = StateFrom<typeof machine>;
 
 export type Context = {
   id: string;
