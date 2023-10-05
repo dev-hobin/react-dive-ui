@@ -1,11 +1,11 @@
 import { ItemProvider } from "./item-provider";
 import { Root, Heading, Trigger, Panel } from "./parts";
-import { ServiceProvider } from "./service-provider";
+import { AccordionProvider } from "./accordion-provider";
 
 export const Accordion = Object.assign(
   {},
   {
-    Provider: ServiceProvider,
+    Provider: AccordionProvider,
     ItemProvider,
     Root,
     Heading,

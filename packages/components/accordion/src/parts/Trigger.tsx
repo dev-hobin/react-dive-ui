@@ -1,10 +1,9 @@
 import { forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useService } from "../service-provider";
+import { useAccordionContext } from "../accordion-provider";
 import { useItem } from "../item-provider";
 
 import type { ComponentPropsWithoutRef } from "react";
-import { connect } from "@react-dive-ui/accordion-machine";
 
 type TriggerProps = Omit<
   ComponentPropsWithoutRef<typeof dive.button>,
@@ -12,10 +11,10 @@ type TriggerProps = Omit<
 >;
 export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
-    const service = useService();
+    const context = useAccordionContext();
     const item = useItem();
 
-    const { getTriggerProps } = connect(service);
+    const { getTriggerProps } = context.props;
     const triggerProps = getTriggerProps(item);
 
     return <dive.button {...triggerProps} {...props} ref={ref} />;

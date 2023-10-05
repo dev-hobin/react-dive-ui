@@ -4,6 +4,7 @@ import {
   Item,
   Orientation,
   Status,
+  connect,
 } from "@react-dive-ui/accordion-machine";
 import { useCallback, useId } from "react";
 
@@ -29,7 +30,7 @@ export type AccordionOptions =
 
 export function useAccordion(options: AccordionOptions) {
   const internalId = useId();
-  const [state, send, actorRef] = useActor(
+  const [state, send] = useActor(
     machine.provide({
       actions: {
         onChange: ({ context }) => {
@@ -92,6 +93,6 @@ export function useAccordion(options: AccordionOptions) {
       type: context.type,
     },
     apis: { toggle, open, close },
-    service: actorRef,
+    props: connect(state, send),
   };
 }
