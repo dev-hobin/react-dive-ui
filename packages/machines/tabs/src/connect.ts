@@ -7,6 +7,8 @@ import type { Item } from "./types";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
+type ItemProp = Pick<Item, "value"> & Partial<Pick<Item, "disabled">>;
+
 export function connect(service: ActorRefFrom<typeof machine>) {
   const snapshot = service.getSnapshot();
   const context = snapshot.context;
@@ -23,13 +25,14 @@ export function connect(service: ActorRefFrom<typeof machine>) {
       "aria-orientation": context.orientation,
       "data-orientation": context.orientation,
     }),
-    getTriggerProps: (value: Item["value"]) => {
+    getTriggerProps: ({ value, disabled = false }: ItemProp) => {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
         role: "tab",
-        disabled: !!context.itemMap.get(value)?.disabled,
+        disabled: disabled,
         tabIndex: context.value === value ? 0 : -1,
+        "data-ownedby": dom.getRootId(context),
         onFocus: () => {
           send({ type: "TRIGGER.FOCUSED", value });
         },
@@ -62,10 +65,10 @@ export function connect(service: ActorRefFrom<typeof machine>) {
         "aria-selected": context.value === value,
         "data-state": context.value === value ? "active" : "inactive",
         "data-orientation": context.orientation,
-        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
+        "data-disabled": disabled ? "" : undefined,
       });
     },
-    getPanelProps: (value: Item["value"]) => {
+    getPanelProps: (value: ItemProp["value"]) => {
       return properties.element({
         id: dom.getPanelId(context, value),
         role: "tabpanel",

@@ -14,7 +14,6 @@ export type Context = {
   id: string;
   value: Item["value"];
   focusedValue: Item["value"] | null;
-  itemMap: Map<Item["value"], Item>;
   activationMode: ActivationMode;
   orientation: Orientation;
 };
@@ -24,8 +23,7 @@ export type Events =
   | { type: "TRIGGER.BLURRED" }
   | { type: "TRIGGER.FOCUS.NEXT" }
   | { type: "TRIGGER.FOCUS.PREV" }
-  | { type: "ITEM.ACTIVATE"; value: Item["value"] }
-  | { type: "SET.ITEM.DISABLED"; value: Item["value"]; disabled: boolean };
+  | { type: "ITEM.ACTIVATE"; value: Item["value"] };
 
 export type Actions =
   | {
@@ -35,11 +33,7 @@ export type Actions =
   | { type: "focusNextTrigger" }
   | { type: "focusPrevTrigger" }
   | { type: "setValue"; params: { value: Item["value"] } }
-  | { type: "onChange" }
-  | {
-      type: "setItemDisabled";
-      params: { value: Item["value"]; disabled: boolean };
-    };
+  | { type: "onChange" };
 
 export type Guards =
   | {
@@ -49,8 +43,6 @@ export type Guards =
   | { type: "isAutomaticMode" };
 
 export type Input = Pick<Context, "id" | "value"> &
-  Partial<
-    Pick<Context, "value" | "itemMap" | "activationMode" | "orientation">
-  >;
+  Partial<Pick<Context, "value" | "activationMode" | "orientation">>;
 
 export type Service = ActorRefFrom<typeof machine>;
