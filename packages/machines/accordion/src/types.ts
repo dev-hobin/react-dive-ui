@@ -42,7 +42,6 @@ export type Actions =
   | { type: "onChange" };
 
 export type Guards =
-  | { type: "isItemDisabled"; params: { value: Item["value"] } }
   | { type: "isExpandedItem"; params: { value: Item["value"] } }
   | { type: "isSingleType" }
   | { type: "hasExpandedItem" }

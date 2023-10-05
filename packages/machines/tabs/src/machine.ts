@@ -9,7 +9,6 @@ export const machine = createMachine(
       id: input.id,
       value: input.value,
       focusedValue: null,
-      itemMap: input?.itemMap ?? new Map(),
       orientation: input?.orientation ?? "horizontal",
       activationMode: input?.activationMode ?? "automatic",
     }),
@@ -62,12 +61,6 @@ export const machine = createMachine(
     on: {
       "ITEM.ACTIVATE": [
         {
-          guard: {
-            type: "isItemDisabled",
-            params: ({ event }) => ({ value: event.value }),
-          },
-        },
-        {
           actions: [
             {
               type: "setValue",
@@ -76,17 +69,6 @@ export const machine = createMachine(
           ],
         },
       ],
-      "SET.ITEM.DISABLED": {
-        actions: [
-          {
-            type: "setItemDisabled",
-            params: ({ event }) => ({
-              value: event.value,
-              disabled: event.disabled,
-            }),
-          },
-        ],
-      },
     },
     types: {
       context: {} as Context,
@@ -98,10 +80,6 @@ export const machine = createMachine(
   },
   {
     guards: {
-      isItemDisabled: ({ context, guard }) => {
-        const item = context.itemMap.get(guard.params.value);
-        return item?.disabled ?? true;
-      },
       isAutomaticMode: ({ context }) => {
         return context.activationMode === "automatic";
       },
@@ -139,16 +117,6 @@ export const machine = createMachine(
 
         triggerEls.at((currentIndex - 1) % triggerEls.length)?.focus();
       },
-      setItemDisabled: assign(({ context, action }) => {
-        const { value, disabled } = action.params;
-        const item = context.itemMap.get(value);
-        if (!item) return {};
-
-        context.itemMap.set(value, { ...item, disabled });
-        return {
-          itemMap: new Map(context.itemMap),
-        };
-      }),
 
       // template
       onChange: () => {},

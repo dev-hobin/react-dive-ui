@@ -1,17 +1,17 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { Item, connect } from "@react-dive-ui/tabs-machine";
-import { useService } from "../service-provider";
+import { ItemProp } from "@react-dive-ui/tabs-machine";
+import { useTabsContext } from "../tabs-provider";
 
 type PanelProps = Omit<ComponentPropsWithoutRef<typeof dive.div>, "value"> & {
-  value: Item["value"];
+  value: ItemProp["value"];
 };
 export const Panel = forwardRef<HTMLDivElement, PanelProps>((props, ref) => {
   const { value, ...restProps } = props;
 
-  const service = useService();
+  const context = useTabsContext();
 
-  const { getPanelProps } = connect(service);
+  const { getPanelProps } = context.props;
   return <dive.div {...getPanelProps(value)} {...restProps} ref={ref} />;
 });
 
