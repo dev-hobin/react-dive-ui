@@ -1,13 +1,12 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
-import { connect } from "@react-dive-ui/tabs-machine";
 import { dive } from "@react-dive-ui/dive";
-import { useService } from "../service-provider";
+import { useTabsContext } from "../tabs-provider";
 
 type ListProps = ComponentPropsWithoutRef<typeof dive.div>;
 export const List = forwardRef<HTMLDivElement, ListProps>((props, ref) => {
-  const service = useService();
+  const context = useTabsContext();
 
-  const { listProps } = connect(service);
+  const { listProps } = context.props;
   return <dive.div {...listProps} {...props} ref={ref} />;
 });
 

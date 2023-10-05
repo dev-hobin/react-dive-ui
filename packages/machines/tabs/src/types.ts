@@ -1,10 +1,12 @@
-import { ActorRefFrom } from "xstate";
+import { ActorRefFrom, StateFrom } from "xstate";
 import { machine } from "./machine";
 
 export type Item = {
   value: string;
   disabled: boolean;
 };
+
+export type ItemProp = Pick<Item, "value"> & Partial<Pick<Item, "disabled">>;
 
 export type Orientation = "vertical" | "horizontal";
 
@@ -35,14 +37,13 @@ export type Actions =
   | { type: "setValue"; params: { value: Item["value"] } }
   | { type: "onChange" };
 
-export type Guards =
-  | {
-      type: "isItemDisabled";
-      params: { value: Item["value"] };
-    }
-  | { type: "isAutomaticMode" };
+export type Guards = { type: "isAutomaticMode" };
 
 export type Input = Pick<Context, "id" | "value"> &
   Partial<Pick<Context, "value" | "activationMode" | "orientation">>;
 
 export type Service = ActorRefFrom<typeof machine>;
+
+export type Send = Service["send"];
+
+export type State = StateFrom<typeof machine>;

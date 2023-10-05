@@ -61,12 +61,6 @@ export const machine = createMachine(
     on: {
       "ITEM.ACTIVATE": [
         {
-          guard: {
-            type: "isItemDisabled",
-            params: ({ event }) => ({ value: event.value }),
-          },
-        },
-        {
           actions: [
             {
               type: "setValue",

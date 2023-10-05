@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { Tabs, useTabs } from "@react-dive-ui/tabs";
+import { Tabs } from "@react-dive-ui/tabs";
 import { root, list, trigger, panel } from "./style.css";
 
 const meta = {
@@ -12,13 +12,8 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { service } = useTabs({
-    defaultValue: "value-1",
-    activationMode: "manual",
-  });
-
   return (
-    <Tabs.Provider service={service}>
+    <Tabs.Provider defaultValue="value-1" activationMode="manual">
       <Tabs.Root className={root}>
         <Tabs.List className={list}>
           <Tabs.Trigger className={trigger} value="value-1">

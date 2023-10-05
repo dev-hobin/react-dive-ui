@@ -1,18 +1,12 @@
-import { ActorRefFrom } from "xstate";
 import { properties } from "@react-dive-ui/properties";
-import { machine } from "./machine";
 import { dom } from "./dom";
 
-import type { Item } from "./types";
+import type { Send, State, ItemProp } from "./types";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
-type ItemProp = Pick<Item, "value"> & Partial<Pick<Item, "disabled">>;
-
-export function connect(service: ActorRefFrom<typeof machine>) {
-  const snapshot = service.getSnapshot();
-  const context = snapshot.context;
-  const send = service.send;
+export function connect(state: State, send: Send) {
+  const context = state.context;
 
   return {
     rootProps: properties.element({
