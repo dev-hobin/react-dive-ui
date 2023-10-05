@@ -1,27 +1,25 @@
-import { ActorRefFrom } from "xstate";
 import { properties } from "@react-dive-ui/properties";
-import { machine } from "./machine";
 import { dom } from "./dom";
 
-import type { Item } from "./types";
+import type { Item, Send, State } from "./types";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
-export function connect(service: ActorRefFrom<typeof machine>) {
-  const snapshot = service.getSnapshot();
-  const context = snapshot.context;
-  const send = service.send;
+type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
+
+export function connect(state: State, send: Send) {
+  const context = state.context;
 
   return {
     rootProps: properties.element({
       id: dom.getRootId(context),
       "data-orientation": context.orientation,
     }),
-    getTriggerProps: (value: Item["value"]) => {
+    getTriggerProps: ({ value, disabled = false }: ItemProp) => {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
-        disabled: !!context.itemMap.get(value)?.disabled,
+        disabled,
         onFocus: () => {
           send({ type: "TRIGGER.FOCUSED", value });
         },
@@ -47,31 +45,35 @@ export function connect(service: ActorRefFrom<typeof machine>) {
             }
           }
         },
+        onClick: () => {
+          send({ type: "ITEM.TOGGLE", value });
+        },
         "data-state": context.expandedValues.includes(value)
           ? "open"
           : "closed",
         "data-orientation": context.orientation,
-        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
+        "data-disabled": disabled ? "" : undefined,
+        "data-ownedby": dom.getRootId(context),
       });
     },
-    getHeadingProps: (value: Item["value"]) => {
+    getHeadingProps: ({ value, disabled = false }: ItemProp) => {
       return properties.h3({
         id: dom.getHeadingId(context, value),
         "data-state": context.expandedValues.includes(value)
           ? "open"
           : "closed",
         "data-orientation": context.orientation,
-        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
+        "data-disabled": disabled ? "" : undefined,
       });
     },
-    getPanelProps: (value: Item["value"]) => {
+    getPanelProps: ({ value, disabled = false }: ItemProp) => {
       return properties.element({
         id: dom.getPanelId(context, value),
         "data-state": context.expandedValues.includes(value)
           ? "open"
           : "closed",
         "data-orientation": context.orientation,
-        "data-disabled": context.itemMap.get(value)?.disabled ? "" : undefined,
+        "data-disabled": disabled ? "" : undefined,
       });
     },
   };

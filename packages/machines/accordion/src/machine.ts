@@ -11,7 +11,6 @@ export const machine = createMachine(
       type: input.type,
       focusedValue: null,
       expandedValues: input.expandedValues ?? [],
-      itemMap: input.itemMap ?? new Map(),
       collapsible: input.collapsible ?? false,
       orientation: input.orientation ?? "vertical",
     }),
@@ -52,12 +51,6 @@ export const machine = createMachine(
     on: {
       "ITEM.EXPAND": [
         {
-          guard: {
-            type: "isItemDisabled",
-            params: ({ event }) => ({ value: event.value }),
-          },
-        },
-        {
           guard: and(["isSingleType", "hasExpandedItem"]),
           actions: [
             {
@@ -78,12 +71,6 @@ export const machine = createMachine(
         },
       ],
       "ITEM.COLLAPSE": [
-        {
-          guard: {
-            type: "isItemDisabled",
-            params: ({ event }) => ({ value: event.value }),
-          },
-        },
         {
           guard: and(["isSingleType", "hasExpandedItem", not("isCollapsible")]),
         },
@@ -113,17 +100,6 @@ export const machine = createMachine(
           ),
         },
       ],
-      "SET.ITEM.DISABLED": {
-        actions: [
-          {
-            type: "setItemDisabled",
-            params: ({ event }) => ({
-              value: event.value,
-              disabled: event.disabled,
-            }),
-          },
-        ],
-      },
     },
     types: {
       context: {} as Context,
@@ -135,10 +111,6 @@ export const machine = createMachine(
   },
   {
     guards: {
-      isItemDisabled: ({ context, guard }) => {
-        const item = context.itemMap.get(guard.params.value);
-        return item?.disabled ?? true;
-      },
       isCollapsible: ({ context }) => {
         return context.collapsible;
       },
@@ -173,16 +145,6 @@ export const machine = createMachine(
       resetExpandedValuesWith: assign(({ action }) => {
         return {
           expandedValues: [action.params.value],
-        };
-      }),
-      setItemDisabled: assign(({ context, action }) => {
-        const { value, disabled } = action.params;
-        const item = context.itemMap.get(value);
-        if (!item) return {};
-
-        context.itemMap.set(value, { ...item, disabled });
-        return {
-          itemMap: new Map(context.itemMap),
         };
       }),
       setFocusedValue: assign(({ action }) => ({

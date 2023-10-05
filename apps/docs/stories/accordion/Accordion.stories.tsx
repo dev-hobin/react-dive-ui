@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { Accordion, useAccordion } from "@react-dive-ui/accordion";
+import { Accordion } from "@react-dive-ui/accordion";
 import {
   rootStyle,
   itemStyle,
@@ -18,15 +18,12 @@ const meta = {
 export default meta;
 
 export const Default = () => {
-  const { service } = useAccordion({
-    type: "single",
-    items: [{ value: "value-1" }, { value: "value-2" }, { value: "value-3" }],
-    initialExpanded: "value-1",
-    onChange: (details) => console.log(details),
-  });
-
   return (
-    <Accordion.Provider service={service}>
+    <Accordion.Provider
+      type="multiple"
+      defaultValue={["value-1", "value-2"]}
+      onChange={(details) => console.log(details)}
+    >
       <Accordion.Root className={rootStyle}>
         <Accordion.ItemProvider value="value-1">
           <div className={itemStyle}>
