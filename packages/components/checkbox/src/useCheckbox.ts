@@ -4,9 +4,10 @@ import {
   CheckedState,
   FormOptions,
   machine,
+  connect,
 } from "@react-dive-ui/checkbox-machine";
 
-type CheckboxOptions = {
+export type CheckboxOptions = {
   id?: string;
   checkedState?: CheckedState;
   disabled?: boolean;
@@ -16,7 +17,7 @@ type CheckboxOptions = {
 };
 export function useCheckbox(options: CheckboxOptions = {}) {
   const internalId = useId();
-  const [state, send, actorRef] = useActor(
+  const [state, send] = useActor(
     machine.provide({
       actions: {
         onChange: ({ context }) => {
@@ -67,6 +68,6 @@ export function useCheckbox(options: CheckboxOptions = {}) {
       ...context,
     },
     apis: { check, setChecked, setIndeterminate, setDisabled },
-    service: actorRef,
+    props: connect(state, send),
   };
 }

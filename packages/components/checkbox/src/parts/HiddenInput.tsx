@@ -1,14 +1,13 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useService } from "../service-provider";
-import { connect } from "@react-dive-ui/checkbox-machine";
+import { useCheckboxContext } from "../checkbox-provider";
 
 type HiddenInputProps = ComponentPropsWithoutRef<typeof dive.input>;
 export const HiddenInput = forwardRef<HTMLInputElement, HiddenInputProps>(
   (props, ref) => {
-    const service = useService();
+    const context = useCheckboxContext();
 
-    const { hiddenInputProps } = connect(service);
+    const { hiddenInputProps } = context.props;
     return <dive.input {...hiddenInputProps} {...props} ref={ref} />;
   }
 );

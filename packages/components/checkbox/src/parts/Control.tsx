@@ -1,14 +1,13 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
-import { useService } from "../service-provider";
-import { connect } from "@react-dive-ui/checkbox-machine";
+import { useCheckboxContext } from "../checkbox-provider";
 
 type ControlProps = ComponentPropsWithoutRef<typeof dive.button>;
 export const Control = forwardRef<HTMLButtonElement, ControlProps>(
   (props, ref) => {
-    const service = useService();
+    const context = useCheckboxContext();
 
-    const { controlProps } = connect(service);
+    const { controlProps } = context.props;
     return <dive.button {...controlProps} {...props} ref={ref} />;
   }
 );
