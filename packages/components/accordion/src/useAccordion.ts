@@ -23,7 +23,10 @@ type MultipleAccordionOptions = {
   onChange?: (details: Item["value"][]) => void;
 };
 
-type AccordionOptions = SingleAccordionOptions | MultipleAccordionOptions;
+export type AccordionOptions =
+  | SingleAccordionOptions
+  | MultipleAccordionOptions;
+
 export function useAccordion(options: AccordionOptions) {
   const internalId = useId();
   const [state, send, actorRef] = useActor(
