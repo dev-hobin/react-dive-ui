@@ -1,14 +1,23 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
+import { composeEventHandlers } from "@react-dive-ui/compose-event-handlers";
 import { usePopoverContext } from "../popover-provider";
 
 type TriggerProps = ComponentPropsWithoutRef<typeof dive.button>;
 export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
   (props, ref) => {
     const context = usePopoverContext();
-
     const { triggerProps } = context.props;
-    return <dive.button {...triggerProps} {...props} ref={ref} />;
+
+    const mergedProps = mergeProps(triggerProps, props);
+    return (
+      <dive.button
+        {...mergedProps}
+        onClick={composeEventHandlers(props.onClick, triggerProps.onClick)}
+        ref={ref}
+      />
+    );
   }
 );
 
