@@ -15,6 +15,7 @@ export function connect(state: State, send: Send) {
         context.checkedState === "indeterminate"
           ? "mixed"
           : context.checkedState === "checked",
+      "aria-labelledby": dom.getLabelId(context),
       onClick: () => {
         send({ type: "CHECK" });
       },
