@@ -1,13 +1,23 @@
 import { style } from "@vanilla-extract/css";
 import { vars } from "../../styles/theme.css";
 
+export const panel = style({
+  boxShadow: `0px 0px 10px 0px ${vars.colors.alphas.black[50]}`,
+  borderRadius: 8,
+  padding: "1rem",
+  background: vars.colors.white,
+  maxWidth: "20rem",
+
+  display: "flex",
+  flexDirection: "column",
+});
+
 export const trigger = style({
   color: vars.colors.black[500],
   borderRadius: 8,
-  boxShadow: `0px 0px 10px 0px ${vars.colors.alphas.black[50]}`,
   backgroundColor: vars.colors.white,
   fontSize: vars.fontSizes.lg,
-  border: `1px solid transparent`,
+  border: `1px solid ${vars.colors.gray[100]}`,
   padding: "0.4em 0.8em",
   fontWeight: vars.fontWeights.medium,
 
@@ -19,17 +29,6 @@ export const trigger = style({
     outline: `2px solid ${vars.colors.gray[200]}`,
     outlineOffset: 2,
   },
-});
-
-export const panel = style({
-  boxShadow: `0px 0px 10px 0px ${vars.colors.alphas.black[50]}`,
-  borderRadius: 8,
-  padding: "1rem",
-  background: vars.colors.white,
-  maxWidth: "20rem",
-
-  display: "flex",
-  flexDirection: "column",
 });
 
 export const arrow = style({
