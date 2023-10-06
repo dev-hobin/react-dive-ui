@@ -49,6 +49,14 @@ export const triggerStyle = style({
   fontWeight: vars.fontWeights.bold,
   lineHeight: vars.lineHeights.none,
   color: vars.colors.purple[800],
+
+  selectors: {
+    "&[data-disabled]": {
+      backgroundColor: vars.colors.gray["200"],
+      color: vars.colors.gray["600"],
+      cursor: "not-allowed",
+    },
+  },
 });
 
 export const panelStyle = style({
