@@ -1,3 +1,4 @@
+import { Meta } from "@storybook/react";
 import { Dialog } from "@react-dive-ui/dialog";
 import * as css from "./style.css";
 
@@ -6,7 +7,8 @@ const meta = {
   parameters: {
     layout: "centered",
   },
-};
+  tags: ["autodocs"],
+} satisfies Meta<typeof Dialog>;
 
 export default meta;
 

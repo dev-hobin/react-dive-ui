@@ -1,3 +1,4 @@
+import { Meta } from "@storybook/react";
 import { Popover } from "@react-dive-ui/popover";
 import * as css from "./style.css";
 
@@ -6,7 +7,8 @@ const meta = {
   parameters: {
     layout: "centered",
   },
-};
+  tags: ["autodocs"],
+} satisfies Meta<typeof Popover>;
 
 export default meta;
 
