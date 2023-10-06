@@ -48,11 +48,13 @@ export function connect(state: State, send: Send) {
       "data-disabled": context.disabled ? "" : undefined,
       "aria-hidden": true,
       style: {
-        pointerEvents: "none",
-        opacity: 0,
-        margin: 0,
-        width: 1,
-        height: 1,
+        overflow: "hidden",
+        clip: "rect(0 0 0 0)",
+        height: "1px",
+        width: "1px",
+        margin: "-1px",
+        padding: 0,
+        border: 0,
       },
     }),
   };
