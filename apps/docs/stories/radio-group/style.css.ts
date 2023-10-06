@@ -25,6 +25,11 @@ export const radio = style({
   backgroundColor: vars.colors.white,
   boxShadow: `0 2px 2px 2px ${vars.colors.alphas.black[200]}`,
 
+  ":disabled": {
+    cursor: "not-allowed",
+    backgroundColor: vars.colors.gray[100],
+  },
+
   selectors: {
     [`${item} &`]: {
       marginRight: "0.5rem",
@@ -62,6 +67,12 @@ export const indicator = style({
 
 export const label = style({
   fontSize: vars.fontSizes.lg,
+
+  selectors: {
+    "&[data-disabled]": {
+      color: vars.colors.gray[400],
+    },
+  },
 });
 
 export const hiddenInput = style({});

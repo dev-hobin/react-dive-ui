@@ -9,7 +9,7 @@ const meta = {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof RadioGroup>;
+} satisfies Meta<typeof RadioGroup.Provider>;
 
 export default meta;
 
@@ -23,6 +23,87 @@ export const Default = () => {
   return (
     <RadioGroup.Provider>
       <RadioGroup.Group className={css.group}>
+        <RadioGroup.ItemProvider value="apple">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["apple"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="banana">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["banana"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="orange">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["orange"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+      </RadioGroup.Group>
+    </RadioGroup.Provider>
+  );
+};
+
+export const Disabled = () => {
+  return (
+    <RadioGroup.Provider>
+      <RadioGroup.Group className={css.group}>
+        <RadioGroup.ItemProvider value="apple" disabled>
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["apple"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="banana" disabled>
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["banana"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+        <RadioGroup.ItemProvider value="orange">
+          <div className={css.item}>
+            <RadioGroup.Radio className={css.radio}>
+              <RadioGroup.Indicator className={css.indicator} />
+            </RadioGroup.Radio>
+            <RadioGroup.Label className={css.label}>
+              {VALUE_TO_LABEL["orange"]}
+            </RadioGroup.Label>
+          </div>
+        </RadioGroup.ItemProvider>
+      </RadioGroup.Group>
+    </RadioGroup.Provider>
+  );
+};
+
+export const Horizontal = () => {
+  return (
+    <RadioGroup.Provider orientation="horizontal">
+      <RadioGroup.Group
+        className={css.group}
+        style={{ display: "flex", flexDirection: "row" }}
+      >
         <RadioGroup.ItemProvider value="apple">
           <div className={css.item}>
             <RadioGroup.Radio className={css.radio}>
