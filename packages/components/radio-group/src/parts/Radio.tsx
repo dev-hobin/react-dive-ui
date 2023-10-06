@@ -1,4 +1,6 @@
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
+import { composeEventHandlers } from "@react-dive-ui/compose-event-handlers";
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useRadioGroupContext } from "../radio-group-provider";
 import { useItem } from "../item-provider";
@@ -9,7 +11,19 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>((props, ref) => {
   const item = useItem();
 
   const { getRadioProps } = context.props;
-  return <dive.button {...getRadioProps(item)} {...props} ref={ref} />;
+  const radioProps = getRadioProps(item);
+
+  const mergedProps = mergeProps(radioProps, props);
+  return (
+    <dive.button
+      {...mergedProps}
+      onFocus={composeEventHandlers(props.onFocus, radioProps.onFocus)}
+      onBlur={composeEventHandlers(props.onBlur, radioProps.onBlur)}
+      onClick={composeEventHandlers(props.onClick, radioProps.onClick)}
+      onKeyDown={composeEventHandlers(props.onKeyDown, radioProps.onKeyDown)}
+      ref={ref}
+    />
+  );
 });
 
 Radio.displayName = "RadioGroup.Radio";

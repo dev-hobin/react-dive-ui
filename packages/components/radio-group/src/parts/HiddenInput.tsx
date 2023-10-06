@@ -1,5 +1,6 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { useRadioGroupContext } from "../radio-group-provider";
 import { useItem } from "../item-provider";
 
@@ -10,7 +11,10 @@ export const HiddenInput = forwardRef<HTMLInputElement, HiddenInputProps>(
     const item = useItem();
 
     const { getHiddenInputProps } = context.props;
-    return <dive.input {...getHiddenInputProps(item)} {...props} ref={ref} />;
+    const hiddenInputProps = getHiddenInputProps(item);
+
+    const mergedProps = mergeProps(hiddenInputProps, props);
+    return <dive.input {...mergedProps} ref={ref} />;
   }
 );
 
