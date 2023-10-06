@@ -1,9 +1,9 @@
-import { forwardRef } from "react";
+import { forwardRef, ComponentPropsWithoutRef } from "react";
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
+import { composeEventHandlers } from "@react-dive-ui/compose-event-handlers";
 import { useAccordionContext } from "../accordion-provider";
 import { useItem } from "../item-provider";
-
-import type { ComponentPropsWithoutRef } from "react";
 
 type TriggerProps = Omit<
   ComponentPropsWithoutRef<typeof dive.button>,
@@ -15,9 +15,21 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(
     const item = useItem();
 
     const { getTriggerProps } = context.props;
-    const triggerProps = getTriggerProps(item);
+    const { onFocus, onBlur, onKeyDown, onClick, ...triggerProps } =
+      getTriggerProps(item);
 
-    return <dive.button {...triggerProps} {...props} ref={ref} />;
+    const mergedProps = mergeProps(triggerProps, props);
+
+    return (
+      <dive.button
+        {...mergedProps}
+        onFocus={composeEventHandlers(props.onFocus, onFocus)}
+        onBlur={composeEventHandlers(props.onBlur, onBlur)}
+        onKeyDown={composeEventHandlers(props.onKeyDown, onKeyDown)}
+        onClick={composeEventHandlers(props.onClick, onClick)}
+        ref={ref}
+      />
+    );
   }
 );
 

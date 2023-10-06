@@ -1,5 +1,6 @@
 import { ComponentPropsWithoutRef, forwardRef } from "react";
 import { dive } from "@react-dive-ui/dive";
+import { mergeProps } from "@react-dive-ui/merge-props";
 import { useItem } from "../item-provider";
 import { useAccordionContext } from "../accordion-provider";
 
@@ -11,7 +12,8 @@ export const Panel = forwardRef<HTMLDivElement, PanelProps>((props, ref) => {
   const { getPanelProps } = context.props;
   const panelProps = getPanelProps(item);
 
-  return <dive.div {...panelProps} {...props} ref={ref} />;
+  const mergedProps = mergeProps(panelProps, props);
+  return <dive.div {...mergedProps} ref={ref} />;
 });
 
 Panel.displayName = "Accordion.Panel";
