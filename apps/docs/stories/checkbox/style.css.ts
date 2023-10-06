@@ -18,6 +18,11 @@ export const controlStyle = style({
     borderColor: vars.colors.blue[500],
   },
 
+  ":disabled": {
+    borderColor: vars.colors.gray[200],
+    background: vars.colors.gray[100],
+  },
+
   ":focus-within": {
     boxShadow: `0 0 0 1.5px ${vars.colors.black}`,
   },
@@ -45,6 +50,9 @@ export const labelStyle = style({
   selectors: {
     [`${controlStyle} + &`]: {
       marginLeft: "0.5rem",
+    },
+    [`&[data-disabled]`]: {
+      color: vars.colors.gray[400],
     },
   },
 });

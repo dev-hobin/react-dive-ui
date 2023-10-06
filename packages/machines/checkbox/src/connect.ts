@@ -18,12 +18,13 @@ export function connect(state: State, send: Send) {
       onClick: () => {
         send({ type: "CHECK" });
       },
+      disabled: context.disabled,
       "data-state": context.checkedState,
       "data-disabled": context.disabled ? "" : undefined,
     }),
     labelProps: properties.label({
       id: dom.getLabelId(context),
-      htmlFor: dom.getHiddenInputId(context),
+      htmlFor: dom.getControlId(context),
       onClick: (ev) => {
         if (context.disabled) {
           ev.preventDefault();
