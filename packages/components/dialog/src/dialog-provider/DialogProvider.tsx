@@ -12,7 +12,7 @@ export const DialogProvider = ({
   children,
   ...options
 }: DialogProviderProps) => {
-  const dialog = useDialog(options);
+  const dialog = useDialog({ ...options, modal: options.modal ?? true });
 
   return (
     <DialogContext.Provider value={dialog}>

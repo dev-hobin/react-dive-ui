@@ -4,12 +4,11 @@ import { vars } from "../../styles/theme.css";
 export const trigger = style({
   color: vars.colors.black[500],
   borderRadius: 8,
-  boxShadow: `0px 0px 10px 0px ${vars.colors.alphas.black[50]}`,
   backgroundColor: vars.colors.white,
   fontSize: vars.fontSizes.lg,
-  border: `1px solid transparent`,
   padding: "0.4em 0.8em",
   fontWeight: vars.fontWeights.medium,
+  border: `1px solid ${vars.colors.gray[100]}`,
 
   ":hover": {
     backgroundColor: vars.colors.gray[50],
