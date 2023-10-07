@@ -1,6 +1,6 @@
 # React Dive UI
 
-직접 만들어보는 디자인 시스템
+직접 만들어보는 컴포넌트 라이브러리
 
 ## Goal
 
@@ -16,6 +16,76 @@ pnpm install
 pnpm build
 cd apps/docs
 pnpm preview-storybook
+```
+
+## Usage
+
+- headless-component
+
+```tsx
+import { Accordion } from "@react-dive-ui/accordion";
+
+const AccordionExample = () => {
+  return (
+    <Accordion.Provider type="single" defaultValue="value-1" collapsible>
+      <Accordion.Root>
+        <Accordion.ItemProvider value="value-1">
+          <Accordion.Heading>
+            <Accordion.Trigger>Item 1</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>Item 1 Content</Accordion.Panel>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-2" disabled>
+          <Accordion.Heading>
+            <Accordion.Trigger>Item 2</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>Item 2 Content</Accordion.Panel>
+        </Accordion.ItemProvider>
+        <Accordion.ItemProvider value="value-3">
+          <Accordion.Heading>
+            <Accordion.Trigger>Item 3</Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>Item 3 Content</Accordion.Panel>
+        </Accordion.ItemProvider>
+      </Accordion.Root>
+    </Accordion.Provider>
+  );
+};
+```
+
+- hook
+
+```tsx
+import { useAccordion } from "@react-dive-ui/accordion";
+
+const AccordionExample = () => {
+  const { state, apis, props } = useAccordion({
+    type: "single",
+    collapsible: true,
+    defaultValue = "value-1",
+  });
+
+  const { rootProps, getHeadingProps, getPanelProps, getTriggerProps } = props;
+
+  return (
+    <div {...rootProps}>
+      <h3 {...getHeadingProps({ value: "value-1" })}>
+        <button {...getTriggerProps({ value: "value-1" })}>Item 1</button>
+      </h3>
+      <div {...getPanelProps({ value: "value-1" })}>Item 1 Content</div>
+      <h3 {...getHeadingProps({ value: "value-2" })}>
+        <button {...getTriggerProps({ value: "value-2", disabled: true })}>
+          Item 2
+        </button>
+      </h3>
+      <div {...getPanelProps({ value: "value-2" })}>Item 2 Content</div>
+      <h3 {...getHeadingProps({ value: "value-3" })}>
+        <button {...getTriggerProps({ value: "value-3" })}>Item 3</button>
+      </h3>
+      <div {...getPanelProps({ value: "value-3" })}>Item 3 Content</div>
+    </div>
+  );
+};
 ```
 
 ## Inspirations
