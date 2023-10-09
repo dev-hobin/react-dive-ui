@@ -1,9 +1,12 @@
-import { CSSProperties, HTMLAttributes } from "react";
+import { JSX, CSSProperties, HTMLAttributes } from "react";
 
 type DataAttr = { [key: `data-${string}`]: string | number | undefined };
 type CSSVariables = { [key: `--${string}`]: string | number | undefined };
 type ElementsWithoutRef = {
-  [K in keyof JSX.IntrinsicElements]: Omit<JSX.IntrinsicElements[K], "ref">;
+  [K in keyof React.JSX.IntrinsicElements]: Omit<
+    JSX.IntrinsicElements[K],
+    "ref"
+  >;
 };
 type ElementToProperties = ElementsWithoutRef & {
   element: Omit<HTMLAttributes<HTMLElement>, "ref">;
