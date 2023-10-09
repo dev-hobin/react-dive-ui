@@ -56,7 +56,7 @@ export function useAccordion(options: AccordionOptions) {
       },
     }
   );
-  console.log("accordion value", state.value);
+
   console.log("accordion context", state.context);
   console.log("-----");
 
