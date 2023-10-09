@@ -439,9 +439,6 @@ importers:
 
   packages/core/properties:
     dependencies:
-      '@types/react':
-        specifier: ^18.2.20
-        version: 18.2.20
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -449,6 +446,9 @@ importers:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
         version: link:../../tsconfig
+      '@types/react':
+        specifier: ^18.2.20
+        version: 18.2.20
       eslint:
         specifier: ^8.46.0
         version: 8.46.0
