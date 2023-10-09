@@ -7,7 +7,13 @@ const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
 type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
 
-export function connect(state: State, send: Send) {
+type ConnectReturn = {
+  rootProps: ReturnType<typeof properties.element>;
+  getTriggerProps: (props: ItemProp) => ReturnType<typeof properties.button>;
+  getHeadingProps: (props: ItemProp) => ReturnType<typeof properties.h3>;
+  getPanelProps: (props: ItemProp) => ReturnType<typeof properties.element>;
+};
+export function connect(state: State, send: Send): ConnectReturn {
   const context = state.context;
 
   return {
@@ -15,7 +21,7 @@ export function connect(state: State, send: Send) {
       id: dom.getRootId(context),
       "data-orientation": context.orientation,
     }),
-    getTriggerProps: ({ value, disabled = false }: ItemProp) => {
+    getTriggerProps: ({ value, disabled = false }) => {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
@@ -56,7 +62,7 @@ export function connect(state: State, send: Send) {
         "data-ownedby": dom.getRootId(context),
       });
     },
-    getHeadingProps: ({ value, disabled = false }: ItemProp) => {
+    getHeadingProps: ({ value, disabled = false }) => {
       return properties.h3({
         id: dom.getHeadingId(context, value),
         "data-state": context.expandedValues.includes(value)
@@ -66,7 +72,7 @@ export function connect(state: State, send: Send) {
         "data-disabled": disabled ? "" : undefined,
       });
     },
-    getPanelProps: ({ value, disabled = false }: ItemProp) => {
+    getPanelProps: ({ value, disabled = false }) => {
       return properties.element({
         id: dom.getPanelId(context, value),
         "data-state": context.expandedValues.includes(value)
@@ -76,5 +82,5 @@ export function connect(state: State, send: Send) {
         "data-disabled": disabled ? "" : undefined,
       });
     },
-  } as const;
+  };
 }

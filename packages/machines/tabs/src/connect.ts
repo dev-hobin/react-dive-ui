@@ -5,7 +5,15 @@ import type { Send, State, ItemProp } from "./types";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
-export function connect(state: State, send: Send) {
+type ConnectReturn = {
+  rootProps: ReturnType<typeof properties.element>;
+  listProps: ReturnType<typeof properties.element>;
+  getTriggerProps: (props: ItemProp) => ReturnType<typeof properties.button>;
+  getPanelProps: (
+    value: ItemProp["value"]
+  ) => ReturnType<typeof properties.element>;
+};
+export function connect(state: State, send: Send): ConnectReturn {
   const context = state.context;
 
   return {
@@ -19,7 +27,7 @@ export function connect(state: State, send: Send) {
       "aria-orientation": context.orientation,
       "data-orientation": context.orientation,
     }),
-    getTriggerProps: ({ value, disabled = false }: ItemProp) => {
+    getTriggerProps: ({ value, disabled = false }) => {
       return properties.button({
         id: dom.getTriggerId(context, value),
         type: "button",
@@ -62,7 +70,7 @@ export function connect(state: State, send: Send) {
         "data-disabled": disabled ? "" : undefined,
       });
     },
-    getPanelProps: (value: ItemProp["value"]) => {
+    getPanelProps: (value) => {
       return properties.element({
         id: dom.getPanelId(context, value),
         role: "tabpanel",
@@ -72,5 +80,5 @@ export function connect(state: State, send: Send) {
         "data-orientation": context.orientation,
       });
     },
-  } as const;
+  };
 }

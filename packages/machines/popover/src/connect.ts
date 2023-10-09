@@ -2,7 +2,15 @@ import { properties } from "@react-dive-ui/properties";
 import { Send, State } from "./types";
 import { dom } from "./dom";
 
-export function connect(state: State, send: Send) {
+type ConnectReturn = {
+  triggerProps: ReturnType<typeof properties.button>;
+  closeProps: ReturnType<typeof properties.button>;
+  panelProps: ReturnType<typeof properties.element>;
+  titleProps: ReturnType<typeof properties.h2>;
+  descriptionProps: ReturnType<typeof properties.p>;
+  arrowProps: ReturnType<typeof properties.element>;
+};
+export function connect(state: State, send: Send): ConnectReturn {
   const context = state.context;
   const status = state.value;
 
@@ -53,5 +61,5 @@ export function connect(state: State, send: Send) {
         position: "absolute",
       },
     }),
-  } as const;
+  };
 }

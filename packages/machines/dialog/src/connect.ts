@@ -3,7 +3,15 @@ import { dom } from "./dom";
 
 import type { Send, State } from "./types";
 
-export function connect(state: State, send: Send) {
+type ConnectReturn = {
+  triggerProps: ReturnType<typeof properties.button>;
+  closeProps: ReturnType<typeof properties.button>;
+  backdropProps: ReturnType<typeof properties.element>;
+  panelProps: ReturnType<typeof properties.element>;
+  titleProps: ReturnType<typeof properties.h2>;
+  descriptionProps: ReturnType<typeof properties.p>;
+};
+export function connect(state: State, send: Send): ConnectReturn {
   const context = state.context;
 
   return {
@@ -44,5 +52,5 @@ export function connect(state: State, send: Send) {
     descriptionProps: properties.p({
       id: dom.getDescriptionId(context),
     }),
-  } as const;
+  };
 }

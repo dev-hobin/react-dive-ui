@@ -6,7 +6,14 @@ const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 
 type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
 
-export function connect(state: State, send: Send) {
+type ConnectReturn = {
+  groupProps: ReturnType<typeof properties.element>;
+  getRadioProps: (props: ItemProp) => ReturnType<typeof properties.button>;
+  getIndicatorProps: (props: ItemProp) => ReturnType<typeof properties.element>;
+  getLabelProps: (props: ItemProp) => ReturnType<typeof properties.label>;
+  getHiddenInputProps: (props: ItemProp) => ReturnType<typeof properties.input>;
+};
+export function connect(state: State, send: Send): ConnectReturn {
   const context = state.context;
 
   const selectedValue = context.selectedValue;
@@ -29,7 +36,7 @@ export function connect(state: State, send: Send) {
       role: "radiogroup",
       "data-disabled": groupDisabled ? "" : undefined,
     }),
-    getRadioProps: ({ value, disabled = false }: ItemProp) => {
+    getRadioProps: ({ value, disabled = false }) => {
       return properties.button({
         id: dom.getRadioId(context, value),
         type: "button",
@@ -72,7 +79,7 @@ export function connect(state: State, send: Send) {
         },
       });
     },
-    getIndicatorProps: ({ value, disabled = false }: ItemProp) => {
+    getIndicatorProps: ({ value, disabled = false }) => {
       return properties.element({
         id: dom.getRadioId(context, value),
         tabIndex: -1,
@@ -80,7 +87,7 @@ export function connect(state: State, send: Send) {
         "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
-    getLabelProps: ({ value, disabled = false }: ItemProp) => {
+    getLabelProps: ({ value, disabled = false }) => {
       return properties.label({
         id: dom.getLabelId(context, value),
         htmlFor: dom.getRadioId(context, value),
@@ -88,7 +95,7 @@ export function connect(state: State, send: Send) {
         "data-state": selectedValue === value ? "checked" : "unchecked",
       });
     },
-    getHiddenInputProps: ({ value, disabled = false }: ItemProp) => {
+    getHiddenInputProps: ({ value, disabled = false }) => {
       return properties.input({
         id: dom.getHiddenInputId(context, value),
         type: "radio",
@@ -108,5 +115,5 @@ export function connect(state: State, send: Send) {
         },
       });
     },
-  } as const;
+  };
 }
