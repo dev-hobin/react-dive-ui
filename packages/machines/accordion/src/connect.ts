@@ -7,7 +7,7 @@ const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
 type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
 
-type ConnectReturn = {
+export type ConnectReturn = {
   rootProps: ReturnType<typeof properties.element>;
   getTriggerProps: (props: ItemProp) => ReturnType<typeof properties.button>;
   getHeadingProps: (props: ItemProp) => ReturnType<typeof properties.h3>;

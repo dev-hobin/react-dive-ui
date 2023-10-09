@@ -12,6 +12,8 @@ export type Orientation = "vertical" | "horizontal";
 
 export type ActivationMode = "manual" | "automatic";
 
+export type Status = "idle" | "focused";
+
 export type Context = {
   id: string;
   value: Item["value"];

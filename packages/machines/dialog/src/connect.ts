@@ -3,7 +3,7 @@ import { dom } from "./dom";
 
 import type { Send, State } from "./types";
 
-type ConnectReturn = {
+export type ConnectReturn = {
   triggerProps: ReturnType<typeof properties.button>;
   closeProps: ReturnType<typeof properties.button>;
   backdropProps: ReturnType<typeof properties.element>;

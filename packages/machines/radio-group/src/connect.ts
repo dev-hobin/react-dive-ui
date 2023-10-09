@@ -6,7 +6,7 @@ const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 
 type ItemProp = Omit<Item, "disabled"> & Partial<Pick<Item, "disabled">>;
 
-type ConnectReturn = {
+export type ConnectReturn = {
   groupProps: ReturnType<typeof properties.element>;
   getRadioProps: (props: ItemProp) => ReturnType<typeof properties.button>;
   getIndicatorProps: (props: ItemProp) => ReturnType<typeof properties.element>;

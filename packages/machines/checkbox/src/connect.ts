@@ -2,7 +2,7 @@ import { properties } from "@react-dive-ui/properties";
 import { Send, State } from "./types";
 import { dom } from "./dom";
 
-type ConnectReturn = {
+export type ConnectReturn = {
   controlProps: ReturnType<typeof properties.button>;
   labelProps: ReturnType<typeof properties.label>;
   hiddenInputProps: ReturnType<typeof properties.input>;

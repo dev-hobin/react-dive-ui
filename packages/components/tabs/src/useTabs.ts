@@ -4,6 +4,9 @@ import {
   Orientation,
   ActivationMode,
   connect,
+  Context,
+  ConnectReturn,
+  Status,
 } from "@react-dive-ui/tabs-machine";
 import { useActor } from "@xstate/react";
 import { useCallback, useId } from "react";
@@ -15,7 +18,17 @@ export type TabsOptions = {
   activationMode?: ActivationMode;
   onChange?: (details: { value: Item["value"] }) => void;
 };
-export function useTabs(options: TabsOptions) {
+
+type UseTabsReturn = {
+  state: {
+    status: string;
+  } & Context;
+  apis: {
+    activate: (value: Item["value"]) => void;
+  };
+  props: ConnectReturn;
+};
+export function useTabs(options: TabsOptions): UseTabsReturn {
   const internalId = useId();
   const [state, send] = useActor(
     machine.provide({
@@ -49,7 +62,7 @@ export function useTabs(options: TabsOptions) {
   console.log("-----");
 
   return {
-    state: { status: value, ...context },
+    state: { status: value as Status, ...context },
     apis: { activate },
     props: connect(state, send),
   };

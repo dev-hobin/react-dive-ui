@@ -8,6 +8,8 @@ export type Send = Service["send"];
 
 export type State = StateFrom<typeof machine>;
 
+export type Status = "setup" | "opened" | "closed";
+
 export type Context = {
   id: string;
   isOpen: boolean;

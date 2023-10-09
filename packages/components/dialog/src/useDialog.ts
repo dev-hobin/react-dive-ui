@@ -1,6 +1,12 @@
 import { useActor } from "@xstate/react";
-import { connect, machine } from "@react-dive-ui/dialog-machine";
-import { useId } from "react";
+import {
+  connect,
+  machine,
+  Context,
+  ConnectReturn,
+  Status,
+} from "@react-dive-ui/dialog-machine";
+import { useCallback, useId } from "react";
 
 export type DialogOptions = {
   id?: string;
@@ -11,7 +17,20 @@ export type DialogOptions = {
   onChange?: (open: boolean) => void;
 };
 
-export function useDialog(options: DialogOptions = { modal: true }) {
+type UseDialogReturn = {
+  state: {
+    status: Status;
+  } & Context;
+  apis: {
+    open: () => void;
+    close: () => void;
+  };
+  props: ConnectReturn;
+};
+
+export function useDialog(
+  options: DialogOptions = { modal: true }
+): UseDialogReturn {
   const internalId = useId();
   const [state, send] = useActor(
     machine.provide({
@@ -32,12 +51,17 @@ export function useDialog(options: DialogOptions = { modal: true }) {
     }
   );
 
-  console.log("status", state.value);
-  console.log("context", state.context);
+  const open = useCallback(() => {
+    send({ type: "OPEN" });
+  }, [send]);
+
+  const close = useCallback(() => {
+    send({ type: "CLOSE" });
+  }, [send]);
 
   return {
-    state: { status: state.value, ...state.context },
-    apis: { send },
+    state: { status: state.value as Status, ...state.context },
+    apis: { open, close },
     props: connect(state, send),
   };
 }

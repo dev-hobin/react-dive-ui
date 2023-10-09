@@ -1,11 +1,14 @@
 import {
   Item,
   Orientation,
+  ConnectReturn,
+  Status,
   connect,
   machine,
+  Context,
 } from "@react-dive-ui/radio-group-machine";
 import { useActor } from "@xstate/react";
-import { useId } from "react";
+import { useCallback, useId } from "react";
 
 export type RadioGroupOptions = {
   id?: string;
@@ -13,7 +16,19 @@ export type RadioGroupOptions = {
   orientation?: Orientation;
   disabled?: boolean;
 };
-export function useRadioGroup(options: RadioGroupOptions = {}) {
+
+type UseRadioGroupReturn = {
+  state: {
+    status: Status;
+  } & Context;
+  apis: {
+    select: (value: Item["value"]) => void;
+  };
+  props: ConnectReturn;
+};
+export function useRadioGroup(
+  options: RadioGroupOptions = {}
+): UseRadioGroupReturn {
   const internalId = useId();
   const [state, send] = useActor(machine, {
     input: {
@@ -24,13 +39,20 @@ export function useRadioGroup(options: RadioGroupOptions = {}) {
     },
   });
 
+  const select = useCallback(
+    (value: Item["value"]) => {
+      send({ type: "RADIO.SELECT", value });
+    },
+    [send]
+  );
+
   console.log("---------");
   console.log("status", state.value);
   console.log("context", state.context);
 
   return {
-    state: { status: state.value, ...state.context },
-    apis: { send },
+    state: { status: state.value as Status, ...state.context },
+    apis: { select },
     props: connect(state, send),
   };
 }

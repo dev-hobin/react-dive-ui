@@ -5,7 +5,7 @@ import type { Send, State, ItemProp } from "./types";
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"];
 
-type ConnectReturn = {
+export type ConnectReturn = {
   rootProps: ReturnType<typeof properties.element>;
   listProps: ReturnType<typeof properties.element>;
   getTriggerProps: (props: ItemProp) => ReturnType<typeof properties.button>;

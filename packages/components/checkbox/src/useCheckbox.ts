@@ -3,9 +3,12 @@ import { useActor } from "@xstate/react";
 import {
   CheckedState,
   FormOptions,
+  ConnectReturn,
   machine,
   connect,
+  Context,
 } from "@react-dive-ui/checkbox-machine";
+import { StateValue } from "xstate";
 
 export type CheckboxOptions = {
   id?: string;
@@ -15,7 +18,18 @@ export type CheckboxOptions = {
   value?: string;
   onChange?: (checked: CheckedState) => void;
 };
-export function useCheckbox(options: CheckboxOptions = {}) {
+
+type UseCheckboxReturn = {
+  state: { status: StateValue } & Context;
+  apis: {
+    check: () => void;
+    setChecked: (checked: boolean) => void;
+    setIndeterminate: () => void;
+    setDisabled: (disabled: boolean) => void;
+  };
+  props: ConnectReturn;
+};
+export function useCheckbox(options: CheckboxOptions = {}): UseCheckboxReturn {
   const internalId = useId();
   const [state, send] = useActor(
     machine.provide({

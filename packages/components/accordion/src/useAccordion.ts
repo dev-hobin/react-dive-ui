@@ -3,6 +3,8 @@ import {
   machine,
   Item,
   Orientation,
+  Context,
+  ConnectReturn,
   Status,
   connect,
 } from "@react-dive-ui/accordion-machine";
@@ -28,7 +30,16 @@ export type AccordionOptions =
   | SingleAccordionOptions
   | MultipleAccordionOptions;
 
-export function useAccordion(options: AccordionOptions) {
+type UseAccordionReturn = {
+  state: { status: Status } & Context;
+  apis: {
+    toggle: (value: Item["value"]) => void;
+    open: (value: Item["value"]) => void;
+    close: (value: Item["value"]) => void;
+  };
+  props: ConnectReturn;
+};
+export function useAccordion(options: AccordionOptions): UseAccordionReturn {
   const internalId = useId();
   const [state, send] = useActor(
     machine.provide({
@@ -86,11 +97,7 @@ export function useAccordion(options: AccordionOptions) {
   return {
     state: {
       status: value as Status,
-      collapsible: context.collapsible,
-      expandedValues: context.expandedValues,
-      focusedValue: context.focusedValue,
-      orientation: context.orientation,
-      type: context.type,
+      ...context,
     },
     apis: { toggle, open, close },
     props: connect(state, send),
