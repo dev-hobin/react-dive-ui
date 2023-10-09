@@ -10,4 +10,4 @@ function createFactory(
   });
 }
 
-export const properties = createFactory((v) => v);
+export const properties: ElementToPropertyFactory = createFactory((v) => v);
