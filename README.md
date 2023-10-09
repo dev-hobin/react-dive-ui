@@ -18,6 +18,18 @@ cd apps/docs
 pnpm preview-storybook
 ```
 
+## Installation
+
+```bash
+npm install @react-dive-ui/{component}
+
+# or
+
+yarn add @react-dive-ui/{component}
+```
+
+> {component}는 제공하는 컴포넌트의 이름을 나타냅니다. (`@react-dive-ui/accordion`, `@react-dive-ui/dialog`, ...)
+
 ## Usage
 
 - headless-component
