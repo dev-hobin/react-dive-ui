@@ -438,6 +438,10 @@ importers:
         version: 5.2.2
 
   packages/core/properties:
+    dependencies:
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
     devDependencies:
       '@react-dive-ui/tsconfig':
         specifier: workspace:*
@@ -445,18 +449,12 @@ importers:
       '@types/react':
         specifier: ^18.2.20
         version: 18.2.20
-      '@types/react-dom':
-        specifier: ^18.2.7
-        version: 18.2.7
       eslint:
         specifier: ^8.46.0
         version: 8.46.0
       eslint-config-dive:
         specifier: workspace:*
         version: link:../../eslint-config-dive
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
       tsup:
         specifier: ^7.2.0
         version: 7.2.0(typescript@5.2.2)
