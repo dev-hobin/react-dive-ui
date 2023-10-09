@@ -76,5 +76,5 @@ export function connect(state: State, send: Send) {
         "data-disabled": disabled ? "" : undefined,
       });
     },
-  };
+  } as const;
 }

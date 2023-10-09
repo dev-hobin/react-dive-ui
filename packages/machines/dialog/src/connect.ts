@@ -44,5 +44,5 @@ export function connect(state: State, send: Send) {
     descriptionProps: properties.p({
       id: dom.getDescriptionId(context),
     }),
-  };
+  } as const;
 }

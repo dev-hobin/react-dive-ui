@@ -59,5 +59,5 @@ export function connect(state: State, send: Send) {
         border: 0,
       },
     }),
-  };
+  } as const;
 }

@@ -108,5 +108,5 @@ export function connect(state: State, send: Send) {
         },
       });
     },
-  };
+  } as const;
 }

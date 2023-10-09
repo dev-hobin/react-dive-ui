@@ -72,5 +72,5 @@ export function connect(state: State, send: Send) {
         "data-orientation": context.orientation,
       });
     },
-  };
+  } as const;
 }

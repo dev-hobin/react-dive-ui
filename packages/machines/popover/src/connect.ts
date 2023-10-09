@@ -53,5 +53,5 @@ export function connect(state: State, send: Send) {
         position: "absolute",
       },
     }),
-  };
+  } as const;
 }
