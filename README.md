@@ -1,6 +1,10 @@
-# React Dive UI (...비밀리에 리빌딩 중...)
+# React Dive UI (...리빌딩)
 
 직접 만들어보는 컴포넌트 라이브러리
+
+## Caution
+
+**현재 [All That Frontend](https://github.com/dev-hobin/all-that-frontend) 에서 작업을 이어나가고 있다. (충분히 작업을 진행한 후 따로 패키지화 예정)**
 
 ## Goal
 
