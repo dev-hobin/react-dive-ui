@@ -1,10 +1,10 @@
-# React Dive UI (...리빌딩)
+# React Dive UI (...리빌딩 중...)
 
 직접 만들어보는 컴포넌트 라이브러리
 
 ## Caution
 
-**현재 [All That Frontend](https://github.com/dev-hobin/all-that-frontend) 에서 작업을 이어나가고 있다. (충분히 작업을 진행한 후 따로 패키지화 예정)**
+구조적인 한계를 느껴 더 나은 구조에 대해 생각하여 테스트해보고 있다.
 
 ## Goal
 
@@ -107,4 +107,5 @@ const AccordionExample = () => {
 ## Inspirations
 
 - [xstate](https://github.com/statelyai/xstate) : 상태머신을 활용한 컴포넌트 로직 추상화
+- [zag.js](https://zagjs.com/) : 상태머신 설계
 - [radix-ui](https://github.com/radix-ui/primitives), [headless-ui](https://github.com/tailwindlabs/headlessui), [ark-ui](https://github.com/chakra-ui/ark), [ariakit](https://github.com/ariakit/ariakit) : 컴포넌트의 구조, 인터페이스의 모양
